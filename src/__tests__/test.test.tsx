@@ -10,11 +10,11 @@ describe('<test/>', () => {
     expect(testText).toBeInTheDocument();
   })
 
-  // it('this test fails', ()=>{
-  //   render(<Test/>);
+  it('this test fails', ()=>{
+    render(<Test/>);
 
-  //   const testText = screen.queryByText("no test");
+    const testText = screen.queryByText("no test");
 
-  //   expect(testText).toBeInTheDocument();
-  // })
+    expect(testText).toBeInTheDocument();
+  })
 })

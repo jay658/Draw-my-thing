@@ -16,7 +16,7 @@ jobs:
       - checkout
       - run:
           name: "Running tests"
-          command: "test"
+          command: "run test"
 
 # Orchestrate jobs using workflows
 # See: https://circleci.com/docs/configuration-reference/#workflows
