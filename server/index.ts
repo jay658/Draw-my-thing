@@ -1,10 +1,9 @@
 import * as server from "./app"
 
+import db from "./database/models"
 import express from 'express';
 
 export const app = server.app
-// const db = require("./database")
-// const client = db.client
 
 const init = async () => {
   if (!process.env['VITE']) {
@@ -16,7 +15,9 @@ const init = async () => {
     app.listen(process.env['PORT'])
   }
   try {
-    console.log("hello")
+    console.log("server connected")
+    db.sequelize.sync({ force:true })
+    console.log("db connected")
     // if (process.env.SEED === "true") {
     //   await seed();
     // } else {
