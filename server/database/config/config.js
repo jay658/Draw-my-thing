@@ -4,7 +4,7 @@ dotenv.config();
 
 const configObj = {
   development: {
-    username: process.env.DB_USER,
+    username: process.env.DB_USER || 'root',
     password: null,
     database: process.env.DB_NAME,
     host: "127.0.0.1",
