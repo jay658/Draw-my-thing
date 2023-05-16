@@ -3,12 +3,26 @@ import reactLogo from './assets/react.svg'
 import viteLogo from '/vite.svg'
 import './App.css'
 import Test from './Test'
+import axios from "axios"
 
 function App() {
   const [count, setCount] = useState(0)
+  const [data, setData] = useState();
+  const getData = () =>{
+    axios
+      .get("/api/test")
+      .then((res) => setData(res.data))
+      .catch((err) => {
+        console.error(err);
+      });
+  }
+  getData()
 
   return (
     <>
+      <div>
+        Server Data: {data}
+      </div>
       <div>
         <a href="https://vitejs.dev" target="_blank">
           <img src={viteLogo} className="logo" alt="Vite logo" />
