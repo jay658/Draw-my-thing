@@ -1,11 +1,12 @@
+import './index.css'
+
+import App from './App'
+import { Provider } from 'react-redux'
 import React from 'react'
 import ReactDOM from 'react-dom/client'
-import App from './App'
-import './index.css'
-import { Provider } from 'react-redux'
+import { ThemeProvider } from '@mui/material'
 import { store } from './Store/Store'
 import theme from './Theme'
-import { ThemeProvider } from '@mui/material'
 
 ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
   <Provider store={store}>

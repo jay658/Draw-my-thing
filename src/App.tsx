@@ -7,7 +7,7 @@ import axios from "axios"
 
 function App() {
   const [count, setCount] = useState(0)
-  const [data, setData] = useState();
+  const [data, setData] = useState('');
   const getData = () =>{
     axios
       .get("/api/test")
@@ -32,7 +32,7 @@ function App() {
         </a>
       </div>
       <h1>Vite + React</h1>
-      <Test/>
+      <Test data={data}/>
       <div className="card">
         <button onClick={() => setCount((count) => count + 1)}>
           count is {count}

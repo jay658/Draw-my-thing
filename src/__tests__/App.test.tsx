@@ -1,10 +1,10 @@
 // Imports
-import { describe, it, expect, afterEach } from 'vitest';
-import { render, screen, cleanup } from '@testing-library/react';
-import userEvent  from '@testing-library/user-event';
+import { afterEach, describe, expect, it } from 'vitest';
+import { cleanup, screen } from '@testing-library/react';
 
-// To Test
 import App from '../App';
+import { renderWithProviders } from './mocks/renderWithProviders';
+import userEvent  from '@testing-library/user-event';
 
 // Tests
 describe('Renders main page correctly', () => {
@@ -20,7 +20,7 @@ describe('Renders main page correctly', () => {
      */
     it('Should render the page correctly', () => {
         // Setup
-        render(<App />);
+        renderWithProviders(<App />);
         const h1 = screen.queryByText('Vite + React');
 
         // Post Expectations
@@ -32,7 +32,7 @@ describe('Renders main page correctly', () => {
      */
     it('Should show the button count set to 0', () => {
         // Setup
-        render(<App />);
+        renderWithProviders(<App />);
         const button = screen.queryByText('count is 0');
 
         // Expectations
@@ -45,7 +45,7 @@ describe('Renders main page correctly', () => {
     it('Should show the button count set to 3', async () => {
         // Setup
         const user = userEvent.setup();
-        render(<App />);
+        renderWithProviders(<App />);
         const button = screen.queryByText('count is 0');
         
         // Pre Expectations
@@ -59,4 +59,10 @@ describe('Renders main page correctly', () => {
         // Post Expectations
         expect(button?.innerHTML).toBe('count is 3');
     });
+
+    it('renders the <Test/> component', () => {
+      renderWithProviders(<App />);
+      const testComponentText = screen.queryByText(/store count/i)
+      expect(testComponentText).toBeInTheDocument()
+    })
 });
