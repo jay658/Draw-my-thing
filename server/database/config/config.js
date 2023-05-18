@@ -11,9 +11,9 @@ const configObj = {
     dialect: "postgres",
   },
   test: {
-    username: "root",
+    username: process.env.DB_USER || 'root',
     password: null,
-    database: "database_test",
+    database: process.env.DB_NAME,
     host: "127.0.0.1",
     dialect: "postgres",
   },
