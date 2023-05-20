@@ -15,8 +15,8 @@ interface ProblemCreationAttributes extends Optional<ProblemAttributes, 'id'> {}
 export default (sequelize: any, DataTypes: any) =>{
   class Problem extends Model<ProblemAttributes, ProblemCreationAttributes> 
   implements ProblemAttributes {
-    public id!: number;
-    public name!: string;
+    id!: number;
+    name!: string;
   
     public static associate(models: any) {
       // Problem.belongsToMany(models.User,{
