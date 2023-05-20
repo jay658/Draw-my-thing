@@ -1,8 +1,9 @@
 // Imports
-import { afterEach, describe, expect, it } from 'vitest';
-import { cleanup, screen } from '@testing-library/react';
+import { SpyInstance, afterEach, describe, expect, it, vi } from 'vitest';
+import { cleanup, screen, waitFor } from '@testing-library/react';
 
 import App from '../App';
+import axios from 'axios'
 import { renderWithProviders } from './mocks/renderWithProviders';
 import userEvent  from '@testing-library/user-event';
 
@@ -11,8 +12,22 @@ describe('Renders main page correctly', () => {
     /**
      * Resets all renders after each test
      */
+
+    let axiosSpy:SpyInstance
+
+    beforeEach(() => {
+      axiosSpy = vi.spyOn(axios, 'get').mockImplementation(() => {
+        return new Promise((resolve) => {
+          return resolve({
+            data:'Hello'
+          });
+        });
+      })
+    })
+
     afterEach(() => {
         cleanup();
+        axiosSpy.mockReset()
     });
 
     /**
@@ -64,5 +79,18 @@ describe('Renders main page correctly', () => {
       renderWithProviders(<App />);
       const testComponentText = screen.queryByText(/store count/i)
       expect(testComponentText).toBeInTheDocument()
+    })
+
+    it('makes a call to the backend', async () => {
+      const expectedData = 'Hello'
+      renderWithProviders(<App />);
+      
+      await waitFor(() => {
+        const serverDataRegex = new RegExp(`Server Data: ${expectedData}`, 'i');
+        expect(screen.queryByText(serverDataRegex)).toBeInTheDocument()
+      });
+      
+      expect(axiosSpy).toHaveBeenCalledWith('/api/test')
+      expect(axiosSpy).toHaveBeenCalledOnce()
     })
 });
