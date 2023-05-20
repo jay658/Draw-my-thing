@@ -2,6 +2,8 @@ import * as server from "./app"
 
 import db from "./database/models"
 import express from 'express';
+import { problems } from "./database/seeders/problems"
+import { users } from "./database/seeders/users";
 
 export const app = server.app
 
@@ -16,7 +18,13 @@ const init = async () => {
   }
   try {
     console.log("server connected")
-    db.sequelize.sync({ force:true })
+    await db.sequelize.sync({ force:true })
+    problems.map(problem=>{
+      db.Problem.create(problem)
+    })
+    users.map(user=>{
+      db.User.create(user)
+    })
     console.log("db connected")
     // if (process.env.SEED === "true") {
     //   await seed();

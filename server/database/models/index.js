@@ -35,20 +35,15 @@ fs.readdirSync(__dirname)
       file.indexOf(".test.ts") === -1
     );
   })
-  .forEach((file) => {
+  .forEach(async (file) => {
     const filePath = path.join(__dirname, file);
-    const model = import(/* @vite-ignore */ filePath).then((module) => {
-      const model = module.default(sequelize, Sequelize.DataTypes);
-      return model;
-    });
-    // const model = require(path.join(__dirname, file))(
-    //   sequelize,
-    //   Sequelize.DataTypes
-    // );
+    const module = await import(/* @vite-ignore */ filePath);
+    const model = module.default(sequelize, Sequelize.DataTypes);
     db[model.name] = model;
   });
 
 Object.keys(db).forEach((modelName) => {
+  console.log(modelName, "HIHIHIHIHIHIHI");
   if (db[modelName].associate) {
     db[modelName].associate(db);
   }

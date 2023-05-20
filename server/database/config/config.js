@@ -4,14 +4,15 @@ dotenv.config();
 
 const configObj = {
   development: {
-    username: process.env.DB_USER || 'root',
+    username: process.env.DB_USER || "root",
     password: null,
     database: process.env.DB_NAME,
     host: "127.0.0.1",
     dialect: "postgres",
+    // logging: false,
   },
   test: {
-    username: process.env.DB_USER || 'root',
+    username: process.env.DB_USER || "root",
     password: null,
     database: process.env.DB_NAME,
     host: "127.0.0.1",
