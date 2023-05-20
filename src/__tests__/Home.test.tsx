@@ -1,8 +1,8 @@
-// Imports
+import { BrowserRouter, Route, Routes } from 'react-router-dom'
 import { SpyInstance, afterEach, describe, expect, it, vi } from 'vitest';
 import { cleanup, screen } from '@testing-library/react';
 
-import App from '../App';
+import Home from '../Routes/Home';
 import { act } from 'react-dom/test-utils';
 import axios from 'axios'
 import { renderWithProviders } from './mocks/renderWithProviders';
@@ -15,6 +15,13 @@ describe('Renders main page correctly', () => {
      */
 
     let axiosSpy:SpyInstance
+
+    const HomeWithRouter = () => 
+      <BrowserRouter>
+        <Routes>
+          <Route path='/' element={<Home/>}/>
+        </Routes>
+      </BrowserRouter>
 
     beforeEach(() => {
       axiosSpy = vi.spyOn(axios, 'get').mockImplementation(() => {
@@ -38,7 +45,7 @@ describe('Renders main page correctly', () => {
      */
     it('Should render the page correctly', () => {
         // Setup
-        renderWithProviders(<App />);
+        renderWithProviders(<HomeWithRouter />);
         const h1 = screen.queryByText('Vite + React');
 
         // Post Expectations
@@ -50,7 +57,7 @@ describe('Renders main page correctly', () => {
      */
     it('Should show the button count set to 0', () => {
         // Setup
-        renderWithProviders(<App />);
+        renderWithProviders(<HomeWithRouter />);
         const button = screen.queryByText('count is 0');
 
         // Expectations
@@ -63,7 +70,7 @@ describe('Renders main page correctly', () => {
     it('Should show the button count set to 3', async () => {
         // Setup
         const user = userEvent.setup();
-        renderWithProviders(<App />);
+        renderWithProviders(<HomeWithRouter />);
         const button = screen.queryByText('count is 0');
         
         // Pre Expectations
@@ -80,7 +87,7 @@ describe('Renders main page correctly', () => {
 
     it('renders the <Test/> component', async() => {
       const expectedData = 'Hello'
-      renderWithProviders(<App />);
+      renderWithProviders(<HomeWithRouter />);
       const serverDataRegex = new RegExp(`${expectedData} for test component`, 'i');
       const testComponentText = await screen.findByText(serverDataRegex)
       expect(testComponentText).toBeInTheDocument()
@@ -88,7 +95,7 @@ describe('Renders main page correctly', () => {
 
     it('makes a call to the backend', async () => {
       const expectedData = 'Hello'
-      renderWithProviders(<App />);
+      renderWithProviders(<HomeWithRouter />);
       
       const serverDataRegex = new RegExp(`Server Data: ${expectedData}`, 'i');
       const serverData = await screen.findByText(serverDataRegex)

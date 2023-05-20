@@ -1,11 +1,11 @@
-import Test from "../Test";
+import TestComponent from "../Components/TestComponent";
 import { renderWithProviders } from "./mocks/renderWithProviders";
 import { screen } from "@testing-library/react";
 
-describe('<test/>', () => {
+describe('<TestComponent/>', () => {
   it('renders the test component', ()=>{
     const sampleProps = 'testing'
-    renderWithProviders(<Test data={sampleProps}/>);
+    renderWithProviders(<TestComponent data={sampleProps}/>);
 
     const data = screen.queryByText(`${sampleProps} for test component`)
 
