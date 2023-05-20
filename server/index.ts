@@ -18,12 +18,12 @@ const init = async () => {
   }
   try {
     console.log("server connected")
-    await db.sequelize.sync({ force:true })
-    problems.map(problem=>{
-      db.Problem.create(problem)
+    await db.sequelize.sync({force:true})
+    problems.forEach(async problem=>{
+      await db.Problem.create(problem)
     })
-    users.map(user=>{
-      db.User.create(user)
+    users.forEach(async user=>{
+      await db.User.create(user)
     })
     console.log("db connected")
     // if (process.env.SEED === "true") {
