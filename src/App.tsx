@@ -1,23 +1,27 @@
 import './App.css'
 
+import { useEffect, useState } from 'react'
+
 import Test from './Test'
 import axios from "axios"
 import reactLogo from './assets/react.svg'
-import { useState } from 'react'
 import viteLogo from '/vite.svg'
 
 function App() {
   const [count, setCount] = useState(0)
   const [data, setData] = useState('');
-  const getData = () =>{
-    axios
-      .get("/api/test")
-      .then((res) => setData(res.data))
-      .catch((err) => {
-        console.error(err);
-      });
-  }
-  getData()
+  
+  useEffect(() => {
+    const getData = async () =>{
+      try{
+        const response = await axios.get('/api/test')
+        setData(response.data)
+      }catch(err){
+        console.log(err)
+      }
+    }
+    getData()
+  }, [])
 
   return (
     <>
