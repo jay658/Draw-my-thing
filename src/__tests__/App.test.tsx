@@ -1,8 +1,9 @@
 // Imports
 import { SpyInstance, afterEach, describe, expect, it, vi } from 'vitest';
-import { cleanup, screen, waitFor } from '@testing-library/react';
+import { cleanup, screen } from '@testing-library/react';
 
 import App from '../App';
+import { act } from 'react-dom/test-utils';
 import axios from 'axios'
 import { renderWithProviders } from './mocks/renderWithProviders';
 import userEvent  from '@testing-library/user-event';
@@ -17,11 +18,13 @@ describe('Renders main page correctly', () => {
 
     beforeEach(() => {
       axiosSpy = vi.spyOn(axios, 'get').mockImplementation(() => {
-        return new Promise((resolve) => {
-          return resolve({
-            data:'Hello'
+        return act(async():Promise<{data:string}> => {
+          return new Promise((resolve) => {
+            return resolve({
+              data:'Hello'
+            });
           });
-        });
+        })
       })
     })
 
@@ -75,9 +78,11 @@ describe('Renders main page correctly', () => {
         expect(button?.innerHTML).toBe('count is 3');
     });
 
-    it('renders the <Test/> component', () => {
+    it('renders the <Test/> component', async() => {
+      const expectedData = 'Hello'
       renderWithProviders(<App />);
-      const testComponentText = screen.queryByText(/store count/i)
+      const serverDataRegex = new RegExp(`${expectedData} for test component`, 'i');
+      const testComponentText = await screen.findByText(serverDataRegex)
       expect(testComponentText).toBeInTheDocument()
     })
 
@@ -85,11 +90,10 @@ describe('Renders main page correctly', () => {
       const expectedData = 'Hello'
       renderWithProviders(<App />);
       
-      await waitFor(() => {
-        const serverDataRegex = new RegExp(`Server Data: ${expectedData}`, 'i');
-        expect(screen.queryByText(serverDataRegex)).toBeInTheDocument()
-      });
+      const serverDataRegex = new RegExp(`Server Data: ${expectedData}`, 'i');
+      const serverData = await screen.findByText(serverDataRegex)
       
+      expect(serverData).toBeInTheDocument()
       expect(axiosSpy).toHaveBeenCalledWith('/api/test')
       expect(axiosSpy).toHaveBeenCalledOnce()
     })

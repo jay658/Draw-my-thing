@@ -16,8 +16,8 @@ interface UserCreationAttributes extends Optional<UserAttributes, 'id'> {}
 export default (sequelize: any, DataTypes: any) =>{
   class User extends Model<UserAttributes, UserCreationAttributes> 
   implements UserAttributes{
-    public id!: string;
-    public name!: string;
+    declare id: string;
+    declare name: string;
 
     public static associate(models: any) {
       // User.belongsToMany(models.Problem,{

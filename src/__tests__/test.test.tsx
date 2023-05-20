@@ -10,7 +10,7 @@ describe('<test/>', () => {
     const data = screen.queryByText(`${sampleProps} for test component`)
 
     //use this and check terminal for a link to playground to check what the dom structure looks like
-    screen.logTestingPlaygroundURL();
+    // screen.logTestingPlaygroundURL();
 
     expect(data).toBeInTheDocument()
   })
