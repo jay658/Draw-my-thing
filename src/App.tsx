@@ -1,55 +1,27 @@
-import './App.css'
+import { BrowserRouter, Route, Routes } from 'react-router-dom'
+import { ReactElement, Suspense } from 'react'
 
-import { useEffect, useState } from 'react'
+import Home from './Routes/Home'
+import { lazyLoad } from './Utility/lazyLoad'
 
-import Test from './Test'
-import axios from "axios"
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
+const AboutPage = lazyLoad('../Routes/About')
 
-function App() {
-  const [count, setCount] = useState(0)
-  const [data, setData] = useState('');
-  
-  useEffect(() => {
-    const getData = async () =>{
-      try{
-        const response = await axios.get('/api/test')
-        setData(response.data)
-      }catch(err){
-        console.log(err)
-      }
-    }
-    getData()
-  }, [])
-
+const About = () => {
   return (
-    <>
-      <div>
-        Server Data: {data}
-      </div>
-      <div>
-        <a href="https://vitejs.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <Test data={data}/>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
+    <Suspense fallback={<h2>Loading...</h2>}>
+      <AboutPage/>
+    </Suspense>
+  )
+}
+
+const App = ():ReactElement => {
+  return(
+    <BrowserRouter>
+      <Routes>
+        <Route path='/' element={<Home/>}/>
+          <Route path='/about' element={<About/>}/>
+      </Routes>
+    </BrowserRouter>
   )
 }
 

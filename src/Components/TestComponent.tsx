@@ -1,5 +1,5 @@
-import { decrement, increment } from "./Store/Slices/counterSlice";
-import { useAppDispatch, useAppSelector } from "./hooks";
+import { decrement, increment } from "../Store/Slices/counterSlice";
+import { useAppDispatch, useAppSelector } from "../Utility/hooks";
 
 import { ReactElement } from "react";
 import { styled } from '@mui/material'
@@ -8,7 +8,7 @@ type ownPropsT = {
   data?: string;
 }
 
-const Test = ({ data }: ownPropsT): ReactElement => {
+const TestComponent = ({ data }: ownPropsT): ReactElement => {
   const storeCount = useAppSelector(state => state.counter.value)
   const dispatch = useAppDispatch()
   const incrementStoreCount = () => dispatch(increment())
@@ -28,4 +28,4 @@ const Test = ({ data }: ownPropsT): ReactElement => {
   );
 };
 
-export default Test
+export default TestComponent
