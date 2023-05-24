@@ -5,9 +5,22 @@ import {
   Optional
 }from "sequelize"
 
-interface ProblemAttributes {
+const difficulty = {
+  easy: 'easy',
+  medium: 'medium',
+  hard: 'hard'
+}
+
+export type difficulty_type = keyof typeof difficulty
+
+export interface ProblemAttributes {
   id: number;
-  name: string;
+  title: string;
+  difficulty: difficulty_type;
+  url: string;
+  paid_only: boolean;
+  total_accepted: number;
+  total_submitted: number;
 }
 
 interface ProblemCreationAttributes extends Optional<ProblemAttributes, 'id'> {}
@@ -16,12 +29,15 @@ export default (sequelize: any, DataTypes: any) =>{
   class Problem extends Model<ProblemAttributes, ProblemCreationAttributes> 
   implements ProblemAttributes {
     declare id: number;
-    declare name: string;
+    declare title: string;
+    declare difficulty: difficulty_type;
+    declare url: string;
+    declare paid_only: boolean;
+    declare total_accepted: number;
+    declare total_submitted: number;
   
     public static associate(models: any) {
-      // Problem.belongsToMany(models.User,{
-      //   through: "UserProblems"
-      // })
+      Problem.hasMany(models.ProblemInfo)
     }
   }
   Problem.init({
@@ -29,12 +45,31 @@ export default (sequelize: any, DataTypes: any) =>{
       type: DataTypes.INTEGER,
       allowNull: false,
       primaryKey: true,
-      autoIncrement: true,
     },
-    name: {
+    title: {
       type: DataTypes.STRING,
       allowNull: false,
-    }
+    },
+    difficulty: {
+      type: DataTypes.ENUM('easy', 'medium', 'hard'),
+      allowNull: false,
+    },
+    url: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
+    paid_only: {
+      type: DataTypes.BOOLEAN,
+      allowNull: false,
+    },
+    total_accepted: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+    },
+    total_submitted: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+    },
   },{
     sequelize, 
     modelName: 'Problem'
