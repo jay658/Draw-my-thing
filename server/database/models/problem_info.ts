@@ -15,15 +15,15 @@ const status = {
 
 export type status_type = keyof typeof status
 
-interface ProblemInfoAttributes {
+export interface ProblemInfoAttributes {
   id: string;
   user_id: string;
   problem_id: number;
-  status: status_type;
-  notes: string;
-  follow_up: Date;
-  attempt_diffculty: difficulty_type;
-  time_to_complete: number;
+  status?: status_type;
+  notes?: string;
+  follow_up?: Date;
+  attempt_diffculty?: difficulty_type;
+  time_to_complete?: number;
 }
 
 interface ProblemInfoCreationAttributes extends Optional<ProblemInfoAttributes, 'id'> {}
@@ -34,11 +34,11 @@ export default (sequelize: any, DataTypes: any) =>{
     declare id: string;
     declare user_id: string;
     declare problem_id: number;
-    declare status: status_type;
-    declare notes: string;
-    declare follow_up: Date;
-    declare attempt_diffculty: difficulty_type;
-    declare time_to_complete: number;
+    declare status?: status_type;
+    declare notes?: string;
+    declare follow_up?: Date;
+    declare attempt_diffculty?: difficulty_type;
+    declare time_to_complete?: number;
 
     public static associate(models: any) {
       ProblemInfo.belongsTo(models.User)
