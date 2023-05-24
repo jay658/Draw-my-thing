@@ -6,9 +6,11 @@ import {
   UUIDV4
 }from "sequelize"
 
-interface UserAttributes {
+export interface UserAttributes {
   id: string;
-  name: string;
+  username: string;
+  password: string;
+  email: string;
 }
 
 interface UserCreationAttributes extends Optional<UserAttributes, 'id'> {}
@@ -17,12 +19,12 @@ export default (sequelize: any, DataTypes: any) =>{
   class User extends Model<UserAttributes, UserCreationAttributes> 
   implements UserAttributes{
     declare id: string;
-    declare name: string;
+    declare username: string;
+    declare password: string;
+    declare email: string;
 
     public static associate(models: any) {
-      // User.belongsToMany(models.Problem,{
-      //   through: "UserProblems"
-      // })
+      User.hasMany(models.ProblemInfo)
     }
   };
   User.init({
@@ -32,7 +34,15 @@ export default (sequelize: any, DataTypes: any) =>{
       allowNull: false,
       primaryKey: true,
     },
-    name: {
+    username: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
+    password: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
+    email: {
       type: DataTypes.STRING,
       allowNull: false,
     }
