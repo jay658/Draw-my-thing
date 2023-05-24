@@ -11,6 +11,10 @@ export interface UserAttributes {
   username: string;
   password: string;
   email: string;
+  num_solved: number;
+  ac_easy: number;
+  ac_medium: number;
+  ac_hard: number;
 }
 
 interface UserCreationAttributes extends Optional<UserAttributes, 'id'> {}
@@ -22,6 +26,10 @@ export default (sequelize: any, DataTypes: any) =>{
     declare username: string;
     declare password: string;
     declare email: string;
+    declare num_solved: number;
+    declare ac_easy: number;
+    declare ac_medium: number;
+    declare ac_hard: number;
 
     public static associate(models: any) {
       User.hasMany(models.ProblemInfo)
@@ -45,7 +53,22 @@ export default (sequelize: any, DataTypes: any) =>{
     email: {
       type: DataTypes.STRING,
       allowNull: false,
-    }
+      validate: {
+        isEmail: true
+      }
+    },
+    num_solved: {
+      type: DataTypes.INTEGER,
+    },
+    ac_easy: {
+      type: DataTypes.INTEGER,
+    },
+    ac_medium: {
+      type: DataTypes.INTEGER,
+    },
+    ac_hard: {
+      type: DataTypes.INTEGER,
+    },
   },{
     sequelize, 
     modelName: 'User'

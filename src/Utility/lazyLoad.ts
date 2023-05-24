@@ -2,7 +2,7 @@ import { lazy } from 'react'
 
 export function lazyLoad(path:string, namedExport?:string) {
   return lazy(async () => {
-    const promise = import(path);
+    const promise = import(/* @vite-ignore */path);
     if (namedExport === undefined) {
       return promise;
     } else {

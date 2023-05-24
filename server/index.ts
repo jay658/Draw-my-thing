@@ -2,7 +2,7 @@ import * as server from "./app"
 
 import db from "./database/models"
 import express from 'express';
-import { problems } from "./database/seeders/problems"
+import { leetcodeInfo } from "./database/seeders/index"
 import { users } from "./database/seeders/users";
 
 export const app = server.app
@@ -22,7 +22,17 @@ const init = async () => {
       console.log('reset database')
       await db.sequelize.sync({force: true})
       await Promise.all(
-        problems.map((problem) => db.Problem.create(problem))
+        leetcodeInfo.problems.map((problem) => db.Problem.create(problem))
+      )
+      const testUser = await db.User.create({
+        ...users[0],
+        ...leetcodeInfo.userInfo
+      })
+      await Promise.all(
+        leetcodeInfo.problemInfo.map(problem => db.ProblemInfo.create({
+          user_id:testUser.id,
+          ...problem
+        }))
       )
     }else await db.sequelize.sync()
     // users.forEach(async user=>{
