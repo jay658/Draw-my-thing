@@ -15,8 +15,9 @@ function Home() {
   useEffect(() => {
     const getData = async () =>{
       try{
-        const response = await axios.get('/api/test')
+        const response = await axios.get('/api/users')
         setData(response.data)
+        //return () => setData('')
       }catch(err){
         console.log(err)
       }

@@ -1,4 +1,4 @@
-import express, { Request, Response } from 'express';
+import express, { NextFunction, Request, Response } from 'express';
 
 import router from './api';
 
@@ -8,12 +8,7 @@ app.use(express.json())
 
 app.use('/api', router)
 
-app.get('/api/test', (req: Request, res: Response) => 
-    res.json("Hello")
-)
-
-
-app.use((err: any, req: Request, res: Response) => {
+app.use((err: any, req: Request, res: Response, next: NextFunction) => {
     console.error(err);
     console.error(err.stack);
     res.status(err.status || 500).send(err.message || 'Internal server error.');
