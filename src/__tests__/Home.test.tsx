@@ -101,7 +101,7 @@ describe('Renders main page correctly', () => {
       const serverData = await screen.findByText(serverDataRegex)
       
       expect(serverData).toBeInTheDocument()
-      expect(axiosSpy).toHaveBeenCalledWith('/api/test')
+      expect(axiosSpy).toHaveBeenCalledWith('/api/users')
       expect(axiosSpy).toHaveBeenCalledOnce()
     })
 });
