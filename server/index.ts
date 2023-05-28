@@ -35,15 +35,8 @@ const init = async () => {
         }))
       )
     }else await db.sequelize.sync()
-    // users.forEach(async user=>{
-    //   await db.User.create(user)
-    // })
+
     console.log("db connected")
-    // if (process.env.SEED === "true") {
-    //   await seed();
-    // } else {
-    //   await db.sync();
-    // } 
   } catch (ex) {
     console.log(ex);
   }

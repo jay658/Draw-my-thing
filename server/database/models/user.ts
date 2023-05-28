@@ -9,12 +9,11 @@ import {
 export interface UserAttributes {
   id: string;
   username: string;
-  password: string;
-  email: string;
-  num_solved: number;
-  ac_easy: number;
-  ac_medium: number;
-  ac_hard: number;
+  email?: string;
+  num_solved?: number;
+  ac_easy?: number;
+  ac_medium?: number;
+  ac_hard?: number;
 }
 
 interface UserCreationAttributes extends Optional<UserAttributes, 'id'> {}
@@ -24,7 +23,6 @@ export default (sequelize: any, DataTypes: any) =>{
   implements UserAttributes{
     declare id: string;
     declare username: string;
-    declare password: string;
     declare email: string;
     declare num_solved: number;
     declare ac_easy: number;
@@ -35,6 +33,7 @@ export default (sequelize: any, DataTypes: any) =>{
       User.hasMany(models.ProblemInfo)
     }
   };
+
   User.init({
     id: {
       type: DataTypes.UUID,
@@ -46,32 +45,32 @@ export default (sequelize: any, DataTypes: any) =>{
       type: DataTypes.STRING,
       allowNull: false,
     },
-    password: {
-      type: DataTypes.STRING,
-      allowNull: false,
-    },
     email: {
       type: DataTypes.STRING,
-      allowNull: false,
       validate: {
         isEmail: true
       }
     },
     num_solved: {
       type: DataTypes.INTEGER,
+      defaultValue: 0,
     },
     ac_easy: {
       type: DataTypes.INTEGER,
+      defaultValue: 0,
     },
     ac_medium: {
       type: DataTypes.INTEGER,
+      defaultValue: 0,
     },
     ac_hard: {
       type: DataTypes.INTEGER,
+      defaultValue: 0,
     },
   },{
     sequelize, 
     modelName: 'User'
   });
+
   return User
 }

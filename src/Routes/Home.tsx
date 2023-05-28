@@ -32,6 +32,20 @@ function Home() {
       <div>
         Server Data: {data}
       </div>
+      {/* google login button */}
+      <div>
+        <button className="google" onClick={() => (window.location.href ="/api/googleOauth")}>
+            <img src="/images/google-icon.svg"/>
+            Google Login
+        </button>
+      </div>
+      {/* github login button */}
+      <div>
+        <button className="github" onClick={() => (window.location.href ="/api/githubOauth")}>
+            <img src=""/>
+            Github Login
+        </button>
+      </div>
       <button onClick={()=> navigate('/about')}>Navigate to the about page</button>
       <div>
         <a href="https://vitejs.dev" target="_blank">
