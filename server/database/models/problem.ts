@@ -25,21 +25,22 @@ export interface ProblemAttributes {
 
 interface ProblemCreationAttributes extends Optional<ProblemAttributes, 'id'> {}
 
-export default (sequelize: any, DataTypes: any) =>{
-  class Problem extends Model<ProblemAttributes, ProblemCreationAttributes> 
-  implements ProblemAttributes {
-    declare id: number;
-    declare title: string;
-    declare difficulty: difficulty_type;
-    declare url: string;
-    declare paid_only: boolean;
-    declare total_accepted: number;
-    declare total_submitted: number;
-  
-    public static associate(models: any) {
-      Problem.hasMany(models.ProblemInfo)
-    }
+export class Problem extends Model<ProblemAttributes, ProblemCreationAttributes> implements ProblemAttributes {
+  declare id: number;
+  declare title: string;
+  declare difficulty: difficulty_type;
+  declare url: string;
+  declare paid_only: boolean;
+  declare total_accepted: number;
+  declare total_submitted: number;
+
+  public static associate(models: any) {
+    Problem.hasMany(models.ProblemInfo)
   }
+}
+
+export default (sequelize: any, DataTypes: any) =>{
+
   Problem.init({
     id: {
       type: DataTypes.INTEGER,
