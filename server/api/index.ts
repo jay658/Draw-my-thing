@@ -1,7 +1,7 @@
 import express, {NextFunction, Request, Response} from 'express'
 
-import githubOauthRouter from './githubOauth'
-import googleOauthRouter from './googleOauth'
+import githubOauthRouter from './auth/githubOauth'
+import googleOauthRouter from './auth/googleOauth'
 import userRouter from './users'
 
 const router = express.Router();

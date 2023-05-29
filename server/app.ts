@@ -1,10 +1,12 @@
 import express, { NextFunction, Request, Response } from 'express';
 
+import cookieParser from 'cookie-parser'
 import router from './api';
 
 export const app = express();
 
 app.use(express.json())
+app.use(cookieParser())
 
 app.use('/api', router)
 

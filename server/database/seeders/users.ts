@@ -10,7 +10,6 @@ export const deserializeUserInfo = (data: any): Partial <UserAttributes>=>({
 export const users: Partial<UserAttributes>[] = [
   {
     username: 'test',
-    password: 'test',
     email: 'test@gmail.com'
   }
 ]

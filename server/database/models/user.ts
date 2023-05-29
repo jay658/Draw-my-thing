@@ -1,13 +1,16 @@
 'use strict';
 
 import {
+  FindOptions,
   Model,
   Optional,
   UUIDV4
 }from "sequelize"
 
+import db from ".";
+
 export interface UserAttributes {
-  id: string;
+  id?: string;
   username: string;
   email?: string;
   num_solved?: number;
@@ -18,21 +21,29 @@ export interface UserAttributes {
 
 interface UserCreationAttributes extends Optional<UserAttributes, 'id'> {}
 
-export default (sequelize: any, DataTypes: any) =>{
-  class User extends Model<UserAttributes, UserCreationAttributes> 
-  implements UserAttributes{
-    declare id: string;
-    declare username: string;
-    declare email: string;
-    declare num_solved: number;
-    declare ac_easy: number;
-    declare ac_medium: number;
-    declare ac_hard: number;
+export class User extends Model<UserAttributes, UserCreationAttributes> implements UserAttributes{
+  declare id: string;
+  declare username: string;
+  declare email: string;
+  declare num_solved: number;
+  declare ac_easy: number;
+  declare ac_medium: number;
+  declare ac_hard: number;
+  
+  public static associate(models: any) {
+    User.hasMany(models.ProblemInfo)
+  }
 
-    public static associate(models: any) {
-      User.hasMany(models.ProblemInfo)
-    }
-  };
+  public static async createUser(info: UserAttributes): Promise<User> {
+    return db.User.create(info)
+  }
+
+  public static async findUser (options: FindOptions): Promise<User> {
+    return db.User.findOne(options)
+  }
+};
+
+export default (sequelize: any, DataTypes: any) =>{
 
   User.init({
     id: {
