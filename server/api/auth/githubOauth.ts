@@ -35,7 +35,7 @@ router.get("/login", async (req: Request, res: Response, next: NextFunction) => 
     }
 
     //to refresh the access token: https://docs.github.com/en/apps/creating-github-apps/authenticating-with-a-github-app/refreshing-user-access-tokens
-    res.cookie('accessToken', access_token, accessTokenCookieOptions)
+    res.cookie('gitHubAccessToken', access_token, accessTokenCookieOptions)
     
     res.redirect(`http://localhost:5173/`)
   } catch (e) {

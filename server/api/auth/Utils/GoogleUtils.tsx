@@ -28,7 +28,7 @@ const getTokens = async (config: typeof googleConfig): Promise<any> => {
   );
 }
 
-const getUserInfo = async (accessToken: string): Promise<any> => {
+const getGoogleInfo = async (accessToken: string): Promise<any> => {
   return axios.get(
     `https://www.googleapis.com/oauth2/v2/userinfo?access_token=${accessToken}`
   );
@@ -55,7 +55,7 @@ export {
   redirectUrl,
   googleConfig, 
   getTokens,
-  getUserInfo,
+  getGoogleInfo,
   accessTokenCookieOptions,
   refreshTokenCookieOptions
 }

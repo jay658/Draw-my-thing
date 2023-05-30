@@ -41,6 +41,10 @@ export class User extends Model<UserAttributes, UserCreationAttributes> implemen
   public static async findUser (options: FindOptions): Promise<User> {
     return db.User.findOne(options)
   }
+
+  public static async findAllUser (): Promise<User[]> {
+    return db.User.findAll()
+  }
 };
 
 export default (sequelize: any, DataTypes: any) =>{

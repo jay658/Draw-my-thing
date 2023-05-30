@@ -1,20 +1,15 @@
 import { BrowserRouter, Route, Routes } from 'react-router-dom'
-import { SpyInstance, afterEach, describe, expect, it, vi } from 'vitest';
-import { cleanup, screen } from '@testing-library/react';
+import { cleanup, screen, waitFor } from '@testing-library/react';
+import { describe, expect, it } from 'vitest';
 
 import Home from '../Routes/Home';
-import { act } from 'react-dom/test-utils';
-import axios from 'axios'
 import { renderWithProviders } from './mocks/renderWithProviders';
 import userEvent  from '@testing-library/user-event';
 
 // Tests
 describe('Renders main page correctly', () => {
-    /**
-     * Resets all renders after each test
-     */
 
-    let axiosSpy:SpyInstance
+    // let axiosSpy:SpyInstance
 
     const HomeWithRouter = () => 
       <BrowserRouter>
@@ -23,85 +18,65 @@ describe('Renders main page correctly', () => {
         </Routes>
       </BrowserRouter>
 
-    beforeEach(() => {
-      axiosSpy = vi.spyOn(axios, 'get').mockImplementation(() => {
-        return act(async():Promise<{data:string}> => {
-          return new Promise((resolve) => {
-            return resolve({
-              data:'Hello'
-            });
-          });
-        })
-      })
-    })
+    // beforeEach(() => {
+    //   axiosSpy = vi.spyOn(axios, 'get').mockImplementation(() => {
+    //     return act(async():Promise<{data:string}> => {
+    //       return new Promise((resolve) => {
+    //         return resolve({
+    //           data:'Hello'
+    //         });
+    //       });
+    //     })
+    //   })
+    // })
 
     afterEach(() => {
-        cleanup();
-        axiosSpy.mockReset()
+      cleanup();
+      // axiosSpy.mockReset()
     });
 
-    /**
-     * Passes - shows title correctly
-     */
     it('Should render the page correctly', () => {
-        // Setup
         renderWithProviders(<HomeWithRouter />);
         const h1 = screen.queryByText('Vite + React');
 
-        // Post Expectations
         expect(h1).toBeInTheDocument();
     });
 
-    /**
-     * Passes - shows the button count correctly present
-     */
     it('Should show the button count set to 0', () => {
-        // Setup
         renderWithProviders(<HomeWithRouter />);
         const button = screen.queryByText('count is 0');
 
-        // Expectations
         expect(button).toBeInTheDocument();
     });
 
-    /**
-     * Passes - clicks the button 3 times and shows the correct count
-     */
     it('Should show the button count set to 3', async () => {
-        // Setup
         const user = userEvent.setup();
         renderWithProviders(<HomeWithRouter />);
         const button = screen.queryByText('count is 0');
         
-        // Pre Expectations
         expect(button).toBeInTheDocument();
 
-        // Actions
         await user.click(button as HTMLElement);
         await user.click(button as HTMLElement);
         await user.click(button as HTMLElement);
         
-        // Post Expectations
         expect(button?.innerHTML).toBe('count is 3');
     });
 
     it('renders the <Test/> component', async() => {
-      const expectedData = 'Hello'
       renderWithProviders(<HomeWithRouter />);
-      const serverDataRegex = new RegExp(`${expectedData} for test component`, 'i');
+      const serverDataRegex = new RegExp(`test data for test component`, 'i');
       const testComponentText = await screen.findByText(serverDataRegex)
       expect(testComponentText).toBeInTheDocument()
     })
 
-    it('makes a call to the backend', async () => {
-      const expectedData = 'Hello'
+    it('sets the auth user', async () => {
       renderWithProviders(<HomeWithRouter />);
+
+      const serverDataRegex = new RegExp(`test auth user`, 'i');
       
-      const serverDataRegex = new RegExp(`Server Data: ${expectedData}`, 'i');
       const serverData = await screen.findByText(serverDataRegex)
       
       expect(serverData).toBeInTheDocument()
-      expect(axiosSpy).toHaveBeenCalledWith('/api/users')
-      expect(axiosSpy).toHaveBeenCalledOnce()
     })
 });

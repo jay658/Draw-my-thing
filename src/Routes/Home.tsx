@@ -1,37 +1,35 @@
 import './Home.css'
 
-import { useEffect, useState } from 'react'
+import { User, useGetUsersQuery, useGetUsersQueryResult } from '../Store/RTK/userSlice'
+import { useGetAuthQuery, useGetAuthQueryResult } from '../Store/RTK/authSlice'
 
 import TestComponent from '../Components/TestComponent'
-import axios from "axios"
 import reactLogo from '../assets/react.svg'
 import { useNavigate } from 'react-router-dom'
+import { useState } from 'react'
 import viteLogo from '/vite.svg'
 
 function Home() {
   const [count, setCount] = useState(0)
-  const [data, setData] = useState('');
-  
-  useEffect(() => {
-    const getData = async () =>{
-      try{
-        const response = await axios.get('/api/users')
-        setData(response.data)
-        //return () => setData('')
-      }catch(err){
-        console.log(err)
-      }
-    }
-    getData()
-  }, [])
 
+  const { data: auth }: Partial<useGetAuthQueryResult> = useGetAuthQuery()
+  const { data: users }: Partial<useGetUsersQueryResult> = useGetUsersQuery()
   const navigate = useNavigate()
 
   return (
     <>
       <div>
-        Server Data: {data}
+        Logged in as: {auth && auth.username}
       </div>
+      <ul>
+        Users in the db:
+        {users && users.map((user: User) => {
+          return (
+            <li key={user.id}>
+              {`${user.id}: ${user.username}`}
+            </li>
+          )})}
+      </ul>
       {/* google login button */}
       <div>
         <button className="google" onClick={() => (window.location.href ="/api/googleOauth")}>
@@ -41,7 +39,10 @@ function Home() {
       </div>
       {/* github login button */}
       <div>
-        <button className="github" onClick={() => (window.location.href ="/api/githubOauth")}>
+        <button className="github" onClick={() => {
+          window.location.href ="/api/githubOauth"
+          console.log('does this run?')
+        }}>
             <img src=""/>
             Github Login
         </button>
@@ -56,7 +57,7 @@ function Home() {
         </a>
       </div>
       <h1>Vite + React</h1>
-      <TestComponent data={data}/>
+      <TestComponent data={'test data'}/>
       <div className="card">
         <button onClick={() => setCount((count) => count + 1)}>
           count is {count}

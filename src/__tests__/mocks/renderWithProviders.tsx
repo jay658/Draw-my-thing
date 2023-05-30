@@ -4,10 +4,8 @@ import React, { PropsWithChildren } from 'react'
 import type { PreloadedState } from '@reduxjs/toolkit'
 import { Provider } from 'react-redux'
 import type { RenderOptions } from '@testing-library/react'
-import { configureStore } from '@reduxjs/toolkit'
-// As a basic setup, import your same slice reducers
-import counterReducer from '../../Store/Slices/counterSlice'
 import { render } from '@testing-library/react'
+import { setupStore } from './mockStore'
 
 //If we need to modify anything, refer to https://redux.js.org/usage/writing-tests
 
@@ -23,7 +21,7 @@ export function renderWithProviders(
   {
     preloadedState = {},
     // Automatically create a store instance if no store was passed in
-    store = configureStore({ reducer: { counter: counterReducer }, preloadedState }),
+    store = setupStore(),
     ...renderOptions
   }: ExtendedRenderOptions = {}
 ) {
