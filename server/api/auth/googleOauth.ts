@@ -1,4 +1,4 @@
-import { accessTokenCookieOptions, getTokens, getUserInfo, googleConfig, redirectUrl, refreshTokenCookieOptions } from './Utils/GoogleUtils'
+import { accessTokenCookieOptions, getGoogleInfo, getTokens, googleConfig, redirectUrl, refreshTokenCookieOptions } from './Utils/GoogleUtils'
 import express, { NextFunction, Request, Response } from 'express'
 
 import { User } from '../../database/models/user'
@@ -18,9 +18,8 @@ router.get("/login", async (req: Request, res: Response, next: NextFunction) => 
 
     const response = await getTokens(config)
     const { id_token, access_token, refresh_token } = response.data
-    console.log(access_token)
-
-    const { email, name }: { email: string, name: string } = (await getUserInfo(access_token)).data
+    
+    const { email, name }: { email: string, name: string } = (await getGoogleInfo(access_token)).data
     
     let user = await User.findUser({
       where: {
@@ -35,9 +34,9 @@ router.get("/login", async (req: Request, res: Response, next: NextFunction) => 
     }
 
     //Note cookies are automatic (assuming correct path), so in the future, if there is a cookie, we can access it in the req.cookies.accessToken
-    res.cookie('accessToken', access_token, accessTokenCookieOptions)
+    res.cookie('googleAccessToken', access_token, accessTokenCookieOptions)
 
-    res.cookie('refreshToken', refresh_token, refreshTokenCookieOptions)
+    res.cookie('googleRefreshToken', refresh_token, refreshTokenCookieOptions)
     
     /*
     TO REFRESH THE ACCESS TOKEN:
