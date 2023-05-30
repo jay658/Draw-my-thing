@@ -1,7 +1,7 @@
 import { accessTokenCookieOptions, getAccessToken, getGitHubInfo, } from './Utils/GithubUtils'
 import express, { NextFunction, Request, Response } from 'express'
 
-import { User } from '../../database/models/user'
+import { User } from '../../database/index'
 
 const router = express.Router();
 
@@ -23,13 +23,13 @@ router.get("/login", async (req: Request, res: Response, next: NextFunction) => 
   
     const { login: username } = (await getGitHubInfo(access_token)).data;
   
-    let user = await User.findUser({
+    let user = await User.findOne({
       where: {
         username,
       },
     });
     if (!user) {
-      user = await User.createUser({
+      user = await User.create({
         username,
       });
     }

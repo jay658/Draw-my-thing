@@ -1,27 +1,14 @@
 import { CookieOptions } from 'express'
 import axios from 'axios'
-import { google } from 'googleapis'
 
-const oauth2Client = new google.auth.OAuth2(
-  process.env.GOOGLE_OAUTH_CLIENT_ID,
-  process.env.GOOGLE_OAUTH_CLIENT_SECRET,
-  process.env.GOOGLE_OAUTH_REDIRECT,
-)
-
-const redirectUrl = oauth2Client.generateAuthUrl({
-  access_type: 'offline',
-  prompt: 'consent',
-  scope: ['email', 'profile']
-})
-
-const googleConfig = {
-  client_id: process.env.GOOGLE_OAUTH_CLIENT_ID,
-  grant_type: "authorization_code",
-  client_secret: process.env.GOOGLE_OAUTH_CLIENT_SECRET,
-  redirect_uri: process.env.GOOGLE_OAUTH_REDIRECT,
+type googleConfigType = {
+  client_id: string | undefined,
+  grant_type: string ,
+  client_secret: string | undefined,
+  redirect_uri: string | undefined,
 };
 
-const getTokens = async (config: typeof googleConfig): Promise<any> => {
+const getTokens = async (config: googleConfigType): Promise<any> => {
   return axios.post(
     "https://oauth2.googleapis.com/token", 
     config
@@ -51,9 +38,6 @@ const refreshTokenCookieOptions: CookieOptions = {
 }
 
 export {
-  oauth2Client,
-  redirectUrl,
-  googleConfig, 
   getTokens,
   getGoogleInfo,
   accessTokenCookieOptions,

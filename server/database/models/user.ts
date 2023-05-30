@@ -7,11 +7,9 @@ import {
   UUIDV4
 }from "sequelize"
 
-import db from ".";
-
 export interface UserAttributes {
   id?: string;
-  username: string;
+  username?: string;
   email?: string;
   num_solved?: number;
   ac_easy?: number;
@@ -32,18 +30,6 @@ export class User extends Model<UserAttributes, UserCreationAttributes> implemen
   
   public static associate(models: any) {
     User.hasMany(models.ProblemInfo)
-  }
-
-  public static async createUser(info: UserAttributes): Promise<User> {
-    return db.User.create(info)
-  }
-
-  public static async findUser (options: FindOptions): Promise<User> {
-    return db.User.findOne(options)
-  }
-
-  public static async findAllUser (): Promise<User[]> {
-    return db.User.findAll()
   }
 };
 

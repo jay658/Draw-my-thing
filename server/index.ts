@@ -1,6 +1,6 @@
 import * as server from "./app"
 
-import db from "./database/models"
+import db from "./database/index"
 import express from 'express';
 import { leetcodeInfo } from "./database/seeders/index"
 import { users } from "./database/seeders/users";

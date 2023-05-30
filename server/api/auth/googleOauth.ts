@@ -1,7 +1,8 @@
-import { accessTokenCookieOptions, getGoogleInfo, getTokens, googleConfig, redirectUrl, refreshTokenCookieOptions } from './Utils/GoogleUtils'
+import { accessTokenCookieOptions, getGoogleInfo, getTokens, refreshTokenCookieOptions } from './Utils/GoogleUtils'
 import express, { NextFunction, Request, Response } from 'express'
 
-import { User } from '../../database/models/user'
+import { User } from '../../database/index'
+import { google } from 'googleapis'
 
 const router = express.Router();
 
@@ -21,7 +22,7 @@ router.get("/login", async (req: Request, res: Response, next: NextFunction) => 
     
     const { email, name }: { email: string, name: string } = (await getGoogleInfo(access_token)).data
     
-    let user = await User.findUser({
+    let user = await User.findOne({
       where: {
         email: email,
       },
@@ -62,5 +63,24 @@ router.get("/login", async (req: Request, res: Response, next: NextFunction) => 
     throw new Error(`The authentication failed with error: ${e.message}`)
   }
 });
+
+const oauth2Client = new google.auth.OAuth2(
+  process.env.GOOGLE_OAUTH_CLIENT_ID,
+  process.env.GOOGLE_OAUTH_CLIENT_SECRET,
+  process.env.GOOGLE_OAUTH_REDIRECT,
+)
+
+const redirectUrl = oauth2Client.generateAuthUrl({
+  access_type: 'offline',
+  prompt: 'consent',
+  scope: ['email', 'profile']
+})
+
+const googleConfig = {
+  client_id: process.env.GOOGLE_OAUTH_CLIENT_ID,
+  grant_type: "authorization_code",
+  client_secret: process.env.GOOGLE_OAUTH_CLIENT_SECRET,
+  redirect_uri: process.env.GOOGLE_OAUTH_REDIRECT,
+};
 
 export default router
