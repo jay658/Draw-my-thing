@@ -4,7 +4,7 @@ import { User } from './userSlice'
 
 export const authSlice = createApi({
   reducerPath: "auth",
-  baseQuery: fetchBaseQuery({ baseUrl: "http://localhost:5173/api" }),
+  baseQuery: fetchBaseQuery({ baseUrl: "/api" }),
   tagTypes: ["Auth"],
   endpoints: (builder) => ({
     getAuth: builder.query<User, void>({

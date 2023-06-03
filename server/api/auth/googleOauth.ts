@@ -76,7 +76,8 @@ router.get("/login", async (req: Request, res: Response, next: NextFunction) => 
     */
 
     //Need to figure out how to do this dynamically for when it is deployed
-    res.redirect(`http://localhost:5173/`)
+    const redirect = process.env.HOME_WEBSITE || ""
+    res.redirect(redirect)
   } catch (e) {
     console.log(`Failed to authenticate user with error: ${e.message}`)
     throw new Error(`The authentication failed with error: ${e.message}`)
