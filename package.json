@@ -4,7 +4,7 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "start": "npm run dev:seed",
+    "start": "npm run dev:seed --port $PORT",
     "dev": "vite",
     "dev:seed": "SEED=true npm run dev",
     "build": "tsc && vite build",
