@@ -11,11 +11,19 @@ export const authSlice = createApi({
       query: () => "/auth",
       providesTags: ["Auth"]
     }),
+    logout: builder.mutation<void, void>({
+      query: () => ({
+        url: `auth/logout`,
+        method: 'POST'
+      }),
+      invalidatesTags: ["Auth"],
+    }),
   }),
 });
 
 export const {
   useGetAuthQuery,
+  useLogoutMutation
 } = authSlice;
 
 export type useGetAuthQueryResult = ReturnType<typeof useGetAuthQuery>

@@ -1,8 +1,9 @@
 import './Home.css'
 
 import { User, useGetUsersQuery, useGetUsersQueryResult } from '../Store/RTK/userSlice'
-import { useGetAuthQuery, useGetAuthQueryResult } from '../Store/RTK/authSlice'
+import { useGetAuthQuery, useGetAuthQueryResult, useLogoutMutation } from '../Store/RTK/authSlice'
 
+import Button from '@mui/material/Button';
 import TestComponent from '../Components/TestComponent'
 import reactLogo from '../assets/react.svg'
 import { useNavigate } from 'react-router-dom'
@@ -16,8 +17,15 @@ function Home() {
   const { data: users }: Partial<useGetUsersQueryResult> = useGetUsersQuery()
   const navigate = useNavigate()
 
+  const [logoutMutation] = useLogoutMutation();
+
+  const handleLogout = async () => {
+    await logoutMutation();
+  };
+
   return (
     <>
+      <Button onClick={handleLogout}>Log out</Button>
       <div>
         Logged in as: {auth && auth.username}
       </div>
@@ -30,23 +38,6 @@ function Home() {
             </li>
           )})}
       </ul>
-      {/* google login button */}
-      <div>
-        <button className="google" onClick={() => (window.location.href ="/api/googleOauth")}>
-            <img src="/images/google-icon.svg"/>
-            Google Login
-        </button>
-      </div>
-      {/* github login button */}
-      <div>
-        <button className="github" onClick={() => {
-          window.location.href ="/api/githubOauth"
-          console.log('does this run?')
-        }}>
-            <img src=""/>
-            Github Login
-        </button>
-      </div>
       <button onClick={()=> navigate('/about')}>Navigate to the about page</button>
       <div>
         <a href="https://vitejs.dev" target="_blank">
