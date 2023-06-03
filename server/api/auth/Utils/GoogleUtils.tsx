@@ -1,18 +1,5 @@
 import { CookieOptions } from 'express'
 import axios from 'axios'
-import { google } from 'googleapis'
-
-const oauth2Client = new google.auth.OAuth2(
-  process.env.GOOGLE_OAUTH_CLIENT_ID,
-  process.env.GOOGLE_OAUTH_CLIENT_SECRET,
-  process.env.GOOGLE_OAUTH_REDIRECT,
-)
-
-const redirectUrl = oauth2Client.generateAuthUrl({
-  access_type: 'offline',
-  prompt: 'consent',
-  scope: ['email', 'profile']
-})
 
 const googleConfig = {
   client_id: process.env.GOOGLE_OAUTH_CLIENT_ID,
@@ -51,8 +38,6 @@ const refreshTokenCookieOptions: CookieOptions = {
 }
 
 export {
-  oauth2Client,
-  redirectUrl,
   googleConfig, 
   getTokens,
   getGoogleInfo,
