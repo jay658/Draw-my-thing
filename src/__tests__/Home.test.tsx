@@ -9,7 +9,7 @@ import userEvent  from '@testing-library/user-event';
 // Tests
 describe('Renders main page correctly', () => {
 
-    // let axiosSpy:SpyInstance
+    //let axiosSpy:SpyInstance
 
     const HomeWithRouter = () => 
       <BrowserRouter>
@@ -19,11 +19,12 @@ describe('Renders main page correctly', () => {
       </BrowserRouter>
 
     // beforeEach(() => {
+      
     //   axiosSpy = vi.spyOn(axios, 'get').mockImplementation(() => {
     //     return act(async():Promise<{data:string}> => {
     //       return new Promise((resolve) => {
     //         return resolve({
-    //           data:'Hello'
+    //           data:'http://localhost:5173/'
     //         });
     //       });
     //     })
@@ -32,7 +33,7 @@ describe('Renders main page correctly', () => {
 
     afterEach(() => {
       cleanup();
-      // axiosSpy.mockReset()
+      //axiosSpy.mockReset()
     });
 
     it('Should render the page correctly', () => {
