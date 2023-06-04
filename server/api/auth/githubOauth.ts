@@ -37,7 +37,8 @@ router.get("/login", async (req: Request, res: Response, next: NextFunction) => 
     //to refresh the access token: https://docs.github.com/en/apps/creating-github-apps/authenticating-with-a-github-app/refreshing-user-access-tokens
     res.cookie('gitHubAccessToken', access_token, accessTokenCookieOptions)
     
-    res.redirect(`http://localhost:5173/`)
+    const redirect = process.env.HOME_WEBSITE || ""
+    res.redirect(redirect)
   } catch (e) {
     console.log(`Failed to authenticate user with error: ${e.message}`)
     throw new Error(`The authentication failed with error: ${e.message}`)
