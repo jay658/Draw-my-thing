@@ -1,9 +1,16 @@
 import { User } from '../../Store/RTK/userSlice'
 import { rest } from 'msw'
-import { website } from '../../Store/RTK/'
 
 export const handlers = [
-  rest.get(`${website}/api/users`, (_, res, ctx) => {
+  rest.get('http://localhost:5173/api/website', (_, res, ctx) => {
+
+    return res(
+      ctx.status(200),
+      ctx.json('http://localhost:5173/')
+    )
+  }),
+  
+  rest.get('http://localhost:5173/api/users', (_, res, ctx) => {
     const testUser: Partial<User> = {
       id: '1',
       username: 'test user'
@@ -15,7 +22,7 @@ export const handlers = [
     )
   }),
 
-  rest.get(`${website}/api/auth`, (_, res, ctx) => {
+  rest.get('http://localhost:5173/api/auth', (_, res, ctx) => {
     const testAuthUser: Partial<User> = {
       id: '0',
       username: 'test auth user'
@@ -25,5 +32,5 @@ export const handlers = [
       ctx.status(200),
       ctx.json(testAuthUser)
     )
-  })
+  }),
 ]

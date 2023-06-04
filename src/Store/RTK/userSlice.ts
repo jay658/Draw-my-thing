@@ -1,10 +1,10 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 
-import { website } from ".";
+import website from ".";
 
 export const userSlice = createApi({
   reducerPath: "user",
-  baseQuery: fetchBaseQuery({ baseUrl: `${website}/api` }),
+  baseQuery: fetchBaseQuery({ baseUrl: `${website}api` }),
   tagTypes: ["Users"],
   endpoints: (builder) => ({
     getUsers: builder.query<Array<User>, void>({

@@ -31,5 +31,8 @@ export default defineConfig(({ command }: ConfigEnv) => {
       environment: 'jsdom',
       setupFiles: ['./vitest.setup.ts']
     },
+    build: {
+      target: 'esnext'
+    }
   };
 });

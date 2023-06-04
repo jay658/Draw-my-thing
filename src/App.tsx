@@ -21,7 +21,7 @@ const About = () => {
 const App = ():ReactElement => {
   const { isLoading, data } = useGetAuthQuery()
   const isLoggedIn = data
-
+  
   if(isLoading) return <CircularProgress/>
   
   return(
