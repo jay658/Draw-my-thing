@@ -1,0 +1,1 @@
+export const website = window.location.href
