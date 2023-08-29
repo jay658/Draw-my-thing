@@ -6,6 +6,7 @@ import Avatar from '@mui/material/Avatar';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import Container from '@mui/material/Container';
+import DefaultUserIcon from '../assets/default-user-icon.png'
 import IconButton from '@mui/material/IconButton';
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
@@ -17,9 +18,11 @@ import { useLogoutMutation } from '../Store/RTK/authSlice';
 import { useNavigate } from 'react-router-dom'
 
 const settings = ['Profile', 'Account', 'Dashboard', 'Logout'];
+
 const tabs = {
   Home: '',
-  About: 'about'
+  About: 'about',
+  Draw: 'draw'
 }
 
 const StyledAppBar = styled(AppBar)(() => ({
@@ -88,7 +91,7 @@ function ResponsiveAppBar() {
           <Box sx={{ flexGrow: 0 }}>
             <Tooltip title="Open settings">
               <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
-                <Avatar alt="Remy Sharp" src="/static/images/avatar/2.jpg" />
+                <Avatar alt="Remy Sharp" src={DefaultUserIcon} />
               </IconButton>
             </Tooltip>
             <Menu
