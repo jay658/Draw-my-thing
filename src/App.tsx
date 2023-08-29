@@ -1,6 +1,7 @@
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom'
 import { ReactElement, Suspense } from 'react'
 
+import Canvas from './Components/Canvas';
 import CircularProgress from '@mui/material/CircularProgress';
 import Home from './Routes/Home'
 import NavBar from './Components/NavBar'
@@ -32,6 +33,7 @@ const App = ():ReactElement => {
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/about" element={<About />} />
+            <Route path="/draw" element={<Canvas />} />
             <Route path="*" element={<Navigate to='/' replace={true}/>} />
           </Routes>
         </BrowserRouter>
