@@ -1,11 +1,19 @@
-import * as server from "./app"
+import * as appServer from "./app"
 
+import { Server } from 'socket.io'
+import { createServer } from 'http'
 import db from "./database/models"
 import express from 'express';
 import { leetcodeInfo } from "./database/seeders/index"
 import { users } from "./database/seeders/users";
 
-export const app = server.app
+export const app = appServer.app
+const httpServer = createServer(app)
+export const io = new Server(httpServer, {
+  cors: {
+    origin: `http://localhost:${process.env['PORT']}`
+  }
+})
 
 const init = async () => {
   if (!process.env['VITE']) {
@@ -14,7 +22,7 @@ const init = async () => {
     app.get('/*', (_, res) => {
       res.send(frontendFiles + '/index.html')
     })
-    app.listen(process.env['PORT'])
+    httpServer.listen(process.env['PORT'])
   }
   try {
     console.log("server connected")
