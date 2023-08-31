@@ -7,6 +7,7 @@
     "allowSyntheticDefaultImports": true,
     "allowJs": true,
     "outDir": "./build",
+    "esModuleInterop": true,
 
     /* Bundler mode */
     "moduleResolution": "node",
@@ -21,6 +22,6 @@
     "noUnusedParameters": true,
     "noFallthroughCasesInSwitch": true
   },
-  "include": ["src"],
+  "include": ["src", "server/socketCommands.ts"],
   "exclude": ["node_modules"]
 }

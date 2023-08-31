@@ -1,5 +1,6 @@
 import { Server } from 'socket.io'
 import { ViteDevServer } from 'vite'
+import socketCommands from './server/socketCommands'
 
 export function configureServer(server: ViteDevServer){
   if(!server.httpServer){
@@ -8,12 +9,7 @@ export function configureServer(server: ViteDevServer){
 
   const io = new Server(server.httpServer)
   
-  io.on('connection', (socket) => {
-    console.log(`A user connected with ID: ${socket.id}`)
-    socket.on('send message', () =>{
-      console.log('this is working!!')
-    })
-  })
+  io.on('connection', socketCommands)
 }
 
 export const webSocket = {
