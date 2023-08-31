@@ -8,11 +8,11 @@ import process from "process";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const basename = path.basename(__filename);
-const env = process.env.NODE_ENV || "development";
+const env: string = process.env.NODE_ENV || "development";
 
-const config = configObj[env];
+const config:any = configObj[env];
 
-const db = {};
+const db:any = {};
 
 let sequelize = new Sequelize(
   process.env.DATABASE_URL || `postgres://localhost:5432/leetcode_tracker`,
@@ -31,6 +31,7 @@ fs.readdirSync(__dirname)
   .forEach(async (file) => {
     const filePath = path.join(__dirname, file);
     const module = await import(/* @vite-ignore */ filePath);
+    //@ts-ignore
     const model = module.default(sequelize, Sequelize.DataTypes);
     db[model.name] = model;
   });
