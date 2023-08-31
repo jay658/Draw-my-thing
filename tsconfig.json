@@ -1,12 +1,4 @@
 {
-  "ts-node": {
-    "transpileOnly": true,
-    "compilerOptions": {
-      "module": "ESNext",
-      "esModuleInterop": true
-    },
-    "esm": true
-  },
   "compilerOptions": {
     "target": "ESNext",
     "lib": ["DOM", "DOM.Iterable", "ESNext"],
@@ -15,7 +7,6 @@
     "allowSyntheticDefaultImports": true,
     "allowJs": true,
     "outDir": "./build",
-    "esModuleInterop": true, 
 
     /* Bundler mode */
     "moduleResolution": "node",
@@ -31,6 +22,5 @@
     "noFallthroughCasesInSwitch": true
   },
   "include": ["src"],
-  "references": [{ "path": "./tsconfig.node.json" }],
   "exclude": ["node_modules"]
 }
