@@ -1,5 +1,5 @@
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom'
-import { ReactElement, Suspense } from 'react'
+import { ReactElement, Suspense, useEffect } from 'react'
 
 import Canvas from './Components/Canvas';
 import CircularProgress from '@mui/material/CircularProgress';
@@ -7,6 +7,7 @@ import Home from './Routes/Home'
 import NavBar from './Components/NavBar'
 import SignIn from './Routes/SignIn'
 import { lazyLoad } from './Utility/lazyLoad'
+import socket from './Components/Websocket/socket';
 import { useGetAuthQuery } from './Store/RTK/authSlice'
 
 const AboutPage = lazyLoad('../Routes/About')
@@ -22,6 +23,11 @@ const About = () => {
 const App = ():ReactElement => {
   const { isLoading, data } = useGetAuthQuery()
   const isLoggedIn = data
+  
+  useEffect(() => {
+    console.log('connecting')
+    socket.emit('send message')
+  }, [])
   
   if(isLoading) return <CircularProgress/>
   

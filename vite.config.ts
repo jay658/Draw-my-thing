@@ -2,6 +2,7 @@ import { ConfigEnv, defineConfig } from 'vitest/config'
 
 import express from "./express.plugin"
 import react from '@vitejs/plugin-react-swc'
+import { webSocket } from './websocket'
 
 // https://vitejs.dev/config/
 // export default defineConfig({
@@ -21,7 +22,7 @@ export default defineConfig(({ command }: ConfigEnv) => {
   const port: number = Number(process.env.PORT) || 5173;
 
   return {
-    plugins: [react(), express("/server")],
+    plugins: [react(), express("/server"), webSocket],
     server: {
       port,
       host: "0.0.0.0"

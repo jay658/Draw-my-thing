@@ -8,12 +8,7 @@ import { leetcodeInfo } from "./database/seeders/index"
 import { users } from "./database/seeders/users";
 
 export const app = appServer.app
-const httpServer = createServer(app)
-export const io = new Server(httpServer, {
-  cors: {
-    origin: `http://localhost:${process.env['PORT']}`
-  }
-})
+const PORT = process.env['PORT'] || 5173
 
 const init = async () => {
   if (!process.env['VITE']) {
@@ -22,10 +17,18 @@ const init = async () => {
     app.get('/*', (_, res) => {
       res.send(frontendFiles + '/index.html')
     })
-    httpServer.listen(process.env['PORT'])
+    const httpServer = createServer(app)
+
+    const io = new Server(httpServer, {
+      cors: {
+        origin: `http://localhost:${PORT}`
+      }
+    })
+    
+    httpServer.listen(PORT)
   }
   try {
-    console.log("server connected")
+    console.log(`server connected on port ${PORT}`)
     if(process.env.SEED === "true"){
       console.log('reset database')
       await db.sequelize.sync({force: true})

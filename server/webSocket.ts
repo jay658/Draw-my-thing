@@ -1,23 +1,23 @@
-import { io } from ".";
 
-io.on('connection', (socket)=>{
-  console.log(`User connected: ${socket.id}`)
 
-  socket.on('join_room', (data)=>{
-    socket.join(data)
-    console.log(`User with ID: ${socket.id} joined room: ${data}`)
-  })
+// io.on('connection', (socket)=>{
+//   console.log(`User connected: ${socket.id}`)
 
-  socket.on('send_message', (data)=>{
-    socket.to(data.room).emit('receive_message', data)
-    console.log(`message sent to room ${data.room}`)
-  })
+//   socket.on('join_room', (data)=>{
+//     socket.join(data)
+//     console.log(`User with ID: ${socket.id} joined room: ${data}`)
+//   })
 
-  socket.on('disconnect', ()=>{
-    console.log('User disconnected', socket.id)
-  })
+//   socket.on('send_message', (data)=>{
+//     socket.to(data.room).emit('receive_message', data)
+//     console.log(`message sent to room ${data.room}`)
+//   })
 
-  socket.on('error', function (err) {
-    console.log(err);
-  });
-})
+//   socket.on('disconnect', ()=>{
+//     console.log('User disconnected', socket.id)
+//   })
+
+//   socket.on('error', function (err) {
+//     console.log(err);
+//   });
+// })
