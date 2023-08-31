@@ -5,6 +5,7 @@ import { createServer } from 'http'
 import db from "./database/models"
 import express from 'express';
 import { leetcodeInfo } from "./database/seeders/index"
+import socketCommands from "./socketCommands";
 import { users } from "./database/seeders/users";
 
 export const app = appServer.app
@@ -24,6 +25,8 @@ const init = async () => {
         origin: `http://localhost:${PORT}`
       }
     })
+
+    io.on('connection', socketCommands)
     
     httpServer.listen(PORT)
   }

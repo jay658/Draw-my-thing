@@ -30,7 +30,7 @@ fs.readdirSync(__dirname)
   })
   .forEach(async (file) => {
     const filePath = path.join(__dirname, file);
-    const module = await import(/* @vite-ignore */ filePath);
+    const module = await import(/*@vite-ignore*/filePath);
     //@ts-ignore
     const model = module.default(sequelize, Sequelize.DataTypes);
     db[model.name] = model;
