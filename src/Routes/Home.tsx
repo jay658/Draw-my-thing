@@ -4,6 +4,7 @@ import { User, useGetUsersQuery, useGetUsersQueryResult } from '../Store/RTK/use
 import { useGetAuthQuery, useGetAuthQueryResult, useLogoutMutation } from '../Store/RTK/authSlice'
 
 import Button from '@mui/material/Button';
+import { ConnectionManager } from '../Components/Websocket/ConnectionManager';
 import TestComponent from '../Components/TestComponent'
 import reactLogo from '../assets/react.svg'
 import { useNavigate } from 'react-router-dom'
@@ -25,6 +26,7 @@ function Home() {
 
   return (
     <>
+      <ConnectionManager />
       <Button onClick={handleLogout}>Log out</Button>
       <div>
         Logged in as: {auth && auth.username}

@@ -1,6 +1,13 @@
-import { io } from 'socket.io-client'
+import { Socket, io } from 'socket.io-client'
+
 import website from '../../Store/RTK/index'
 
-const socket = io(website)
+declare module 'socket.io-client' {
+  interface Socket {
+      username: string
+  }
+}
+
+const socket: Socket = io(website)
 
 export default socket

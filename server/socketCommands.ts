@@ -1,24 +1,44 @@
-import { Socket } from 'socket.io'
+import { Server, Socket } from 'socket.io'
 
-const socketCommands = (socket: Socket)=>{
-  console.log(`User connected: ${socket.id}`)
+declare module 'socket.io' {
+  interface Socket {
+      username: string
+  }
+}
 
-  socket.on('join_room', (data)=>{
-    socket.join(data)
-    console.log(`User with ID: ${socket.id} joined room: ${data}`)
-  })
+const socketCommands = (io: Server)=>{
+  return (socket: Socket)=>{
+    console.log(`User connected: ${socket.id}`)
+    console.log(io.engine.clientsCount)
 
-  socket.on('send message', ()=>{
-    console.log(`message received from user: ${socket.id}`)
-  })
+    socket.username = `anonymous${io.engine.clientsCount}`
+    socket.emit('sending username', socket.username)
 
-  socket.on('disconnect', ()=>{
-    console.log('User disconnected', socket.id)
-  })
+    console.log(socket.username)
 
-  socket.on('error', function (err) {
-    console.log(err);
-  });
+    socket.on('join_room', (data)=>{
+      socket.join(data)
+      console.log(`User with ID: ${socket.id} joined room: ${data}`)
+    })
+
+    socket.on('send message', ()=>{
+      console.log(`message received from user: ${socket.id}`)
+    })
+
+    socket.on('disconnect', ()=>{
+      console.log('User disconnected', socket.id)
+    })
+
+    socket.on('add username', (data) => {
+      const { username } = data
+      socket.username = username
+      socket.emit('sending username', socket.username)
+    })
+
+    socket.on('error', function (err) {
+      console.log(err);
+    });
+  }
 }
 
 export default socketCommands

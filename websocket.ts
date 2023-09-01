@@ -9,7 +9,7 @@ export function configureServer(server: ViteDevServer){
 
   const io = new Server(server.httpServer)
   
-  io.on('connection', socketCommands)
+  io.on('connection', socketCommands(io))
 }
 
 export const webSocket = {
