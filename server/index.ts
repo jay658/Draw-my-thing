@@ -26,7 +26,7 @@ const init = async () => {
       }
     })
 
-    io.on('connection', socketCommands)
+    io.on('connection', socketCommands(io))
     
     httpServer.listen(PORT)
   }

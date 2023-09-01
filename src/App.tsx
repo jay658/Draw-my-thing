@@ -1,5 +1,5 @@
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom'
-import { ReactElement, Suspense, useEffect } from 'react'
+import { ReactElement, Suspense, useEffect, useState } from 'react'
 
 import Canvas from './Components/Canvas';
 import CircularProgress from '@mui/material/CircularProgress';
@@ -21,15 +21,33 @@ const About = () => {
 }
 
 const App = ():ReactElement => {
+  const [isConnected, setIsConnected] = useState(socket.connected);
   const { isLoading, data } = useGetAuthQuery()
   const isLoggedIn = data
   
   useEffect(() => {
-    console.log('connecting')
-    socket.emit('send message')
-  }, [])
+    function onConnect() {
+      console.log('connecting')
+      setIsConnected(true);
+    }
+
+    function onDisconnect() {
+      console.log('disconnecting')
+      setIsConnected(false);
+    }
+
+    socket.on('connect', onConnect);
+    socket.on('disconnect', onDisconnect);
+
+    return () => {
+      socket.off('connect', onConnect);
+      socket.off('disconnect', onDisconnect);
+    };
+  }, []);
   
   if(isLoading) return <CircularProgress/>
+  
+  console.log(`User is ${isConnected ? "connected" : "not connected"}`)
   
   return(
     <>
