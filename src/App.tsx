@@ -29,6 +29,9 @@ const App = ():ReactElement => {
     function onConnect() {
       console.log('connecting')
       setIsConnected(true);
+      socket.on('sending username', (data) => {
+        socket.username = data
+      })
     }
 
     function onDisconnect() {

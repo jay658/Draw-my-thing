@@ -2,14 +2,14 @@ import socket from './socket';
 import { useState } from 'react';
 
 export function ConnectionManager() {
-  const [UserName, setUserName] = useState("");
+  const [usernameFormValue, setUsernameFormValue] = useState("");
+  const [username, setUsername] = useState(socket.username);
   
-  function changeUserName(event: React.ChangeEvent<HTMLInputElement>){
-    setUserName(event.target.value)
+  function handleUsernameForm(event: React.ChangeEvent<HTMLInputElement>){
+    setUsernameFormValue(event.target.value)
   }
   
   function connect() {
-    // send UserName to backend and add to socket
     socket.connect();
   }
 
@@ -17,9 +17,20 @@ export function ConnectionManager() {
     socket.disconnect();
   }
 
+  function handleChangeUsername() {
+    socket.emit('add username', {username: usernameFormValue})
+    socket.on("sending username", (data) => {
+      socket.username = data
+      setUsername(socket.username)
+      setUsernameFormValue('')
+    })
+  }
+
   return (
     <>
-      <input value={UserName} onChange={changeUserName}/>
+      <h2>Current username: {username}</h2>
+      <input value={usernameFormValue} onChange={handleUsernameForm}/>
+      <button onClick={ handleChangeUsername }>Change username</button>
       <button onClick={ connect }>Connect</button>
       <button onClick={ disconnect }>Disconnect</button>
     </>
