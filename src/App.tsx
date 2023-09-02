@@ -4,6 +4,7 @@ import { ReactElement, Suspense, useEffect, useState } from 'react'
 import Canvas from './Components/Canvas';
 import CircularProgress from '@mui/material/CircularProgress';
 import Home from './Routes/Home'
+import JoinScreen from './Components/JoinScreen/JoinScreen';
 import NavBar from './Components/NavBar'
 import SignIn from './Routes/SignIn'
 import { lazyLoad } from './Utility/lazyLoad'
@@ -61,6 +62,7 @@ const App = ():ReactElement => {
             <Route path="/" element={<Home />} />
             <Route path="/about" element={<About />} />
             <Route path="/draw" element={<Canvas />} />
+            <Route path ="/join" element={<JoinScreen/>}/>
             <Route path="*" element={<Navigate to='/' replace={true}/>} />
           </Routes>
         </BrowserRouter>

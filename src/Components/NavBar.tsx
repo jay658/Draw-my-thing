@@ -22,7 +22,8 @@ const settings = ['Profile', 'Account', 'Dashboard', 'Logout'];
 const tabs = {
   Home: '',
   About: 'about',
-  Draw: 'draw'
+  Draw: 'draw',
+  'Join Screen': 'join'
 }
 
 const StyledAppBar = styled(AppBar)(() => ({
