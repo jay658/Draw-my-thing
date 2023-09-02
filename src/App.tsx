@@ -2,14 +2,15 @@ import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom'
 import { ReactElement, Suspense, useEffect, useState } from 'react'
 
 import Canvas from './Components/Canvas';
-import CircularProgress from '@mui/material/CircularProgress';
+// import CircularProgress from '@mui/material/CircularProgress';
 import Home from './Routes/Home'
 import JoinScreen from './Components/JoinScreen/JoinScreen';
 import NavBar from './Components/NavBar'
-import SignIn from './Routes/SignIn'
+// import SignIn from './Routes/SignIn'
 import { lazyLoad } from './Utility/lazyLoad'
 import socket from './Components/Websocket/socket';
-import { useGetAuthQuery } from './Store/RTK/authSlice'
+
+// import { useGetAuthQuery } from './Store/RTK/authSlice'
 
 const AboutPage = lazyLoad('../Routes/About')
 
@@ -23,8 +24,8 @@ const About = () => {
 
 const App = ():ReactElement => {
   const [isConnected, setIsConnected] = useState(socket.connected);
-  const { isLoading, data } = useGetAuthQuery()
-  const isLoggedIn = data
+  // const { isLoading, data } = useGetAuthQuery()
+  // const isLoggedIn = data
   
   useEffect(() => {
     function onConnect() {
@@ -49,13 +50,23 @@ const App = ():ReactElement => {
     };
   }, []);
   
-  if(isLoading) return <CircularProgress/>
+  // if(isLoading) return <CircularProgress/>
   
   console.log(`User is ${isConnected ? "connected" : "not connected"}`)
   
   return(
     <>
-    {isLoggedIn ? (
+    <BrowserRouter>
+      <NavBar/>
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route path="/about" element={<About />} />
+        <Route path="/draw" element={<Canvas />} />
+        <Route path ="/join" element={<JoinScreen/>}/>
+        <Route path="*" element={<Navigate to='/' replace={true}/>} />
+      </Routes>
+    </BrowserRouter>
+    {/* {isLoggedIn ? (
         <BrowserRouter>
           <NavBar/>
           <Routes>
@@ -73,7 +84,7 @@ const App = ():ReactElement => {
           <Route path="*" element={<Navigate to='/' replace={true}/>} />
         </Routes>
       </BrowserRouter>
-    )}
+    )} */}
   </>
   )
 }
