@@ -48,7 +48,7 @@ const Canvas = (): ReactElement => {
     historyStep = 0
   }
 
-  const handleMouseDown = (e: any) => {
+  const handlePointerDown = (e: any) => {
     isDrawing.current = true;
     const pos = e.target.getStage().getPointerPosition();
     const {tool, stroke, strokeWidth} = settings
@@ -62,7 +62,7 @@ const Canvas = (): ReactElement => {
     setLines([...updatedLines]);
   };
 
-  const handleMouseMove = (e: any) => {
+  const handlePointerMove = (e: any) => {
     // no drawing - skipping
     if (!isDrawing.current) {
       return;
@@ -70,6 +70,9 @@ const Canvas = (): ReactElement => {
     const stage = e.target.getStage();
     const point = stage.getPointerPosition();
     let lastLine = lines[lines.length - 1];
+    
+    const { width, height } = stage.attrs
+    const delta = 10
     // add point
     lastLine.points = lastLine.points.concat([point.x, point.y]);
     
@@ -78,14 +81,13 @@ const Canvas = (): ReactElement => {
     
     const updatedLines = lines.concat()
     history[history.length - 1] = updatedLines
+    if(point.x <= 0 + delta || point.y <= 0 + delta || point.x >= width - delta || point.y >= height - delta) isDrawing.current = false
     setLines(updatedLines);
   };
 
-  const handleMouseUpOrLeave = () => {
+  const handlePointerUp = () => {
     isDrawing.current = false;
   };
-
-  
 
   const handleSettingChange = (e:React.ChangeEvent<HTMLSelectElement>) => {
     setSettings({
@@ -109,10 +111,10 @@ const Canvas = (): ReactElement => {
       <Stage
         width={window.innerWidth}
         height={500}
-        onMouseDown={handleMouseDown}
-        onMousemove={handleMouseMove}
-        onMouseup={handleMouseUpOrLeave}
-        onMouseLeave={handleMouseUpOrLeave}
+        onPointerUp={handlePointerUp}
+        onPointerDown={handlePointerDown}
+        onPointerMove={handlePointerMove}
+        onContextMenu={handlePointerUp}
         style={{'border': '1px solid black'}}
       >
         <Layer>
