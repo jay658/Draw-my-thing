@@ -64,7 +64,6 @@ const Canvas = (): ReactElement => {
   };
 
   const handlePointerMove = (e: Konva.KonvaEventObject<PointerEvent>) => {
-    e.evt.preventDefault()
     // no drawing - skipping
     if (!isDrawing.current) {
       return;
@@ -112,12 +111,12 @@ const Canvas = (): ReactElement => {
       
       <Stage
         width={window.innerWidth}
-        height={500}
+        height={Math.min(500, window.innerHeight)}
         onPointerUp={handlePointerUp}
         onPointerDown={handlePointerDown}
         onPointerMove={handlePointerMove}
         onContextMenu={handlePointerUp}
-        style={{'border': '1px solid black'}}
+        style={{'border': '1px solid black', 'touchAction':'none'}}
       >
         <Layer>
           <Text text="Just start drawing" x={5} y={30} />
