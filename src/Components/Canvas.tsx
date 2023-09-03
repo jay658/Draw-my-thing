@@ -2,6 +2,7 @@ import { Layer, Line, Stage, Text } from 'react-konva';
 import { useRef, useState } from 'react';
 
 import CanvasSettings from "./CanvasSettings";
+import Konva from 'konva';
 import type { ReactElement } from "react";
 
 export type LinesT = {
@@ -48,9 +49,9 @@ const Canvas = (): ReactElement => {
     historyStep = 0
   }
 
-  const handlePointerDown = (e: any) => {
+  const handlePointerDown = (e: Konva.KonvaEventObject<PointerEvent>) => {
     isDrawing.current = true;
-    const pos = e.target.getStage().getPointerPosition();
+    const pos = e.target.getStage()!.getPointerPosition()!;
     const {tool, stroke, strokeWidth} = settings
     const updatedLines = [...lines, { tool, points: [pos.x, pos.y], stroke, strokeWidth }]
     if(historyStep < history.length){
@@ -62,13 +63,14 @@ const Canvas = (): ReactElement => {
     setLines([...updatedLines]);
   };
 
-  const handlePointerMove = (e: any) => {
+  const handlePointerMove = (e: Konva.KonvaEventObject<PointerEvent>) => {
+    e.evt.preventDefault()
     // no drawing - skipping
     if (!isDrawing.current) {
       return;
     }
-    const stage = e.target.getStage();
-    const point = stage.getPointerPosition();
+    const stage = e.target.getStage()!;
+    const point = stage.getPointerPosition()!;
     let lastLine = lines[lines.length - 1];
     
     const { width, height } = stage.attrs
