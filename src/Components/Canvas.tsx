@@ -1,52 +1,61 @@
-import { Layer, Line, Stage, Text } from 'react-konva';
+import { Layer, Line, Stage } from 'react-konva';
 import { useRef, useState } from 'react';
 
 import CanvasSettings from "./CanvasSettings";
 import Konva from 'konva';
 import type { ReactElement } from "react";
+import type { SelectChangeEvent } from '@mui/material/Select';
+import { styled } from '@mui/material'
 
 export type LinesT = {
   tool: string
   points: number[],
   stroke: string,
-  strokeWidth: number
+  strokeWidth: string
 }
 
 export type SettingsT = {
   tool: string,
   stroke: string,
-  strokeWidth: number
+  strokeWidth: string
 }
 
-let history: LinesT[][] = [[]]
-let historyStep = 0
+const StyledStage = styled(Stage)(() => ({
+  border: '1px solid black', 
+  touchAction:'none'
+}))
 
 const Canvas = (): ReactElement => {
+  
   const [settings, setSettings] = useState<SettingsT>({
     tool: 'pen',
     stroke: "#000000",
-    strokeWidth: 5
+    strokeWidth: '5'
   })
-  const [lines, setLines] = useState<LinesT[]>(history[historyStep]);
+  const history = useRef<LinesT[][]>([[]])
+  const historyStep = useRef(0)
+  const [lines, setLines] = useState<LinesT[]>(history.current[historyStep.current]);
   const isDrawing = useRef(false);
 
   const handleUndo = () => {
-    if (historyStep === 0) return 
-    historyStep -= 1
-    const previous = history[historyStep]
+    if (historyStep.current === 0) return 
+    historyStep.current -= 1
+    const previous = history.current[historyStep.current]
     setLines([...previous])
   }
 
   const handleRedo = () => {
-    if (!history.length || historyStep === history.length - 1) return
-    historyStep += 1
-    const next = history[historyStep]
+    if (!history.current.length || historyStep.current === history.current.length - 1) return
+    historyStep.current += 1
+    const next = history.current[historyStep.current]
     setLines([...next])
   }
   
   const handleClearHistory = () => {
-    history = [[]]
-    historyStep = 0
+    if(history.current[historyStep.current].length){
+      history.current.push([])
+      historyStep.current += 1
+    }
   }
 
   const handlePointerDown = (e: Konva.KonvaEventObject<PointerEvent>) => {
@@ -54,11 +63,11 @@ const Canvas = (): ReactElement => {
     const pos = e.target.getStage()!.getPointerPosition()!;
     const {tool, stroke, strokeWidth} = settings
     const updatedLines = [...lines, { tool, points: [pos.x, pos.y], stroke, strokeWidth }]
-    if(historyStep < history.length){
-      history.splice(historyStep + 1, history.length - historyStep - 1)
+    if(historyStep.current < history.current.length){
+      history.current.splice(historyStep.current + 1, history.current.length - historyStep.current - 1)
     }
-    history.push(updatedLines)
-    historyStep += 1
+    history.current.push(updatedLines)
+    historyStep.current += 1
     
     setLines([...updatedLines]);
   };
@@ -81,7 +90,7 @@ const Canvas = (): ReactElement => {
     lines.splice(lines.length - 1, 1, lastLine);
     
     const updatedLines = lines.concat()
-    history[history.length - 1] = updatedLines
+    history.current[history.current.length - 1] = updatedLines
     if(point.x <= 0 + delta || point.y <= 0 + delta || point.x >= width - delta || point.y >= height - delta) isDrawing.current = false
     setLines(updatedLines);
   };
@@ -90,10 +99,14 @@ const Canvas = (): ReactElement => {
     isDrawing.current = false;
   };
 
-  const handleSettingChange = (e:React.ChangeEvent<HTMLSelectElement>) => {
+  const handleMouseLeave = () => {
+    isDrawing.current = false
+  }
+
+  const handleSettingChange = (e:SelectChangeEvent<unknown>) => {
     setSettings({
       ...settings,
-      [e.target.name]: e.target.name === 'strokeWidth'? Number(e.target.value): e.target.value
+      [e.target.name]: e.target.value
     })
   }
 
@@ -108,25 +121,22 @@ const Canvas = (): ReactElement => {
         handleUndo={handleUndo}
         handleClearHistory={handleClearHistory}
       />
-      
-      <Stage
+      <StyledStage
         width={window.innerWidth}
-        height={Math.min(500, window.innerHeight)}
+        height={window.innerHeight * .8}
         onPointerUp={handlePointerUp}
         onPointerDown={handlePointerDown}
         onPointerMove={handlePointerMove}
         onContextMenu={handlePointerUp}
-        onMouseLeave={handlePointerUp}
-        style={{'border': '1px solid black', 'touchAction':'none'}}
+        onMouseLeave={handleMouseLeave}
       >
         <Layer>
-          <Text text="Just start drawing" x={5} y={30} />
           {lines.map((line, i) => (
             <Line
               key={i}
               points={line.points}
               stroke={line.stroke}
-              strokeWidth={line.strokeWidth}
+              strokeWidth={Number(line.strokeWidth)}
               tension={0.5}
               lineCap="round"
               globalCompositeOperation={
@@ -135,7 +145,7 @@ const Canvas = (): ReactElement => {
             />
           ))}
         </Layer>
-      </Stage>
+      </StyledStage>
     </div>
   );
 };
