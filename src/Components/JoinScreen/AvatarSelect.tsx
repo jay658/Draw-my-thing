@@ -52,9 +52,9 @@ export default function AvatarSelect() {
           label="Avatar"
           onChange={handleChange}
         >
-          {avatars.map((avatar) => {
+          {avatars.map((avatar, idx) => {
             return(
-              <MenuItem value={avatar}><AvatarIcon src={avatarsMap[avatar]}/></MenuItem>
+              <MenuItem value={avatar} key={idx}><AvatarIcon src={avatarsMap[avatar]}/></MenuItem>
             )
           })}
         </Select>

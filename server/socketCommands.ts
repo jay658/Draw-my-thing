@@ -5,6 +5,10 @@ declare module 'socket.io' {
       username: string
   }
 }
+type Room = {
+  name: string,
+  members: string[]
+}
 
 const socketCommands = (io: Server)=>{
   return (socket: Socket)=>{
@@ -21,6 +25,20 @@ const socketCommands = (io: Server)=>{
       console.log(`User with ID: ${socket.id} joined room: ${data}`)
     })
 
+    socket.on('get_rooms', ()=>{
+      const rooms = io.sockets.adapter.rooms
+      
+      const roomData: Array<Room> = []
+      
+      for(const [name, membersSet] of rooms){
+        
+        roomData.push({name, members:[...membersSet]})
+      }
+      // roomData.filter(roomArray => roomArray[0].length < 20) to filter the default rooms created for each socket
+      
+      socket.emit('send_rooms', roomData)
+    })
+    
     socket.on('send message', ()=>{
       console.log(`message received from user: ${socket.id}`)
     })

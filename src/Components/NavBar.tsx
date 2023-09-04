@@ -23,7 +23,8 @@ const tabs = {
   Home: '',
   About: 'about',
   Draw: 'draw',
-  'Join Screen': 'join'
+  'Join Screen': 'join',
+  Rooms: 'rooms'
 }
 
 const StyledAppBar = styled(AppBar)(() => ({
