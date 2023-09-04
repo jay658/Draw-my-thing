@@ -6,6 +6,7 @@ import Canvas from './Components/Canvas';
 import Home from './Routes/Home'
 import JoinScreen from './Components/JoinScreen/JoinScreen';
 import NavBar from './Components/NavBar'
+import RoomList from './Components/JoinScreen/RoomList';
 // import SignIn from './Routes/SignIn'
 import { lazyLoad } from './Utility/lazyLoad'
 import socket from './Components/Websocket/socket';
@@ -63,6 +64,7 @@ const App = ():ReactElement => {
         <Route path="/about" element={<About />} />
         <Route path="/draw" element={<Canvas />} />
         <Route path ="/join" element={<JoinScreen/>}/>
+        <Route path ="/rooms" element={<RoomList/>}/>
         <Route path="*" element={<Navigate to='/' replace={true}/>} />
       </Routes>
     </BrowserRouter>

@@ -1,0 +1,64 @@
+import { ReactElement, useEffect, useState } from "react";
+import { Table, TableBody, TableCell, TableHead, TableRow } from "@mui/material";
+
+import Button from '@mui/material/Button';
+import socket from "../Websocket/socket";
+
+type Room = {
+  name: string,
+  members: string[]
+}
+const MAX_ROOM_CAPACITY = 6
+
+const RoomList = (): ReactElement => {
+  const [rooms, setRooms] = useState<Array<Room>>([])
+  
+  useEffect(()=>{
+    getRooms()
+  },[])
+  
+  function getRooms(){
+    socket.emit('get_rooms')
+    socket.on('send_rooms', (data: Array<Room>)=>{
+      setRooms(data)
+    })
+  }
+  
+  if(!rooms.length) return <div>Loading</div>
+  
+  function joinRoom(roomName: string){
+    console.log("joining room", roomName)
+    socket.emit('join_room', roomName)
+  }
+  
+  return (
+    <div>
+      <Button onClick={ getRooms }>REFRESH ROOMS</Button>
+      <Table >
+        <TableHead>
+          <TableRow>
+            <TableCell>Name</TableCell>
+            <TableCell>Players</TableCell>
+            <TableCell align="right">Join</TableCell>
+          </TableRow>
+        </TableHead>
+        <TableBody>
+          {rooms.map((room, idx) => (
+            <TableRow key={idx}>
+              <TableCell component="th" scope="row">
+                {room.name}
+              </TableCell>
+              <TableCell >{room.members.length}/{MAX_ROOM_CAPACITY}</TableCell>
+              <TableCell align="right">
+              <Button onClick = {()=>joinRoom(room.name)}>JOIN</Button>
+              </TableCell>
+            </TableRow>
+          ))}
+        </TableBody>
+      </Table>
+    </div>
+  )
+}
+
+export default RoomList;
+

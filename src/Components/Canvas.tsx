@@ -73,7 +73,7 @@ const Canvas = (): ReactElement => {
     let lastLine = lines[lines.length - 1];
     
     const { width, height } = stage.attrs
-    const delta = 10
+    const delta = 0
     // add point
     lastLine.points = lastLine.points.concat([point.x, point.y]);
     
@@ -116,6 +116,7 @@ const Canvas = (): ReactElement => {
         onPointerDown={handlePointerDown}
         onPointerMove={handlePointerMove}
         onContextMenu={handlePointerUp}
+        onMouseLeave={handlePointerUp}
         style={{'border': '1px solid black', 'touchAction':'none'}}
       >
         <Layer>
