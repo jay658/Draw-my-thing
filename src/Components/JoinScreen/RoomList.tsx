@@ -3,6 +3,7 @@ import { Table, TableBody, TableCell, TableHead, TableRow } from "@mui/material"
 
 import Button from '@mui/material/Button';
 import socket from "../Websocket/socket";
+import { useNavigate } from 'react-router-dom'
 
 type Room = {
   name: string,
@@ -11,20 +12,28 @@ type Room = {
 const MAX_ROOM_CAPACITY = 6
 
 const RoomList = (): ReactElement => {
+  const navigate = useNavigate()
   const [rooms, setRooms] = useState<Array<Room>>([])
+  console.log(socket.username, rooms.length)
   
   useEffect(()=>{
+    if(!socket.username) navigate('/join')
+    socket.on('send_rooms', (data: Array<Room>)=>{
+      setRooms(data)
+    })
+    
     getRooms()
+
+    return () => {
+      socket.off('send_rooms')
+    }
   },[])
   
   function getRooms(){
     socket.emit('get_rooms')
-    socket.on('send_rooms', (data: Array<Room>)=>{
-      setRooms(data)
-    })
   }
   
-  if(!rooms.length) return <div>Loading</div>
+  // if(!rooms.length) return <div>Loading</div>
   
   function joinRoom(roomName: string){
     console.log("joining room", roomName)
@@ -34,6 +43,7 @@ const RoomList = (): ReactElement => {
   return (
     <div>
       <Button onClick={ getRooms }>REFRESH ROOMS</Button>
+      <h3>{socket.username}</h3>
       <Table >
         <TableHead>
           <TableRow>
