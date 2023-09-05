@@ -25,7 +25,7 @@ const AvatarIcon = styled('img')(() => ({
 }));
 
 export default function AvatarSelect() {
-  const [avatar, setAvatar] = React.useState<string | number>('');
+  const [avatar, setAvatar] = React.useState<string | number>('Elephant Circus');
   const [open, setOpen] = React.useState(false);
 
   const handleChange = (event: SelectChangeEvent<typeof avatar>) => {
