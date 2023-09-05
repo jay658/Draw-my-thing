@@ -17,6 +17,14 @@ import { styled } from '@mui/material'
 import { useLogoutMutation } from '../Store/RTK/authSlice';
 import { useNavigate } from 'react-router-dom'
 
+const breakpoints = {
+  mobile: 768
+};
+
+const mq = {
+  mobile: `@media (max-width: ${breakpoints.mobile}px)`
+};
+
 const settings = ['Profile', 'Account', 'Dashboard', 'Logout'];
 
 const tabs = {
@@ -27,12 +35,20 @@ const tabs = {
   Rooms: 'rooms'
 }
 
+const mobile = new Set(['Draw', 'Join Screen', 'Rooms'])
+
 const StyledAppBar = styled(AppBar)(() => ({
   backgroundColor: 'white'
 }))
 
 const NavBarBox = styled(Box)(() => ({
   display: 'flex',
+}))
+
+const MobileButton = styled(Button)(() => ({
+  [mq.mobile]: {
+    display: 'none', // Hide all tabs by default on mobile
+  }
 }))
 
 function ResponsiveAppBar() {
@@ -80,10 +96,11 @@ function ResponsiveAppBar() {
           <NavBarBox>
             {Object.entries(tabs).map(entry => {
               const [linkName, linkRoute] = entry
+              console.log(linkName)
               return(
-                  <Button onClick={() => navigate(`/${linkRoute}`)} key={linkName}>
+                  <MobileButton onClick={() => navigate(`/${linkRoute}`)} key={linkName} style={!mobile.has(linkName)?{}: {display:'flex'}}>
                     {linkName}
-                  </Button>
+                  </MobileButton>
               )
             })}
             <Button onClick={handleLogout}>

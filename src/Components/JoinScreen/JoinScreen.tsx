@@ -26,13 +26,9 @@ const Item = styled(Paper)(({ theme }) => ({
   padding: theme.spacing(3),
   textAlign: 'center',
   color: theme.palette.text.secondary,
-  width: '40vw',
-  height: '40vh',
+  width: '100vw',
+  maxWidth: '600px',
   border: '1px solid black',
-  top: '50%',
-  left: '50%',
-  position: 'absolute',
-  transform: 'translate(-50%, -50%)',
 }));
 
 const InLineContainer = styled('div')(() => ({
@@ -40,6 +36,11 @@ const InLineContainer = styled('div')(() => ({
   alignItems: 'center',
   justifyContent: 'center'
 }));
+
+const StyledGrid = styled(Grid)(() => ({
+  justifyContent:'center',
+  alignItems:'center'
+}))
 
 const JoinScreen = ({setUsername}: JoinScreenPropsT): ReactElement => {
   const [name, setName] = useState('')
@@ -110,40 +111,38 @@ const JoinScreen = ({setUsername}: JoinScreenPropsT): ReactElement => {
   }
   
   return(
-    <Grid container spacing={2}>
-      <Grid>
-        <Item>
-          <h1>APP'S NAME</h1>
-          <InLineContainer>
-            <TextField
-              required
-              label="Username"
-              defaultValue=""
-              onChange={handleNameChange}
-              inputProps={{ maxLength: 15 }}
-            />
-            <AvatarSelect/>
-          </InLineContainer>
+    <StyledGrid container spacing={2}>
+      <Item>
+        <h1>APP'S NAME</h1>
+        <InLineContainer>
           <TextField
             required
-            label="Room name"
-            defaultValue={name}
-            onChange={handleRoomChange}
+            label="Username"
+            defaultValue=""
+            onChange={handleNameChange}
             inputProps={{ maxLength: 15 }}
           />
-          <InLineContainer>
-            <Button onClick={handleCreateRoom} disabled={!roomName || !name}>CREATE ROOM</Button>
-            <Button onClick={handleJoinRoom} disabled={!roomName || !name}>JOIN ROOM</Button>
-          </InLineContainer>
-          <InLineContainer>
-            <Button onClick={handleGoToRoomList} disabled={!name}>
-              Join an existing room (Pick a username first!)
-            </Button>
-          </InLineContainer>
-        </Item>
-        <JoinScreenErrors error={errorRef.current} openError={openError} setOpenError={setOpenError}/>
-      </Grid>
-    </Grid>
+          <AvatarSelect/>
+        </InLineContainer>
+        <TextField
+          required
+          label="Room name"
+          defaultValue={name}
+          onChange={handleRoomChange}
+          inputProps={{ maxLength: 15 }}
+        />
+        <InLineContainer>
+          <Button onClick={handleCreateRoom} disabled={!roomName || !name}>CREATE ROOM</Button>
+          <Button onClick={handleJoinRoom} disabled={!roomName || !name}>JOIN ROOM</Button>
+        </InLineContainer>
+        <InLineContainer>
+          <Button onClick={handleGoToRoomList} disabled={!name}>
+            Join an existing room (Pick a username first!)
+          </Button>
+        </InLineContainer>
+      </Item>
+      <JoinScreenErrors error={errorRef.current} openError={openError} setOpenError={setOpenError}/>
+    </StyledGrid>
   )
 }
 
