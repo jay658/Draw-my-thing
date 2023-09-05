@@ -40,7 +40,8 @@ const StyledDiv = styled('div')(() => ({
   display: 'flex',
   justifyContent: 'center', 
   alignItems: 'center',
-  gap: '10px'
+  gap: '10px',
+  flexWrap: 'wrap'
 }))
 
 const StyledInputLabel = styled(InputLabel)(() => ({
