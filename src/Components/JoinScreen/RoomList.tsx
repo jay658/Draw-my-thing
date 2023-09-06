@@ -14,7 +14,6 @@ const MAX_ROOM_CAPACITY = 6
 const RoomList = (): ReactElement => {
   const navigate = useNavigate()
   const [rooms, setRooms] = useState<Array<Room>>([])
-  console.log(socket.username, rooms.length)
   
   useEffect(()=>{
     if(!socket.username) navigate('/join')

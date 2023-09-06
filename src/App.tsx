@@ -7,6 +7,7 @@ import { ConnectionManager } from './Components/Websocket/ConnectionManager';
 import Home from './Routes/Home'
 import NavBar from './Components/NavBar'
 import RoomList from './Components/JoinScreen/RoomList';
+import WaitingRoom from './Components/JoinScreen/WaitingRoom';
 // import SignIn from './Routes/SignIn'
 import { lazyLoad } from './Utility/lazyLoad'
 
@@ -67,6 +68,7 @@ const App = ():ReactElement => {
         <Route path="/draw" element={<Canvas />} />
         <Route path ="/join" element={<ConnectionManager/>}/>
         <Route path ="/rooms" element={<RoomList/>}/>
+        <Route path ="/waitingroom" element={<WaitingRoom/>}/>
         <Route path="*" element={<Navigate to='/' replace={true}/>} />
       </Routes>
     </BrowserRouter>
