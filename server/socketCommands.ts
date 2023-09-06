@@ -42,7 +42,7 @@ const socketCommands = (io: Server)=>{
     return getRooms().find(room => room.name === roomName)
   }
 
-  const doesRoomExists = (roomName: string) => {
+  const roomExists = (roomName: string) => {
     const rooms = getRooms()
     
     for(let room of rooms){
@@ -62,8 +62,7 @@ const socketCommands = (io: Server)=>{
 
     socket.on('create_room', (data) => {
       const roomName = data
-      
-      if(!doesRoomExists(roomName)){
+      if(!roomExists(roomName)){
         socket.join(roomName)
         console.log(`User ${socket.username} (${socket.id}) created the room ${roomName}`)
         socket.emit('create_room_success', roomName)
@@ -74,7 +73,7 @@ const socketCommands = (io: Server)=>{
 
     socket.on('join_room', (data)=>{
       const roomName = data
-      if(doesRoomExists(roomName)){
+      if(roomExists(roomName)){
         socket.join(roomName)
         console.log(`User ${socket.username} (${socket.id}) joined room: ${roomName}`)
         
@@ -112,6 +111,7 @@ const socketCommands = (io: Server)=>{
       console.log(`User ${socket.username} (${socket.id}) disconnected`, socket.id)
     })
 
+    //can remove
     socket.on('add_username', (data) => {
       const { username } = data
       socket.username = username

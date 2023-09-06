@@ -24,8 +24,12 @@ const AvatarIcon = styled('img')(() => ({
     height: 'auto',
 }));
 
+const StyledFormControl = styled(FormControl)(() => ({
+  margin: '10px',
+}))
+
 export default function AvatarSelect() {
-  const [avatar, setAvatar] = React.useState<string | number>('Elephant Circus');
+  const [avatar, setAvatar] = React.useState<string>('Elephant Circus');
   const [open, setOpen] = React.useState(false);
 
   const handleChange = (event: SelectChangeEvent<typeof avatar>) => {
@@ -42,7 +46,7 @@ export default function AvatarSelect() {
 
   return (
     <div>
-      <FormControl sx={{ m: 1, minWidth: 90 }}>
+      <StyledFormControl>
         <InputLabel>Avatar</InputLabel>
         <Select
           open={open}
@@ -58,7 +62,7 @@ export default function AvatarSelect() {
             )
           })}
         </Select>
-      </FormControl>
+      </StyledFormControl>
     </div>
   );
 }

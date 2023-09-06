@@ -8,6 +8,6 @@ declare module 'socket.io-client' {
   }
 }
 
-const socket: Socket = io(website)
+const socket: Socket = io(website, {autoConnect: false})
 
 export default socket
