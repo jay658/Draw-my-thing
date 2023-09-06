@@ -55,12 +55,12 @@ const JoinScreen = ({setUsername}: JoinScreenPropsT): ReactElement => {
 
   useEffect(() => {
     socket.on("room_not_found", (data) => {
-        setOpenError(true)
-        setError(prevError => {
-          const newError = { ...prevError, roomNotFound: data }
-          errorRef.current = newError
-          return newError
-        });
+      setOpenError(true)
+      setError(prevError => {
+        const newError = { ...prevError, roomNotFound: data }
+        errorRef.current = newError
+        return newError
+      });
     });
 
     socket.on("room_name_taken", (data) => {
@@ -72,10 +72,22 @@ const JoinScreen = ({setUsername}: JoinScreenPropsT): ReactElement => {
       })
     })
 
+    socket.on("create_room_success", (roomName) => {
+      console.log(`${name} created room ${roomName}`)
+      navigate(`/waitingroom?room=${roomName}`)
+    })
+
+    socket.on("join_room_success", (roomName) => {
+      console.log(`${name} joined room ${roomName}`)
+      navigate(`/waitingroom?room=${roomName}`)
+    })
+
     // Cleanup by removing the event listener when the component unmounts
     return () => {
-        socket.off("room_not_found");
+        socket.off("room_not_found")
         socket.off("room_name_taken")
+        socket.off("create_room_success")
+        socket.off("join_room_success")
     };
 }, []);
   
@@ -83,14 +95,12 @@ const JoinScreen = ({setUsername}: JoinScreenPropsT): ReactElement => {
     socket.emit('update_username', name)
     socket.emit("create_room", roomName)
     socket.username = name
-    if(!errorRef.current.roomNameTaken) console.log(`${name} created room ${roomName}`)
   }
 
   const handleJoinRoom = () => {
     socket.emit('update_username', name)
     socket.emit("join_room", roomName)
     socket.username = name
-    if(!errorRef.current.roomNotFound) console.log(`${name} joined room ${roomName}`)
   }
 
   const handleNameChange = (e: ChangeEvent<HTMLInputElement>) => {

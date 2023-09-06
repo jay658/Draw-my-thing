@@ -2,25 +2,44 @@ import { Server, Socket } from 'socket.io'
 
 declare module 'socket.io' {
   interface Socket {
-      username: string
+      username: string,
+      readyStatus: boolean
   }
+}
+type Member = {
+  username: string,
+  readyStatus: boolean
 }
 type Room = {
   name: string,
-  members: string[]
+  members: Member[]
 }
 
 const socketCommands = (io: Server)=>{
-
+  
   const getRooms = () => {
     const rooms = io.sockets.adapter.rooms
-    const roomData: Array<Room> = []
+    const roomData: Room[] = []
 
-    for(const [name, membersSet] of rooms){ 
-      roomData.push({name, members:[...membersSet]})
+    for(const [name, membersSet] of rooms){
+      const members: Member[] = []
+      const membersSetArray = [...membersSet]
+      
+      membersSetArray.forEach(memberStringId => {
+        const socket = io.sockets.sockets.get(memberStringId)
+        if(socket){
+          const { readyStatus, username } = socket
+          if(username) members.push({username, readyStatus}) 
+        }
+      });
+      roomData.push({name, members})
     }
 
     return roomData
+  }
+
+  const getRoom = (roomName: string) =>{
+    return getRooms().find(room => room.name === roomName)
   }
 
   const doesRoomExists = (roomName: string) => {
@@ -36,7 +55,8 @@ const socketCommands = (io: Server)=>{
   return (socket: Socket)=>{
     console.log(io.engine.clientsCount)
 
-    socket.username = `anonymous`
+    socket.username = socket.id
+    socket.readyStatus = false
     console.log(`User ${socket.username} (${socket.id}) connected`)
     socket.emit('sending_username', socket.username)
 
@@ -46,6 +66,7 @@ const socketCommands = (io: Server)=>{
       if(!doesRoomExists(roomName)){
         socket.join(roomName)
         console.log(`User ${socket.username} (${socket.id}) created the room ${roomName}`)
+        socket.emit('create_room_success', roomName)
       }else{
         socket.emit('room_name_taken', `The room name ${roomName} is already taken`)
       }
@@ -56,15 +77,31 @@ const socketCommands = (io: Server)=>{
       if(doesRoomExists(roomName)){
         socket.join(roomName)
         console.log(`User ${socket.username} (${socket.id}) joined room: ${roomName}`)
+        
+        io.to(roomName).emit('send_room', getRoom(roomName))
+        socket.emit('join_room_success', roomName)
       }else{
         socket.emit('room_not_found', `There is no room ${roomName}`)
       }
     })
 
+    socket.on('get_room', (name)=>{
+      socket.emit('send_room', getRoom(name))
+    })
+    
     socket.on('get_rooms', ()=>{
       const roomData = getRooms().filter(room => room.name.length !== 20)
-      // roomData.filter(roomArray => roomArray[0].length < 20) to filter the default rooms created for each socket
       socket.emit('send_rooms', roomData)
+    })
+    
+    socket.on('update_status', ({username, roomName})=>{
+      const sockets = [...io.sockets.sockets.values()]
+      const socketToUpdate = sockets.find(socket => socket.username === username)
+      if(socketToUpdate !== undefined) socketToUpdate.readyStatus = !socketToUpdate.readyStatus
+      
+      const updatedRoom = getRooms().find(room => room.name === roomName)
+      
+      io.to(roomName).emit('status_updated', updatedRoom)
     })
     
     socket.on('send message', ()=>{

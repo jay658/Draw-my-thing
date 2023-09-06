@@ -96,7 +96,6 @@ function ResponsiveAppBar() {
           <NavBarBox>
             {Object.entries(tabs).map(entry => {
               const [linkName, linkRoute] = entry
-              console.log(linkName)
               return(
                   <MobileButton onClick={() => navigate(`/${linkRoute}`)} key={linkName} style={!mobile.has(linkName)?{}: {display:'flex'}}>
                     {linkName}
