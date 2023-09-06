@@ -65,8 +65,8 @@ const JoinScreen = ({setUsername}: JoinScreenPropsT): ReactElement => {
 
     socket.on("room_name_taken", (data) => {
       setOpenError(true)
-      setError(prevError => {
-        const newError = {...prevError, roomNameTaken: data}
+      setError(_prevError => {
+        const newError = { roomNotFound: '', roomNameTaken: data }
         errorRef.current = newError
         return newError
       })
@@ -92,12 +92,14 @@ const JoinScreen = ({setUsername}: JoinScreenPropsT): ReactElement => {
 }, []);
   
   const handleCreateRoom = () => {
+    if(!socket.connected) socket.connect()
     socket.emit('update_username', name)
     socket.emit("create_room", roomName)
     socket.username = name
   }
 
   const handleJoinRoom = () => {
+    if(!socket.connected) socket.connect()
     socket.emit('update_username', name)
     socket.emit("join_room", roomName)
     socket.username = name
@@ -115,6 +117,7 @@ const JoinScreen = ({setUsername}: JoinScreenPropsT): ReactElement => {
   }
 
   const handleGoToRoomList = () => {
+    if(!socket.connected) socket.connect()
     socket.username = name
     setUsername(name)
     navigate('/rooms')

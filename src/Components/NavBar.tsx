@@ -14,7 +14,7 @@ import Toolbar from '@mui/material/Toolbar';
 import Tooltip from '@mui/material/Tooltip';
 import Typography from '@mui/material/Typography';
 import { styled } from '@mui/material'
-import { useLogoutMutation } from '../Store/RTK/authSlice';
+// import { useLogoutMutation } from '../Store/RTK/authSlice';
 import { useNavigate } from 'react-router-dom'
 
 const breakpoints = {
@@ -45,10 +45,43 @@ const NavBarBox = styled(Box)(() => ({
   display: 'flex',
 }))
 
-const MobileButton = styled(Button)(() => ({
+const NavButton = styled(Button)(() => ({
   [mq.mobile]: {
     display: 'none', // Hide all tabs by default on mobile
   }
+}))
+
+const AppIcon = styled(AdbIcon)(() => ({
+  color: 'black',
+  display: 'flex',
+  marginRight: 8, 
+  '@media (max-width: 600px)': {
+    display: 'flex',
+  },
+  '@media (min-width: 960px)': {
+    display: 'flex',
+  },
+}));
+
+const HomeLink = styled(Typography)(() => ({
+  marginRight: 16, 
+  display: 'flex',
+  flexGrow: 1,
+  fontFamily: 'monospace',
+  fontWeight: 700,
+  letterSpacing: '.3rem',
+  color: 'inherit',
+  textDecoration: 'none',
+  '@media (max-width: 600px)': { 
+    display: 'flex',
+  },
+  '@media (min-width: 960px)': { 
+    display: 'flex',
+  },
+}));
+
+const CenteredTypography = styled(Typography)(() => ({
+  textAlign: 'center'
 }))
 
 function ResponsiveAppBar() {
@@ -64,47 +97,31 @@ function ResponsiveAppBar() {
 
   const navigate = useNavigate()
 
-  const [logoutMutation] = useLogoutMutation()
+  // const [logoutMutation] = useLogoutMutation()
 
-  const handleLogout = async () => {
-    await logoutMutation();
-  };
+  // const handleLogout = async () => {
+  //   await logoutMutation();
+  // };
 
   return (
     <StyledAppBar position="static">
       <Container maxWidth="xl">
         <Toolbar disableGutters>
-          <AdbIcon sx={{ display: { xs: 'flex', md: 'flex' }, mr: 1 }} />
-          <Typography
-            variant="h5"
-            noWrap
-            component="a"
-            href=""
-            sx={{
-              mr: 2,
-              display: { xs: 'flex', md: 'flex' },
-              flexGrow: 1,
-              fontFamily: 'monospace',
-              fontWeight: 700,
-              letterSpacing: '.3rem',
-              color: 'inherit',
-              textDecoration: 'none',
-            }}
-          >
-            <Button onClick={() => navigate('/')}>LOGO</Button>
-          </Typography>
+          <HomeLink variant="h5" noWrap>
+            <Button onClick={() => navigate('/')}><AppIcon/></Button>
+          </HomeLink>
           <NavBarBox>
             {Object.entries(tabs).map(entry => {
               const [linkName, linkRoute] = entry
               return(
-                  <MobileButton onClick={() => navigate(`/${linkRoute}`)} key={linkName} style={!mobile.has(linkName)?{}: {display:'flex'}}>
+                  <NavButton onClick={() => navigate(`/${linkRoute}`)} key={linkName} style={!mobile.has(linkName)?{}: {display:'flex'}}>
                     {linkName}
-                  </MobileButton>
+                  </NavButton>
               )
             })}
-            <Button onClick={handleLogout}>
+            {/* <Button onClick={handleLogout}>
               Logout
-            </Button>
+            </Button> */}
           </NavBarBox>
           <Box sx={{ flexGrow: 0 }}>
             <Tooltip title="Open settings">
@@ -130,7 +147,7 @@ function ResponsiveAppBar() {
             >
               {settings.map((setting) => (
                 <MenuItem key={setting} onClick={handleCloseUserMenu}>
-                  <Typography textAlign="center">{setting}</Typography>
+                  <CenteredTypography>{setting}</CenteredTypography>
                 </MenuItem>
               ))}
             </Menu>

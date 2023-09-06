@@ -32,11 +32,11 @@ export default function JoinScreenErrors({error, openError, setOpenError}: JoinS
   return (
     <Stack spacing={2} sx={{ width: '100%' }}>
       {roomNotFound &&
-      <Snackbar open={openError} autoHideDuration={3000} onClose={handleClose}>
+      <Snackbar open={openError} autoHideDuration={3000} onClose={handleClose} anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}>
         <Alert severity="error" sx={{ width: '100%' }}>{roomNotFound}</Alert>
       </Snackbar>}
       {roomNameTaken &&
-      <Snackbar open={openError} autoHideDuration={3000} onClose={handleClose}>
+      <Snackbar open={openError} autoHideDuration={3000} onClose={handleClose} anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}>
         <Alert severity="error" sx={{ width: '100%' }}>{roomNameTaken}</Alert>
       </Snackbar>}
     </Stack>

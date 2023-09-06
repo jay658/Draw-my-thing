@@ -1,4 +1,4 @@
-import { ReactElement, useEffect, useRef, useState } from "react";
+import { ReactElement, useEffect, useState } from "react";
 
 import Button from '@mui/material/Button';
 import Card from '@mui/material/Card';
@@ -41,7 +41,7 @@ const WaitingRoom = (): ReactElement => {
     const username = players[idx].username
     socket.emit("update_status", {username, roomName})
   }
-  if(!roomExists) return <div>No game found</div>
+  if(!roomExists) return <div>There is no room with the name {roomName}</div>
   
   return (
     <Grid container spacing={4} justifyContent={"center"} alignItems={"center"}>
