@@ -73,6 +73,7 @@ const WaitingRoom = (): ReactElement => {
   const params = new URLSearchParams(window.location.search)
   const roomName = params.get("room")
   const [players, setPlayers] = useState<Player[]>([])
+  const [currPlayer, setCurrPlayer] = useState<Player | null>(null)
   const [roomExists, setRoomExists] = useState(false)
   const [error, setError] = useState<WaitingRoomErrorsT>({
     playersNotReady: '',
@@ -83,10 +84,10 @@ const WaitingRoom = (): ReactElement => {
   
   useEffect(()=>{
     socket.emit("get_room", roomName)
+    socket.emit("get_socket_info")
     socket.on("send_room", (room)=>{
       if(room){
         if(!roomExists) setRoomExists(true)
-        console.log(room)
         setPlayers([...room.members])
       }
     })
@@ -108,11 +109,16 @@ const WaitingRoom = (): ReactElement => {
       })
     })
     
+    socket.on("sending_socket_info", (player) => {
+      setCurrPlayer(player)
+    })
+    
     return ()=>{
       socket.off("send_room")
       socket.off("status_updated")
       socket.off("starting_game")
       socket.off("players_not_ready")
+      socket.off("sending_socket_info")
     }
   },[])
   
@@ -136,7 +142,7 @@ const WaitingRoom = (): ReactElement => {
     <Container>
       <OutterGrid container>
         <InnerGrid>
-          {populateScreen(players, readyUp).map(item => item)}
+          {populateScreen(players, currPlayer, readyUp).map(item => item)}
         </InnerGrid>
       </OutterGrid>
       <div>
@@ -150,7 +156,7 @@ const WaitingRoom = (): ReactElement => {
 
 export default WaitingRoom;
 
-const populateScreen = (players: Player[], readyUp: (idx:number) => void) => {
+const populateScreen = (players: Player[], currPlayer: Player | null, readyUp: (idx:number) => void) => {
   const playerDetails = []
   for(let i = 0; i < MAX_ROOM_CAPACITY; i++){
     const player = players[i]
@@ -170,7 +176,7 @@ const populateScreen = (players: Player[], readyUp: (idx:number) => void) => {
               Ready Status: {player.readyStatus ? "Ready" : "Not Ready"}
             </Typography>
           </CardContent>
-          {socket.username === player.username && <CardActions>
+          {currPlayer && currPlayer.username === player.username && <CardActions>
             <Button size="small" onClick={()=> readyUp(i)}>Ready Up</Button>
           </CardActions>}
         </StyledCard>)

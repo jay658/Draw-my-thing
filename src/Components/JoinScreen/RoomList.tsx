@@ -16,7 +16,9 @@ const RoomList = (): ReactElement => {
   const [rooms, setRooms] = useState<Array<Room>>([])
   
   useEffect(()=>{
-    if(!socket.username) navigate('/join')
+    if(!socket.connected) navigate('/join')
+    socket.emit("get_socket_info")
+    
     socket.on('send_rooms', (data: Array<Room>)=>{
       setRooms(data)
     })

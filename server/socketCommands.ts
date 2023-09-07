@@ -133,6 +133,11 @@ const socketCommands = (io: Server)=>{
     socket.on('leave_room', () => {
       leaveAllOtherRooms(socket)
     })
+
+    socket.on("get_socket_info", () => {
+      const { username, readyStatus, avatar } = socket
+      socket.emit("sending_socket_info", { username, readyStatus, avatar})
+    })
     
     socket.on('update_status', ({username, roomName})=>{
       const sockets = [...io.sockets.sockets.values()]

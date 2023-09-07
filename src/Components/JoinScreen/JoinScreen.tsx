@@ -94,15 +94,12 @@ const JoinScreen = ({setUsername}: JoinScreenPropsT): ReactElement => {
   
   const handleCreateRoom = () => {
     if(!socket.connected) socket.connect()
-    console.log(playerAvatar)
     socket.emit("create_room", {name, roomName, avatar: playerAvatar})
-    socket.username = name
   }
 
   const handleJoinRoom = () => {
     if(!socket.connected) socket.connect()
     socket.emit("join_room", {name, roomName, avatar: playerAvatar})
-    socket.username = name
   }
 
   const handleNameChange = (e: ChangeEvent<HTMLInputElement>) => {
@@ -118,7 +115,6 @@ const JoinScreen = ({setUsername}: JoinScreenPropsT): ReactElement => {
 
   const handleGoToRoomList = () => {
     if(!socket.connected) socket.connect()
-    socket.username = name
     setUsername(name)
     navigate('/rooms')
   }
