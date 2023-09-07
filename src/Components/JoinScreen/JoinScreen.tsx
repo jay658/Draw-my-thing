@@ -2,15 +2,15 @@ import { ChangeEvent, ReactElement, useEffect, useRef, useState } from "react";
 
 import AvatarSelect from './AvatarSelect';
 import Button from '@mui/material/Button';
+import ErrorMessages from "./ErrorMessage";
 import Grid from '@mui/material/Grid';
-import JoinScreenErrors from "./ErrorMessage";
 import Paper from '@mui/material/Paper';
 import TextField from '@mui/material/TextField';
 import socket from "../Websocket/socket";
 import { styled } from '@mui/material/styles';
 import { useNavigate } from 'react-router-dom'
 
-export type ErrorStateT = {
+export type JoinScreenErrorsT = {
   roomNotFound: string,
   roomNameTaken: string
 }
@@ -45,7 +45,7 @@ const StyledGrid = styled(Grid)(() => ({
 const JoinScreen = ({setUsername}: JoinScreenPropsT): ReactElement => {
   const [name, setName] = useState('')
   const [roomName, setRoomName] = useState('')
-  const [error, setError] = useState<ErrorStateT>({
+  const [error, setError] = useState<JoinScreenErrorsT>({
     roomNotFound: '',
     roomNameTaken: ''
   })
@@ -154,7 +154,7 @@ const JoinScreen = ({setUsername}: JoinScreenPropsT): ReactElement => {
           </Button>
         </InLineContainer>
       </Item>
-      <JoinScreenErrors error={errorRef.current} openError={openError} setOpenError={setOpenError}/>
+      <ErrorMessages error={errorRef.current} openError={openError} setOpenError={setOpenError}/>
     </StyledGrid>
   )
 }
