@@ -1,9 +1,11 @@
 import MuiAlert, { AlertProps } from '@mui/material/Alert';
 import { SyntheticEvent, forwardRef } from 'react'
 
-import type { ErrorStateT } from './JoinScreen'
+import type { JoinScreenErrorsT } from './JoinScreen'
 import Snackbar from '@mui/material/Snackbar';
 import Stack from '@mui/material/Stack';
+import type { WaitingRoomErrorsT } from './WaitingRoom'
+import { styled } from '@mui/material/styles';
 
 const Alert = forwardRef<HTMLDivElement, AlertProps>(function Alert(
   props,
@@ -12,15 +14,23 @@ const Alert = forwardRef<HTMLDivElement, AlertProps>(function Alert(
   return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
 });
 
-type JoinScreenErrorsPropsT = {
-  error: ErrorStateT,
+type ErrorsPropsT = {
+  error: Partial<JoinScreenErrorsT & WaitingRoomErrorsT>,
   openError: boolean,
   setOpenError: (open: boolean) => void
 }
 
-export default function JoinScreenErrors({error, openError, setOpenError}: JoinScreenErrorsPropsT) {
-  const { roomNameTaken, roomNotFound } = error
-  
+const StyledStack = styled(Stack)(() => ({
+  width: '100%'
+}))
+
+const StyledAlert = styled(Alert)(() => ({
+  width: '100%'
+}))
+
+export default function ErrorMessages({error, openError, setOpenError}: ErrorsPropsT) {
+  const errors = Object.keys(error) as (keyof (JoinScreenErrorsT & WaitingRoomErrorsT))[]
+
   const handleClose = (_event?: SyntheticEvent | Event, reason?: string) => {
     if (reason === 'clickaway') {
       return;
@@ -30,15 +40,14 @@ export default function JoinScreenErrors({error, openError, setOpenError}: JoinS
   };
 
   return (
-    <Stack spacing={2} sx={{ width: '100%' }}>
-      {roomNotFound &&
-      <Snackbar open={openError} autoHideDuration={3000} onClose={handleClose} anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}>
-        <Alert severity="error" sx={{ width: '100%' }}>{roomNotFound}</Alert>
-      </Snackbar>}
-      {roomNameTaken &&
-      <Snackbar open={openError} autoHideDuration={3000} onClose={handleClose} anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}>
-        <Alert severity="error" sx={{ width: '100%' }}>{roomNameTaken}</Alert>
-      </Snackbar>}
-    </Stack>
+    <StyledStack spacing={2}>
+      {errors.map((errorName)=> {
+        if(error[errorName]) return (
+          <Snackbar open={openError} autoHideDuration={3000} onClose={handleClose} anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}>
+            <StyledAlert severity="error">{error[errorName]}</StyledAlert>
+          </Snackbar>
+        )
+      })}
+    </StyledStack>
   );
 }

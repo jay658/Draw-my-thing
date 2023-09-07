@@ -52,6 +52,20 @@ const socketCommands = (io: Server)=>{
     return false
   }
 
+  const roomCanStartGame = (roomName: string) => {
+    const room = getRoom(roomName)
+      if(room){
+        const members = room.members
+      
+        for(let member of members) {
+          if(member.readyStatus === false) return false
+        }
+        
+        return true
+      }
+      return false
+  }
+
   return (socket: Socket)=>{
     console.log(io.engine.clientsCount)
 
@@ -60,8 +74,8 @@ const socketCommands = (io: Server)=>{
     console.log(`User ${socket.username} (${socket.id}) connected`)
     socket.emit('sending_username', socket.username)
 
-    socket.on('create_room', (data) => {
-      const roomName = data
+    socket.on('create_room', (roomName) => {
+      socket.readyStatus = false
       if(!roomExists(roomName)){
         socket.join(roomName)
         console.log(`User ${socket.username} (${socket.id}) created the room ${roomName}`)
@@ -71,8 +85,8 @@ const socketCommands = (io: Server)=>{
       }
     })
 
-    socket.on('join_room', (data)=>{
-      const roomName = data
+    socket.on('join_room', (roomName)=>{
+      socket.readyStatus = false
       if(roomExists(roomName)){
         socket.join(roomName)
         console.log(`User ${socket.username} (${socket.id}) joined room: ${roomName}`)
@@ -102,13 +116,10 @@ const socketCommands = (io: Server)=>{
       
       io.to(roomName).emit('status_updated', updatedRoom)
     })
-    
-    socket.on('send message', ()=>{
-      console.log(`message received from user: ${socket.id}`)
-    })
 
-    socket.on('disconnect', ()=>{
-      console.log(`User ${socket.username} (${socket.id}) disconnected`, socket.id)
+    socket.on('check_if_everyone_is_ready', (roomName) => {
+      if(roomCanStartGame(roomName)) io.to(roomName).emit('starting_game')
+      else socket.emit('players_not_ready', 'All players must be ready to start the game.')
     })
 
     //can remove
@@ -121,6 +132,10 @@ const socketCommands = (io: Server)=>{
     socket.on('update_username', (data) => {
       socket.username = data
       socket.emit('sending_username', socket.username)
+    })
+
+    socket.on('disconnect', ()=>{
+      console.log(`User ${socket.username} (${socket.id}) disconnected`, socket.id)
     })
 
     socket.on('error', function (err) {
