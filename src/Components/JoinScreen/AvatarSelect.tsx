@@ -1,5 +1,3 @@
-import * as React from 'react';
-
 import Select, { SelectChangeEvent } from '@mui/material/Select';
 
 import ElephantCircus from '../../assets/avatars/elephant-circus.png'
@@ -10,8 +8,9 @@ import MenuItem from '@mui/material/MenuItem';
 import RubberDuck from '../../assets/avatars/rubber-duck.png'
 import SantasLittleHelper from '../../assets/avatars/santas-little-helper.png'
 import { styled } from '@mui/material/styles';
+import { useState } from 'react'
 
-const avatarsMap: Record<string, string> = {
+export const avatarsMap: Record<string, string> = {
   ['Elephant Circus']: ElephantCircus, 
   ['Kawaii Dinosaur']: KawaiiDinosaur, 
   ['Rubber Duck']: RubberDuck, 
@@ -28,12 +27,19 @@ const StyledFormControl = styled(FormControl)(() => ({
   margin: '10px',
 }))
 
-export default function AvatarSelect() {
-  const [avatar, setAvatar] = React.useState<string>('Elephant Circus');
-  const [open, setOpen] = React.useState(false);
+type AvatarType = keyof typeof avatarsMap
+
+type OwnPropsT = {
+  setPlayerAvatar: (avatar: AvatarType) => void
+}
+
+export default function AvatarSelect({ setPlayerAvatar }: OwnPropsT) {
+  const [avatar, setAvatar] = useState<AvatarType>('Elephant Circus')
+  const [open, setOpen] = useState(false);
 
   const handleChange = (event: SelectChangeEvent<typeof avatar>) => {
     setAvatar(event.target.value);
+    setPlayerAvatar(event.target.value)
   };
 
   const handleClose = () => {

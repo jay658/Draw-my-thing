@@ -9,7 +9,7 @@ type Room = {
   name: string,
   members: string[]
 }
-const MAX_ROOM_CAPACITY = 6
+export const MAX_ROOM_CAPACITY = 8
 
 const RoomList = (): ReactElement => {
   const navigate = useNavigate()

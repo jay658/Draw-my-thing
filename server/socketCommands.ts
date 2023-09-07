@@ -4,11 +4,13 @@ declare module 'socket.io' {
   interface Socket {
       username: string,
       readyStatus: boolean
+      avatar: string
   }
 }
 type Member = {
   username: string,
-  readyStatus: boolean
+  readyStatus: boolean, 
+  avatar: string
 }
 type Room = {
   name: string,
@@ -28,8 +30,8 @@ const socketCommands = (io: Server)=>{
       membersSetArray.forEach(memberStringId => {
         const socket = io.sockets.sockets.get(memberStringId)
         if(socket){
-          const { readyStatus, username } = socket
-          if(username) members.push({username, readyStatus}) 
+          const { readyStatus, username, avatar } = socket
+          if(username) members.push({username, readyStatus, avatar}) 
         }
       });
       roomData.push({name, members})
@@ -66,33 +68,54 @@ const socketCommands = (io: Server)=>{
       return false
   }
 
+  //this is all rooms minus the default room for the socket
+  const getRoomsForASocket = (socket: Socket) => {
+    return Array.from(socket.rooms).filter(room => room !== socket.id)
+  }
+
+  const leaveAllOtherRooms = (socket: Socket) => {
+    const rooms = getRoomsForASocket(socket)
+    rooms.forEach(roomName => {
+      socket.leave(roomName)
+      const room = getRoom(roomName)
+      io.to(roomName).emit('send_room', room)
+    })
+  }
+
   return (socket: Socket)=>{
     console.log(io.engine.clientsCount)
 
     socket.username = socket.id
     socket.readyStatus = false
+    socket.avatar = 'Elephant Circus'
     console.log(`User ${socket.username} (${socket.id}) connected`)
     socket.emit('sending_username', socket.username)
 
-    socket.on('create_room', (roomName) => {
+    socket.on('create_room', ({name, roomName, avatar}) => {
       socket.readyStatus = false
       if(!roomExists(roomName)){
+        leaveAllOtherRooms(socket)
+        socket.username = name
+        socket.avatar = avatar
         socket.join(roomName)
         console.log(`User ${socket.username} (${socket.id}) created the room ${roomName}`)
-        socket.emit('create_room_success', roomName)
+        socket.emit('create_room_success', {name: socket.username, roomName})
       }else{
         socket.emit('room_name_taken', `The room name ${roomName} is already taken`)
       }
     })
 
-    socket.on('join_room', (roomName)=>{
+    socket.on('join_room', ({name, roomName, avatar})=>{
       socket.readyStatus = false
       if(roomExists(roomName)){
+        leaveAllOtherRooms(socket)
+        socket.username = name
+        socket.avatar = avatar
         socket.join(roomName)
         console.log(`User ${socket.username} (${socket.id}) joined room: ${roomName}`)
         
         io.to(roomName).emit('send_room', getRoom(roomName))
-        socket.emit('join_room_success', roomName)
+        socket.emit('join_room_success', {name: socket.username, roomName})
       }else{
         socket.emit('room_not_found', `There is no room ${roomName}`)
       }
@@ -105,6 +128,10 @@ const socketCommands = (io: Server)=>{
     socket.on('get_rooms', ()=>{
       const roomData = getRooms().filter(room => room.name.length !== 20)
       socket.emit('send_rooms', roomData)
+    })
+
+    socket.on('leave_room', () => {
+      leaveAllOtherRooms(socket)
     })
     
     socket.on('update_status', ({username, roomName})=>{

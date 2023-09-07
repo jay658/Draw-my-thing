@@ -45,6 +45,7 @@ const StyledGrid = styled(Grid)(() => ({
 const JoinScreen = ({setUsername}: JoinScreenPropsT): ReactElement => {
   const [name, setName] = useState('')
   const [roomName, setRoomName] = useState('')
+  const [playerAvatar, setPlayerAvatar] = useState('Elephant Circus')
   const [error, setError] = useState<JoinScreenErrorsT>({
     roomNotFound: '',
     roomNameTaken: ''
@@ -72,12 +73,12 @@ const JoinScreen = ({setUsername}: JoinScreenPropsT): ReactElement => {
       })
     })
 
-    socket.on("create_room_success", (roomName) => {
+    socket.on("create_room_success", ({name, roomName}) => {
       console.log(`${name} created room ${roomName}`)
       navigate(`/waitingroom?room=${roomName}`)
     })
 
-    socket.on("join_room_success", (roomName) => {
+    socket.on("join_room_success", ({name, roomName}) => {
       console.log(`${name} joined room ${roomName}`)
       navigate(`/waitingroom?room=${roomName}`)
     })
@@ -93,15 +94,14 @@ const JoinScreen = ({setUsername}: JoinScreenPropsT): ReactElement => {
   
   const handleCreateRoom = () => {
     if(!socket.connected) socket.connect()
-    socket.emit('update_username', name)
-    socket.emit("create_room", roomName)
+    console.log(playerAvatar)
+    socket.emit("create_room", {name, roomName, avatar: playerAvatar})
     socket.username = name
   }
 
   const handleJoinRoom = () => {
     if(!socket.connected) socket.connect()
-    socket.emit('update_username', name)
-    socket.emit("join_room", roomName)
+    socket.emit("join_room", {name, roomName, avatar: playerAvatar})
     socket.username = name
   }
 
@@ -135,7 +135,7 @@ const JoinScreen = ({setUsername}: JoinScreenPropsT): ReactElement => {
             onChange={handleNameChange}
             inputProps={{ maxLength: 15 }}
           />
-          <AvatarSelect/>
+          <AvatarSelect setPlayerAvatar={setPlayerAvatar}/>
         </InLineContainer>
         <TextField
           required
