@@ -43,7 +43,7 @@ export default function ErrorMessages({error, openError, setOpenError}: ErrorsPr
     <StyledStack spacing={2}>
       {errors.map((errorName)=> {
         if(error[errorName]) return (
-          <Snackbar open={openError} autoHideDuration={3000} onClose={handleClose} anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}>
+          <Snackbar open={openError} autoHideDuration={3000} onClose={handleClose} anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }} key={errorName}>
             <StyledAlert severity="error">{error[errorName]}</StyledAlert>
           </Snackbar>
         )

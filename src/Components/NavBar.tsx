@@ -13,6 +13,7 @@ import MenuItem from '@mui/material/MenuItem';
 import Toolbar from '@mui/material/Toolbar';
 import Tooltip from '@mui/material/Tooltip';
 import Typography from '@mui/material/Typography';
+import socket from './Websocket/socket';
 import { styled } from '@mui/material'
 // import { useLogoutMutation } from '../Store/RTK/authSlice';
 import { useNavigate } from 'react-router-dom'
@@ -103,6 +104,11 @@ function ResponsiveAppBar() {
   //   await logoutMutation();
   // };
 
+  const handleNavClick = (linkRoute: string) => {
+    socket.emit('leave_room')
+    navigate(`/${linkRoute}`)
+  }
+
   return (
     <StyledAppBar position="static">
       <Container maxWidth="xl">
@@ -114,7 +120,7 @@ function ResponsiveAppBar() {
             {Object.entries(tabs).map(entry => {
               const [linkName, linkRoute] = entry
               return(
-                  <NavButton onClick={() => navigate(`/${linkRoute}`)} key={linkName} style={!mobile.has(linkName)?{}: {display:'flex'}}>
+                  <NavButton onClick={() => handleNavClick(linkRoute)} key={linkName} style={!mobile.has(linkName)?{}: {display:'flex'}}>
                     {linkName}
                   </NavButton>
               )
