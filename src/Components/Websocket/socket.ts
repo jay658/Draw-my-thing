@@ -4,7 +4,10 @@ import website from '../../Store/RTK/index'
 
 declare module 'socket.io-client' {
   interface Socket {
-      username: string
+      username: string,
+      readyStatus: boolean,
+      avatar: string,
+      roomName?: string    
   }
 }
 
