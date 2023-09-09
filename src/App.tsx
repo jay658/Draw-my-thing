@@ -2,6 +2,7 @@ import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom'
 import { ReactElement, Suspense } from 'react'
 
 import Canvas from './Components/Canvas';
+import Chatbox from './Components/JoinScreen/Chatbox';
 import { ConnectionManager } from './Components/Websocket/ConnectionManager';
 // import CircularProgress from '@mui/material/CircularProgress';
 import Home from './Routes/Home'
@@ -69,6 +70,7 @@ const App = ():ReactElement => {
         <Route path ="/join" element={<ConnectionManager/>}/>
         <Route path ="/rooms" element={<RoomList/>}/>
         <Route path ="/waitingroom" element={<WaitingRoom/>}/>
+        <Route path ="/chatbox/:roomName" element={<Chatbox/>}/>
         <Route path="*" element={<Navigate to='/' replace={true}/>} />
       </Routes>
     </BrowserRouter>

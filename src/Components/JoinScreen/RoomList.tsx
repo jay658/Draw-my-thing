@@ -9,14 +9,16 @@ type Room = {
   name: string,
   members: string[]
 }
-const MAX_ROOM_CAPACITY = 6
+export const MAX_ROOM_CAPACITY = 8
 
 const RoomList = (): ReactElement => {
   const navigate = useNavigate()
   const [rooms, setRooms] = useState<Array<Room>>([])
   
   useEffect(()=>{
-    if(!socket.username) navigate('/join')
+    if(!socket.connected) navigate('/join')
+    socket.emit("get_socket_info")
+    
     socket.on('send_rooms', (data: Array<Room>)=>{
       setRooms(data)
     })
