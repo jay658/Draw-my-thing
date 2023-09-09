@@ -3,11 +3,13 @@ import { Server, Socket } from 'socket.io'
 declare module 'socket.io' {
   interface Socket {
       username: string,
-      readyStatus: boolean
-      avatar: string
+      readyStatus: boolean,
+      avatar: string,
+      roomName?: string
   }
 }
 type Member = {
+  id: string,
   username: string,
   readyStatus: boolean, 
   avatar: string
@@ -30,8 +32,8 @@ const socketCommands = (io: Server)=>{
       membersSetArray.forEach(memberStringId => {
         const socket = io.sockets.sockets.get(memberStringId)
         if(socket){
-          const { readyStatus, username, avatar } = socket
-          if(username) members.push({username, readyStatus, avatar}) 
+          const { id, readyStatus, username, avatar } = socket
+          if(username) members.push({id, username, readyStatus, avatar}) 
         }
       });
       roomData.push({name, members})
@@ -91,15 +93,17 @@ const socketCommands = (io: Server)=>{
     console.log(`User ${socket.username} (${socket.id}) connected`)
     socket.emit('sending_username', socket.username)
 
-    socket.on('create_room', ({name, roomName, avatar}) => {
+    socket.on('create_room', ({name, roomName, avatar}, callback) => {
       socket.readyStatus = false
       if(!roomExists(roomName)){
         leaveAllOtherRooms(socket)
         socket.username = name
         socket.avatar = avatar
+        socket.roomName = roomName
         socket.join(roomName)
+        callback('success')
         console.log(`User ${socket.username} (${socket.id}) created the room ${roomName}`)
-        socket.emit('create_room_success', {name: socket.username, roomName})
+        //socket.emit('create_room_success', {name: socket.username, roomName})
       }else{
         socket.emit('room_name_taken', `The room name ${roomName} is already taken`)
       }
@@ -111,6 +115,7 @@ const socketCommands = (io: Server)=>{
         leaveAllOtherRooms(socket)
         socket.username = name
         socket.avatar = avatar
+        socket.roomName = roomName
         socket.join(roomName)
         console.log(`User ${socket.username} (${socket.id}) joined room: ${roomName}`)
         
@@ -135,8 +140,8 @@ const socketCommands = (io: Server)=>{
     })
 
     socket.on("get_socket_info", () => {
-      const { username, readyStatus, avatar } = socket
-      socket.emit("sending_socket_info", { username, readyStatus, avatar})
+      const { username, readyStatus, avatar, roomName } = socket
+      socket.emit("sending_socket_info", { username, readyStatus, avatar, roomName})
     })
     
     socket.on('update_status', ({username, roomName})=>{

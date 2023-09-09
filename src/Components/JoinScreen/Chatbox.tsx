@@ -2,14 +2,14 @@ import { ChangeEvent, ReactElement, useEffect, useState } from "react";
 
 import { Button } from "@mui/material";
 import socket from "../Websocket/socket";
-import { useParams } from "react-router-dom";
 
 type MessageT = {
   author: string,
   message: string
 } 
 const Chatbox = (): ReactElement => {
-  const {roomName} = useParams()
+  const params = new URLSearchParams(window.location.search)
+  const roomName = params.get("room")
   const [messages, setMessages] = useState<MessageT[]>([])
   const [roomExists, setRoomExists] = useState(false)
   const [currentMessage, setCurrentMessage] = useState("")

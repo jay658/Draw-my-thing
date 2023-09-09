@@ -73,14 +73,17 @@ const JoinScreen = ({setUsername}: JoinScreenPropsT): ReactElement => {
       })
     })
 
+    //We can potentially delete this. Currently navigating through a callback function on the emit
     socket.on("create_room_success", ({name, roomName}) => {
       console.log(`${name} created room ${roomName}`)
-      navigate(`/waitingroom?room=${roomName}`)
+      navigate(`/loading?room=${roomName}`)
     })
 
     socket.on("join_room_success", ({name, roomName}) => {
       console.log(`${name} joined room ${roomName}`)
-      navigate(`/waitingroom?room=${roomName}`)
+      console.log(socket)
+      socket.username = name
+      navigate(`/loading?room=${roomName}`)
     })
 
     // Cleanup by removing the event listener when the component unmounts
@@ -94,7 +97,12 @@ const JoinScreen = ({setUsername}: JoinScreenPropsT): ReactElement => {
   
   const handleCreateRoom = () => {
     if(!socket.connected) socket.connect()
-    socket.emit("create_room", {name, roomName, avatar: playerAvatar})
+    socket.emit("create_room", {name, roomName, avatar: playerAvatar}, (response: 'success' | 'failed') => {
+      if(response === 'success') {
+        socket.username = name
+        navigate(`/loading?room=${roomName}`) 
+      }
+    })
   }
 
   const handleJoinRoom = () => {

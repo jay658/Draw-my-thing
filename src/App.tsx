@@ -6,6 +6,7 @@ import Chatbox from './Components/JoinScreen/Chatbox';
 import { ConnectionManager } from './Components/Websocket/ConnectionManager';
 // import CircularProgress from '@mui/material/CircularProgress';
 import Home from './Routes/Home'
+import LoadingScreen from './Components/JoinScreen/LoadingScreen';
 import NavBar from './Components/NavBar'
 import RoomList from './Components/JoinScreen/RoomList';
 import WaitingRoom from './Components/JoinScreen/WaitingRoom';
@@ -70,7 +71,8 @@ const App = ():ReactElement => {
         <Route path ="/join" element={<ConnectionManager/>}/>
         <Route path ="/rooms" element={<RoomList/>}/>
         <Route path ="/waitingroom" element={<WaitingRoom/>}/>
-        <Route path ="/chatbox/:roomName" element={<Chatbox/>}/>
+        <Route path ="/chatbox" element={<Chatbox/>}/>
+        <Route path="/loading" element={<LoadingScreen/>}/>
         <Route path="*" element={<Navigate to='/' replace={true}/>} />
       </Routes>
     </BrowserRouter>
