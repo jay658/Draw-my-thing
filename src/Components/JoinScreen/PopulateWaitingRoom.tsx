@@ -1,10 +1,8 @@
 import Lottie, { LottieRefCurrentProps } from 'lottie-react'
 import { ReactElement, useRef } from "react";
 
-import Avatar from '@mui/material/Avatar';
 import Button from '@mui/material/Button';
 import Card from '@mui/material/Card';
-import CardActions from '@mui/material/CardActions';
 import CardContent from '@mui/material/CardContent';
 import { MAX_ROOM_CAPACITY } from "./RoomList";
 import type { Player } from './WaitingRoom'
@@ -35,6 +33,11 @@ const StyledSkeleton = styled(Skeleton)(() => ({
   padding: '16px'
 }))
 
+const StyledCardContent = styled(CardContent)(() => ({
+  padding:'5px',
+  height:'50%'
+}))
+
 type OwnPropsT = {
   players: Player[],
   readyUp: (idx: number) => void
@@ -51,22 +54,14 @@ const PopulateWaitingScreen = ({ players, readyUp }: OwnPropsT): ReactElement =>
       i >= players.length? (<StyledSkeleton variant="rectangular" key={i}>
       </StyledSkeleton>):
       (<StyledCard key={i}>
-          <Avatar alt={player.avatar} src={avatarsMap[player.avatar]}/>
-          <CardContent>
+          <Lottie animationData={avatarsMap[player.avatar]} style={{height:'30%'}}/>
+          <StyledCardContent>
             <Typography>
-              Player {i + 1}
+              {player.username}
             </Typography>
-            <Typography>
-              Name: {player.username}
-            </Typography>
-            <Typography>
-              Ready Status: {player.readyStatus ? "Ready" : "Not Ready"}
-            </Typography>
-          </CardContent>
-          <CardActions>
-            {socket.id === player.id && <Button size="small" onClick={()=> readyUp(i)}>Ready Up</Button>}
-            <Lottie lottieRef={readyAnimation} loop={player.readyStatus? false: true} animationData={ReadyAnimation} initialSegment={player.readyStatus? [30, 100]: [0, 30]}/>
-          </CardActions>
+            <Lottie lottieRef={readyAnimation} loop={player.readyStatus? false: true} animationData={ReadyAnimation} initialSegment={player.readyStatus? [30, 100]: [0, 30]} style={{height:'50%'}}/>
+            <Button size="small" onClick={()=> readyUp(i)} style={{visibility: socket.id === player.id? 'visible': 'hidden'}}>Ready Up</Button>
+          </StyledCardContent>
         </StyledCard>)
     )
   }

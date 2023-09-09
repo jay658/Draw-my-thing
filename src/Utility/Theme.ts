@@ -1,6 +1,9 @@
 import { createTheme } from "@mui/material/styles"
 
 const theme = createTheme({
+  typography:{
+    fontFamily: "'Luckiest Guy';", 
+  },
   palette: {
     primary: {
       light: "#63b8ff",

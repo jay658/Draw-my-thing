@@ -30,7 +30,6 @@ const settings = ['Profile', 'Account', 'Dashboard', 'Logout'];
 
 const tabs = {
   Home: '',
-  About: 'about',
   Draw: 'draw',
   'Join Screen': 'join',
   Rooms: 'rooms'

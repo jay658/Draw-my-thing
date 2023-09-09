@@ -15,11 +15,6 @@ export type JoinScreenErrorsT = {
   roomNameTaken: string
 }
 
-type JoinScreenPropsT = {
-  setUsername: (username: string) => void,
-  username: string
-}
-
 const Item = styled(Paper)(({ theme }) => ({
   backgroundColor: theme.palette.mode === 'dark' ? '#1A2027' : '#fff',
   ...theme.typography.body2,
@@ -37,15 +32,22 @@ const InLineContainer = styled('div')(() => ({
   justifyContent: 'center'
 }));
 
-const StyledGrid = styled(Grid)(() => ({
+const InnerGrid = styled(Grid)(() => ({
   justifyContent:'center',
   alignItems:'center'
 }))
 
-const JoinScreen = ({setUsername}: JoinScreenPropsT): ReactElement => {
+const OutterGrid = styled(Grid)(() => ({
+  display: 'flex', 
+  justifyContent: 'center', 
+  alignItems: 'center', 
+  height: '80vh'
+}))
+
+const JoinScreen = (): ReactElement => {
   const [name, setName] = useState('')
   const [roomName, setRoomName] = useState('')
-  const [playerAvatar, setPlayerAvatar] = useState('Elephant Circus')
+  const [playerAvatar, setPlayerAvatar] = useState('Lounging Fox')
   const [error, setError] = useState<JoinScreenErrorsT>({
     roomNotFound: '',
     roomNameTaken: ''
@@ -123,43 +125,44 @@ const JoinScreen = ({setUsername}: JoinScreenPropsT): ReactElement => {
 
   const handleGoToRoomList = () => {
     if(!socket.connected) socket.connect()
-    setUsername(name)
     navigate('/rooms')
   }
   
   return(
-    <StyledGrid container spacing={2}>
-      <Item>
-        <h1>APP'S NAME</h1>
-        <InLineContainer>
+    <OutterGrid>
+      <InnerGrid container spacing={2}>
+        <Item>
+          <h1>DRAW MY THING</h1>
+          <InLineContainer>
+            <TextField
+              required
+              label="Username"
+              defaultValue={name}
+              onChange={handleNameChange}
+              inputProps={{ maxLength: 15 }}
+            />
+            <AvatarSelect setPlayerAvatar={setPlayerAvatar}/>
+          </InLineContainer>
           <TextField
             required
-            label="Username"
-            defaultValue=""
-            onChange={handleNameChange}
+            label="Room name"
+            defaultValue={roomName}
+            onChange={handleRoomChange}
             inputProps={{ maxLength: 15 }}
           />
-          <AvatarSelect setPlayerAvatar={setPlayerAvatar}/>
-        </InLineContainer>
-        <TextField
-          required
-          label="Room name"
-          defaultValue={name}
-          onChange={handleRoomChange}
-          inputProps={{ maxLength: 15 }}
-        />
-        <InLineContainer>
-          <Button onClick={handleCreateRoom} disabled={!roomName || !name}>CREATE ROOM</Button>
-          <Button onClick={handleJoinRoom} disabled={!roomName || !name}>JOIN ROOM</Button>
-        </InLineContainer>
-        <InLineContainer>
-          <Button onClick={handleGoToRoomList} disabled={!name}>
-            Join an existing room (Pick a username first!)
-          </Button>
-        </InLineContainer>
-      </Item>
-      <ErrorMessages error={errorRef.current} openError={openError} setOpenError={setOpenError}/>
-    </StyledGrid>
+          <InLineContainer>
+            <Button onClick={handleCreateRoom} disabled={!roomName || !name}>CREATE ROOM</Button>
+            <Button onClick={handleJoinRoom} disabled={!roomName || !name}>JOIN ROOM</Button>
+          </InLineContainer>
+          <InLineContainer>
+            <Button onClick={handleGoToRoomList} disabled={!name}>
+              Join an existing room (Pick a username first!)
+            </Button>
+          </InLineContainer>
+        </Item>
+        <ErrorMessages error={errorRef.current} openError={openError} setOpenError={setOpenError}/>
+      </InnerGrid>
+    </OutterGrid>
   )
 }
 
