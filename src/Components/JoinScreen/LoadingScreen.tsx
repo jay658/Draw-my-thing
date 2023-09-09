@@ -8,7 +8,6 @@ import { useNavigate } from 'react-router-dom';
 const LoadingScreen = () => {
   const params = new URLSearchParams(window.location.search)
   const roomName = params.get("room")
-  console.log(params, roomName)
   const differentAnimationsRef = useRef<LottieRefCurrentProps>(null)
   const loadingAnimationRef = useRef<LottieRefCurrentProps>(null)
   const navigate = useNavigate()
@@ -25,8 +24,8 @@ const LoadingScreen = () => {
   
   return(
     <div style={{display:'flex', flexDirection:'column', alignItems:'center'}}>
-      <Lottie lottieRef={loadingAnimationRef} animationData={LoadingAnimation} style={{width: '50%'}}/>
-      <Lottie lottieRef={differentAnimationsRef} animationData={DifferentObjectsAnimation} style={{width: '20%'}}/>
+      <Lottie lottieRef={loadingAnimationRef} animationData={LoadingAnimation} style={{height: '50vh'}}/>
+      <Lottie lottieRef={differentAnimationsRef} animationData={DifferentObjectsAnimation} style={{height: '40vh'}}/>
     </div>
   )
 }

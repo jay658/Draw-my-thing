@@ -89,7 +89,7 @@ const socketCommands = (io: Server)=>{
 
     socket.username = socket.id
     socket.readyStatus = false
-    socket.avatar = 'Elephant Circus'
+    socket.avatar = 'Lounging Fox'
     console.log(`User ${socket.username} (${socket.id}) connected`)
     socket.emit('sending_username', socket.username)
 
@@ -157,18 +157,6 @@ const socketCommands = (io: Server)=>{
     socket.on('check_if_everyone_is_ready', (roomName) => {
       if(roomCanStartGame(roomName)) io.to(roomName).emit('starting_game')
       else socket.emit('players_not_ready', 'All players must be ready to start the game.')
-    })
-
-    //can remove
-    socket.on('add_username', (data) => {
-      const { username } = data
-      socket.username = username
-      socket.emit('sending_username', socket.username)
-    })
-
-    socket.on('update_username', (data) => {
-      socket.username = data
-      socket.emit('sending_username', socket.username)
     })
 
     socket.on("message_to_server", ({author, message, roomName})=>{
