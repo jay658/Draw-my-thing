@@ -125,6 +125,9 @@ const WaitingRoom = (): ReactElement => {
   const startGame = () => {
     socket.emit("check_if_everyone_is_ready", roomName)
   }
+  const goToChat = () =>{
+    navigate(`/chatbox/${roomName}`)
+  }
   
   const readyUp =(idx: number)=>{
     const username = players[idx].username
@@ -148,6 +151,7 @@ const WaitingRoom = (): ReactElement => {
       <div>
         <Button onClick={backToJoinScreen}>Back to join screen</Button>
         <Button onClick={startGame}>Start game</Button>
+        <Button onClick={goToChat}>Go to Chat</Button>
       </div>
       <ErrorMessages openError={openError} setOpenError={setOpenError} error={errorRef.current}/>
     </Container>
