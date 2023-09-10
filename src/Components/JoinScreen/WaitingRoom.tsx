@@ -1,6 +1,7 @@
 import { ReactElement, useEffect, useRef, useState } from "react";
 
 import Button from '@mui/material/Button';
+import Chatbox from "./Chatbox";
 import ErrorMessages from "./ErrorMessage";
 import { Grid } from "@mui/material";
 import PageNotFound from "../PageNotFound";
@@ -37,11 +38,21 @@ const InnerGrid = styled(Grid)(() => ({
   gap: 'calc(100vw * 0.02)',
 }))
 
-const Container = styled('div')(() => ({
+const PlayersInfoContainer = styled('div')(() => ({
   display: 'flex', 
   flexDirection:'column', 
   height: '90vh', 
-  alignItems:'center'
+  alignItems:'center',
+  flex: '0 0 75%'
+}))
+
+const WaitingRoomContainer = styled('div')(() => ({
+  display:'flex'
+}))
+
+const ChatBoxContainer = styled('div')(() => ({
+  flex:'0 0 25%',
+  height: '60vh'
 }))
 
 const WaitingRoom = (): ReactElement => {
@@ -111,19 +122,24 @@ const WaitingRoom = (): ReactElement => {
   if(!roomExists) return <PageNotFound/>
   
   return (
-    <Container>
-      <OutterGrid container>
-        <InnerGrid>
-          <PopulateWaitingScreen players={players} readyUp={readyUp}/>
-        </InnerGrid>
-      </OutterGrid>
-      <div>
-        <Button onClick={backToJoinScreen}>Back to join screen</Button>
-        <Button onClick={startGame}>Start game</Button>
-        <Button onClick={goToChat}>Go to Chat</Button>
-      </div>
-      <ErrorMessages openError={openError} setOpenError={setOpenError} error={errorRef.current}/>
-    </Container>
+    <WaitingRoomContainer>
+      <PlayersInfoContainer>
+        <OutterGrid container>
+          <InnerGrid>
+            <PopulateWaitingScreen players={players} readyUp={readyUp}/>
+          </InnerGrid>
+        </OutterGrid>
+        <div>
+          <Button onClick={backToJoinScreen}>Back to join screen</Button>
+          <Button onClick={startGame}>Start game</Button>
+          <Button onClick={goToChat}>Go to Chat</Button>
+        </div>
+        <ErrorMessages openError={openError} setOpenError={setOpenError} error={errorRef.current}/>
+      </PlayersInfoContainer>
+      <ChatBoxContainer>
+        <Chatbox/>
+      </ChatBoxContainer>
+    </WaitingRoomContainer>
   )
 }
 

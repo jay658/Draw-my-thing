@@ -160,7 +160,7 @@ const socketCommands = (io: Server)=>{
     })
 
     socket.on("message_to_server", ({author, message, roomName})=>{
-      io.to(roomName).emit("message_to_client", { author:author, message:message })
+      io.to(roomName).emit("message_to_client", { author, message })
     })
 
     socket.on('disconnect', ()=>{
