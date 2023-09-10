@@ -14,7 +14,7 @@ import { styled } from '@mui/material/styles';
 
 const StyledCard = styled(Card)(() => ({
   borderRadius:'3%',
-  width: '18vw',
+  width: '13vw',
   height: '100%',
   display:'flex',
   flexDirection: 'column',
@@ -25,7 +25,7 @@ const StyledCard = styled(Card)(() => ({
 
 const StyledSkeleton = styled(Skeleton)(() => ({
   borderRadius:'3%',
-  width: '18vw',
+  width: '13vw',
   height: '100%',
   display:'flex',
   flexDirection: 'column',
