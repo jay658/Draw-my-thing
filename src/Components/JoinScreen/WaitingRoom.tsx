@@ -3,6 +3,7 @@ import { ReactElement, useEffect, useRef, useState } from "react";
 import Button from '@mui/material/Button';
 import ErrorMessages from "./ErrorMessage";
 import { Grid } from "@mui/material";
+import PageNotFound from "../PageNotFound";
 import PopulateWaitingScreen from './PopulateWaitingRoom';
 import socket from "../Websocket/socket";
 import { styled } from '@mui/material/styles';
@@ -107,7 +108,7 @@ const WaitingRoom = (): ReactElement => {
     navigate('/join')
   }
   
-  if(!roomExists) return <div>There is no room with the name {roomName}</div>
+  if(!roomExists) return <PageNotFound/>
   
   return (
     <Container>

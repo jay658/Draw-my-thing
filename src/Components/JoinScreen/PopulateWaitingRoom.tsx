@@ -1,11 +1,10 @@
-import Lottie, { LottieRefCurrentProps } from 'lottie-react'
-import { ReactElement, useRef } from "react";
-
 import Button from '@mui/material/Button';
 import Card from '@mui/material/Card';
 import CardContent from '@mui/material/CardContent';
+import Lottie from 'lottie-react'
 import { MAX_ROOM_CAPACITY } from "./RoomList";
 import type { Player } from './WaitingRoom'
+import { ReactElement } from "react";
 import ReadyAnimation from '../../assets/lottie/ready-animation.json'
 import Skeleton from '@mui/material/Skeleton';
 import Typography from '@mui/material/Typography';
@@ -20,7 +19,8 @@ const StyledCard = styled(Card)(() => ({
   display:'flex',
   flexDirection: 'column',
   alignItems:' center',
-  padding: '16px'
+  padding: '16px',
+  justifyContent: 'center'
 }))
 
 const StyledSkeleton = styled(Skeleton)(() => ({
@@ -45,8 +45,6 @@ type OwnPropsT = {
 
 const PopulateWaitingScreen = ({ players, readyUp }: OwnPropsT): ReactElement => {
 
-  const readyAnimation = useRef<LottieRefCurrentProps>(null)
-
   const playerDetails = []
   for(let i = 0; i < MAX_ROOM_CAPACITY; i++){
     const player = players[i]
@@ -59,7 +57,7 @@ const PopulateWaitingScreen = ({ players, readyUp }: OwnPropsT): ReactElement =>
             <Typography>
               {player.username}
             </Typography>
-            <Lottie lottieRef={readyAnimation} loop={player.readyStatus? false: true} animationData={ReadyAnimation} initialSegment={player.readyStatus? [30, 100]: [0, 30]} style={{height:'50%'}}/>
+            <Lottie loop={player.readyStatus? false: true} animationData={ReadyAnimation} initialSegment={player.readyStatus? [30, 100]: [0, 30]} style={{height:'50%'}}/>
             <Button size="small" onClick={()=> readyUp(i)} style={{visibility: socket.id === player.id? 'visible': 'hidden'}}>Ready Up</Button>
           </StyledCardContent>
         </StyledCard>)
