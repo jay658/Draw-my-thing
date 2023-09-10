@@ -10,12 +10,12 @@ import DefaultUserIcon from '../assets/default-user-icon.png'
 import IconButton from '@mui/material/IconButton';
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
+import MusicPlayer from './MusicPlayer/MusicPlayer';
 import Toolbar from '@mui/material/Toolbar';
 import Tooltip from '@mui/material/Tooltip';
 import Typography from '@mui/material/Typography';
 import socket from './Websocket/socket';
 import { styled } from '@mui/material'
-// import { useLogoutMutation } from '../Store/RTK/authSlice';
 import { useNavigate } from 'react-router-dom'
 
 const breakpoints = {
@@ -30,8 +30,8 @@ const settings = ['Profile', 'Account', 'Dashboard', 'Logout'];
 
 const tabs = {
   Home: '',
-  Draw: 'draw',
   'Join Screen': 'join',
+  Draw: 'draw',
   Rooms: 'rooms'
 }
 
@@ -116,6 +116,7 @@ function ResponsiveAppBar() {
             <Button onClick={() => navigate('/')}><AppIcon/></Button>
           </HomeLink>
           <NavBarBox>
+            <MusicPlayer/>
             {Object.entries(tabs).map(entry => {
               const [linkName, linkRoute] = entry
               return(
@@ -124,9 +125,6 @@ function ResponsiveAppBar() {
                   </NavButton>
               )
             })}
-            {/* <Button onClick={handleLogout}>
-              Logout
-            </Button> */}
           </NavBarBox>
           <Box sx={{ flexGrow: 0 }}>
             <Tooltip title="Open settings">

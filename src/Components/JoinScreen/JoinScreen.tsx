@@ -83,7 +83,6 @@ const JoinScreen = (): ReactElement => {
 
     socket.on("join_room_success", ({name, roomName}) => {
       console.log(`${name} joined room ${roomName}`)
-      console.log(socket)
       socket.username = name
       navigate(`/loading?room=${roomName}`)
     })
