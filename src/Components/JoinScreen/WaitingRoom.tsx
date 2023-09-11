@@ -2,6 +2,7 @@ import { ReactElement, useEffect, useRef, useState } from "react";
 
 import Button from '@mui/material/Button';
 import Chatbox from "./Chatbox";
+import CircularProgress from '@mui/material/CircularProgress';
 import ErrorMessages from "./ErrorMessage";
 import { Grid } from "@mui/material";
 import PageNotFound from "../PageNotFound";
@@ -59,6 +60,7 @@ const WaitingRoom = (): ReactElement => {
   const params = new URLSearchParams(window.location.search)
   const roomName = params.get("room")
   const [players, setPlayers] = useState<Player[]>([])
+  const [loading, setLoading] = useState(true)
   const [roomExists, setRoomExists] = useState(false)
   const [error, setError] = useState<WaitingRoomErrorsT>({
     playersNotReady: '',
@@ -68,12 +70,34 @@ const WaitingRoom = (): ReactElement => {
   const navigate = useNavigate()
   
   useEffect(()=>{
-    socket.emit("get_room", roomName)
+    const sessionId = sessionStorage.getItem('sessionId')
+
+    const finalizeLoading = (exists: boolean) => {
+      setRoomExists(exists);
+      setLoading(false);
+    };
+    
+    if(!socket.connected && sessionId){
+      socket.connect()
+      socket.emit('restore_session', sessionId, (response: 'success' | 'failed') => {
+        if(response === 'failed') {
+          socket.disconnect()
+          finalizeLoading(false)
+        }
+        if(response === 'success'){ 
+          socket.emit("get_room", roomName)
+        }
+      })
+    }else {
+      socket.emit("get_room", roomName)
+    }
+    
     socket.on("send_room", (room)=>{
       if(room){
         if(!roomExists) setRoomExists(true)
         setPlayers([...room.members])
       }
+      finalizeLoading(!!room)
     })
     
     socket.on("status_updated", (room)=>{
@@ -92,6 +116,12 @@ const WaitingRoom = (): ReactElement => {
         return newError
       })
     })
+
+    socket.on("player_left", ({ id }) => {
+      setPlayers((prevPlayers) => {
+        return prevPlayers.filter(player => player.id !== id)
+      })
+    })
     
     return ()=>{
       socket.off("send_room")
@@ -99,14 +129,12 @@ const WaitingRoom = (): ReactElement => {
       socket.off("starting_game")
       socket.off("players_not_ready")
       socket.off("sending_socket_info")
+      socket.off("player_left")
     }
   },[])
   
   const startGame = () => {
     socket.emit("check_if_everyone_is_ready", roomName)
-  }
-  const goToChat = () =>{
-    navigate(`/chatbox?room=${roomName}`)
   }
   
   const readyUp =(idx: number)=>{
@@ -119,6 +147,7 @@ const WaitingRoom = (): ReactElement => {
     navigate('/join')
   }
   
+  if(loading) return <CircularProgress/>
   if(!roomExists) return <PageNotFound/>
   
   return (
@@ -132,12 +161,11 @@ const WaitingRoom = (): ReactElement => {
         <div>
           <Button onClick={backToJoinScreen}>Back to join screen</Button>
           <Button onClick={startGame}>Start game</Button>
-          <Button onClick={goToChat}>Go to Chat</Button>
         </div>
         <ErrorMessages openError={openError} setOpenError={setOpenError} error={errorRef.current}/>
       </PlayersInfoContainer>
       <ChatBoxContainer>
-        <Chatbox/>
+        <Chatbox roomName={roomName}/>
       </ChatBoxContainer>
     </WaitingRoomContainer>
   )

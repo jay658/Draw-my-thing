@@ -12,6 +12,11 @@ type MessageT = {
   },
   message: string
 } 
+
+type ChatBoxPropsT = {
+  roomName: string | null
+}
+
 const ChatContainer = styled(Box)(() =>({
   width: '90%',
   height: '100%',
@@ -58,12 +63,8 @@ const Sender = styled(Paper)(({ theme }) => ({
   padding: "5px",
 }));
 
-
-const Chatbox = (): ReactElement => {
-  const params = new URLSearchParams(window.location.search)
-  const roomName = params.get("room")
+const Chatbox = ({ roomName }: ChatBoxPropsT): ReactElement => {
   const [messages, setMessages] = useState<MessageT[]>([])
-  const [roomExists, setRoomExists] = useState(false)
   const [currentMessage, setCurrentMessage] = useState("")
   // const [gamewords, setGameWords] = useState<string[]>([])
   const [currWord, setCurrWord] = useState("")
@@ -71,13 +72,7 @@ const Chatbox = (): ReactElement => {
   useEffect(()=>{
     const words = getRandom(5, wordbank)
     setCurrWord(words[Math.floor(Math.random()*words.length)])
-    console.log(currWord)
-    socket.emit("get_room", roomName)
-    socket.on("send_room", (room)=>{
-      if(room){
-        if(!roomExists) setRoomExists(true)
-      }
-    })
+    
     socket.on("message_to_client", ({author, message})=>{
       setMessages((prevMessages) =>{
         return [...prevMessages, {author, message}]
@@ -86,7 +81,6 @@ const Chatbox = (): ReactElement => {
     
     return ()=>{
       socket.off("message_to_client")
-      socket.off("send_room")
     }
   },[])
 
@@ -104,8 +98,6 @@ const Chatbox = (): ReactElement => {
     }
     setCurrentMessage("")
   }
-  
-  if(!roomExists) return <div>There is no room with the name {roomName}</div>
   
   return (
     <ChatContainer>

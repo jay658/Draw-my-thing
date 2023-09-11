@@ -12,19 +12,21 @@ type Member = {
   id: string,
   username: string,
   readyStatus: boolean, 
-  avatar: string
+  avatar: string,
+  roomName?: string
 }
 type Room = {
   name: string,
   members: Member[]
 }
 
+const sessions: Record<string, Member>= {}
+
 const socketCommands = (io: Server)=>{
   
   const getRooms = () => {
     const rooms = io.sockets.adapter.rooms
     const roomData: Room[] = []
-
     for(const [name, membersSet] of rooms){
       const members: Member[] = []
       const membersSetArray = [...membersSet]
@@ -91,7 +93,6 @@ const socketCommands = (io: Server)=>{
     socket.readyStatus = false
     socket.avatar = 'Lounging Fox'
     console.log(`User ${socket.username} (${socket.id}) connected`)
-    socket.emit('sending_username', socket.username)
 
     socket.on('create_room', ({name, roomName, avatar}, callback) => {
       socket.readyStatus = false
@@ -100,6 +101,7 @@ const socketCommands = (io: Server)=>{
         socket.username = name
         socket.avatar = avatar
         socket.roomName = roomName
+        sessions[socket.id] = { id: socket.id, username:name, roomName, avatar, readyStatus:socket.readyStatus }
         socket.join(roomName)
         callback('success')
         console.log(`User ${socket.username} (${socket.id}) created the room ${roomName}`)
@@ -116,6 +118,7 @@ const socketCommands = (io: Server)=>{
         socket.username = name
         socket.avatar = avatar
         socket.roomName = roomName
+        sessions[socket.id] = { id: socket.id, username:name, roomName, avatar, readyStatus:socket.readyStatus }
         socket.join(roomName)
         console.log(`User ${socket.username} (${socket.id}) joined room: ${roomName}`)
         
@@ -127,7 +130,7 @@ const socketCommands = (io: Server)=>{
     })
 
     socket.on('get_room', (name)=>{
-      socket.emit('send_room', getRoom(name))
+      io.to(name).emit('send_room', getRoom(name))
     })
     
     socket.on('get_rooms', ()=>{
@@ -154,6 +157,20 @@ const socketCommands = (io: Server)=>{
       io.to(roomName).emit('status_updated', updatedRoom)
     })
 
+    socket.on('restore_session', (sessionId, callback) => {
+      if(sessionId in sessions){
+        const { username, avatar, roomName } = sessions[sessionId]
+        socket.username = username
+        socket.readyStatus = false
+        socket.avatar = avatar
+        socket.roomName = roomName
+        if(roomName) socket.join(roomName)
+        callback('success')
+      }else{
+        callback('failed')
+      }
+    })
+
     socket.on('check_if_everyone_is_ready', (roomName) => {
       if(roomCanStartGame(roomName)) io.to(roomName).emit('starting_game')
       else socket.emit('players_not_ready', 'All players must be ready to start the game.')
@@ -164,6 +181,8 @@ const socketCommands = (io: Server)=>{
     })
 
     socket.on('disconnect', ()=>{
+      const { roomName, id } = socket
+      if(roomName) io.to(roomName).emit('player_left', { id })
       console.log(`User ${socket.username} (${socket.id}) disconnected`, socket.id)
     })
 
