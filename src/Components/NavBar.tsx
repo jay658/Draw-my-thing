@@ -22,7 +22,7 @@ const breakpoints = {
   mobile: 768
 };
 
-const mq = {
+export const mq = {
   mobile: `@media (max-width: ${breakpoints.mobile}px)`
 };
 

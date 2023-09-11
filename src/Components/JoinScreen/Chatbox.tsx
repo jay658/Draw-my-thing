@@ -6,25 +6,44 @@ import socket from "../Websocket/socket";
 import { styled } from '@mui/material/styles';
 
 type MessageT = {
-  author: string,
+  author: {
+    id: string,
+    username: string
+  },
   message: string
 } 
+
+type ChatBoxPropsT = {
+  roomName: string | null
+}
+
 const ChatContainer = styled(Box)(() =>({
-  width: '30vw',
-  // height: '70vh',
+  width: '90%',
+  height: '100%',
   display: 'flex',
   flexDirection: 'column',
   justifyContent: 'center',
-  backgroundColor: 'lightgrey'
+  backgroundColor: 'lightgrey',
+  margin:'10px',
+  marginTop:'5vh',
+  marginLeft:'0px',
+  borderRadius:'3%'
+}))
+
+const MessageBox = styled('div')(() => ({
+  width: '100%',
+  display: 'flex',
+  flexDirection: 'column',
+  justifyContent: 'flex-end',
+  height:'80%'
 }))
 
 const MessageGrid = styled(Grid)(({ theme }) =>({
+  display: 'flex',
+  flexDirection: 'column',
   padding: theme.spacing(1),
   width: '70%',
   margin: '3px', 
-  display: 'flex',
-  flexDirection: 'column',
-  justifyContent: 'center',
 }))
 
 const Message = styled(Paper)(({ theme }) => ({
@@ -41,14 +60,11 @@ const Sender = styled(Paper)(({ theme }) => ({
   textAlign: 'center',
   fontSize: '.6rem',
   border: 'none',
-  padding: "5px"
+  padding: "5px",
 }));
 
-const Chatbox = (): ReactElement => {
-  const params = new URLSearchParams(window.location.search)
-  const roomName = params.get("room")
+const Chatbox = ({ roomName }: ChatBoxPropsT): ReactElement => {
   const [messages, setMessages] = useState<MessageT[]>([])
-  const [roomExists, setRoomExists] = useState(false)
   const [currentMessage, setCurrentMessage] = useState("")
   // const [gamewords, setGameWords] = useState<string[]>([])
   const [currWord, setCurrWord] = useState("")
@@ -56,13 +72,7 @@ const Chatbox = (): ReactElement => {
   useEffect(()=>{
     const words = getRandom(5, wordbank)
     setCurrWord(words[Math.floor(Math.random()*words.length)])
-    console.log(currWord)
-    socket.emit("get_room", roomName)
-    socket.on("send_room", (room)=>{
-      if(room){
-        if(!roomExists) setRoomExists(true)
-      }
-    })
+    
     socket.on("message_to_client", ({author, message})=>{
       setMessages((prevMessages) =>{
         return [...prevMessages, {author, message}]
@@ -71,7 +81,6 @@ const Chatbox = (): ReactElement => {
     
     return ()=>{
       socket.off("message_to_client")
-      socket.off("send_room")
     }
   },[])
 
@@ -82,29 +91,32 @@ const Chatbox = (): ReactElement => {
   const handleSendMessage = () =>{
     if(currWord === currentMessage) console.log("We have a winner!!!")
     else{
-      socket.emit("message_to_server", { author: socket.username, message: currentMessage, roomName: roomName })
+      socket.emit("message_to_server", { author: {
+        id:socket.id, 
+        username: socket.username
+      }, message: currentMessage, roomName: roomName })
     }
     setCurrentMessage("")
   }
   
-  if(!roomExists) return <div>There is no room with the name {roomName}</div>
-  
   return (
     <ChatContainer>
-      {messages.map((message, idx)=>{
-        const isUserMessage = message.author === socket.username
-        const textAlign = isUserMessage ? 'left' : 'right'
-        const alignSelf = isUserMessage ? 'start': 'end'
-        return (
-          <MessageGrid key={idx} sx={{
-            textAlign: textAlign,
-            alignSelf: alignSelf
-          }}>
-            <Message>{message.message}</Message>
-            <Sender sx={{alignSelf: alignSelf}}>{message.author}</Sender>
-          </MessageGrid>
-        )
-      })}
+      <MessageBox>
+        {messages.map((message, idx)=>{
+          const isUserMessage = message.author.id === socket.id
+          const textAlign = isUserMessage ? 'right' : 'left'
+          const alignSelf = isUserMessage ? 'end': 'start'
+          return (
+            <MessageGrid key={idx} sx={{
+              textAlign: textAlign,
+              alignSelf: alignSelf
+            }}>
+              <Message>{message.message}</Message>
+              <Sender sx={{ alignSelf: alignSelf }}>{message.author.username}</Sender>
+            </MessageGrid>
+          )
+        })}
+      </MessageBox>
       <Grid>
         <input value={currentMessage} onChange={handleCurrMessage}></input>
         <Button onClick={handleSendMessage}>Send Message</Button>

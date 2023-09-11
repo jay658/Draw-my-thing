@@ -18,12 +18,12 @@ const StyledButton = styled(Button)(() => ({
   width:'3vw', 
   maxWidth:'50px', 
   maxHeight:'20px', 
-  margin: '20px'
+  margin: '10px'
 }))
 
 const MusicPlayer = () => {
   const [musicPlaying, setMusicPlaying] = useState(false)
-  const [volume, setVolume] = useState(1)
+  const [volume, setVolume] = useState(0)
   
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -42,18 +42,13 @@ const MusicPlayer = () => {
   return(
     <StyledDiv>
       <ColorSlider volume={volume} setVolume={setVolume}/>
-      <StyledButton onClick={handleToggleMusic}>{musicPlaying? 
+      <StyledButton onClick={handleToggleMusic}>{musicPlaying && volume > 0? 
         <Lottie animationData={MusicOnOff} initialSegment={[35, 100]}/>:
         <Lottie animationData={MusicOnOff} initialSegment={[80, 150]} loop={false}/>
-      }
-      </StyledButton>
+      }</StyledButton>
       <ReactHowler src={IntroMusic} playing={musicPlaying} loop={true} volume={volume}/>
     </StyledDiv>
   )
 }
 
 export default MusicPlayer
-
-/*
-<Lottie lottieRef={readyAnimation} loop={player.readyStatus? false: true} animationData={ReadyAnimation} initialSegment={player.readyStatus? [30, 100]: [0, 30]} style={{height:'50%'}}/>
-*/
