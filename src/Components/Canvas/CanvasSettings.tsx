@@ -1,5 +1,5 @@
 import { BsEraser, BsPencil } from "react-icons/bs";
-import { ColorResult, CompactPicker } from 'react-color';
+import { ColorResult, GithubPicker } from 'react-color';
 import { LinesT, SettingsT } from './Types'
 import {
   PenWidthContainer,
@@ -25,6 +25,25 @@ type OwnPropsT = {
   handleClearHistory: () => void
 }
 
+const colors = [
+  "#000000", // Black
+  "#808080", // Gray
+  "#A9A9A9", // Dark Gray
+  "#D3D3D3", // Light Gray
+  "#FFFFFF", // White
+  "#FF0000", // Red
+  "#FFA500", // Orange
+  "#FFFF00", // Yellow
+  "#808000", // Olive
+  "#00FF00", // Green
+  "#008080", // Teal
+  "#00FFFF", // Cyan
+  "#0000FF", // Blue
+  "#800080", // Purple
+  "#FF00FF", // Magenta
+  "#800000"  // Maroon
+];
+
 const CanvasSettings = ({settings, setSettings, handleSettingChange, setLines, handleRedo, handleUndo, handleClearHistory}: OwnPropsT): ReactElement => {
 
   const { stroke, tool, strokeWidth } = settings
@@ -43,7 +62,8 @@ const CanvasSettings = ({settings, setSettings, handleSettingChange, setLines, h
   
   return (
     <StyledDiv>
-      <CompactPicker color={stroke} onChange={(color:ColorResult) => {handleColorPickerClick(color.hex)}}/>
+      {/*Can use the width property to make this vertical. Can also change the box sizes to fit mobile better. */}
+      <GithubPicker color={stroke} onChange={(color:ColorResult) => {handleColorPickerClick(color.hex)}} colors={colors}/>
       <ToolsContainer>
         <Button 
           sx={{'border':tool === 'pen'? '1px solid black': ''}}

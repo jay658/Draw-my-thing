@@ -10,6 +10,14 @@ const StyledStage = styled(Stage)(() => ({
   touchAction:'none'
 }))
 
+const CanvasScreen = styled('div')(() => ({
+  display: 'flex', 
+  justifyContent:'center', 
+  alignItems: 'center', 
+  flexDirection: 'column',
+  width: '100%'
+}))
+
 /* CANVAS SETTINGS COMPONENTS */
 const StyledSelect = styled(Select)(() => ({
   '&&.css-11u53oe-MuiSelect-select-MuiInputBase-input-MuiOutlinedInput-input': {
@@ -31,16 +39,18 @@ const StyledDiv = styled('div')(() => ({
   justifyContent: 'center', 
   alignItems: 'center',
   gap: '10px',
-  flexWrap: 'wrap'
+  flexWrap: 'wrap',
+  margin: '10px'
 }))
 
 const StyledInputLabel = styled(InputLabel)(() => ({
-  fontSize: '13px'
+  fontSize: '12px'
 }))
 
 export {
   /* CANVAS SETTINGS COMPONENTS */
   StyledStage,
+  CanvasScreen,
   /* CANVAS SETTINGS COMPONENTS */
   StyledSelect,
   PenWidthContainer,
