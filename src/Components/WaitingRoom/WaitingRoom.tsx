@@ -1,61 +1,15 @@
+import { ChatBoxContainer, InnerGrid, OutterGrid, PlayersInfoContainer, WaitingRoomContainer } from './StyledComponents'
+import { Player, WaitingRoomErrorsT } from './Types'
 import { ReactElement, useEffect, useRef, useState } from "react";
 
 import Button from '@mui/material/Button';
-import Chatbox from "./Chatbox";
+import Chatbox from "../Chat/Chatbox";
 import CircularProgress from '@mui/material/CircularProgress';
-import ErrorMessages from "./ErrorMessage";
-import { Grid } from "@mui/material";
-import PageNotFound from "../PageNotFound";
+import ErrorMessages from "../ErrorMessages/ErrorMessage";
+import PageNotFound from "../PageNotFound/PageNotFound";
 import PopulateWaitingScreen from './PopulateWaitingRoom';
 import socket from "../Websocket/socket";
-import { styled } from '@mui/material/styles';
 import { useNavigate } from 'react-router-dom'
-
-export type Player = {
-  sessionId: string,
-  username: string,
-  readyStatus: boolean,
-  avatar: string
-} 
-
-export type WaitingRoomErrorsT = {
-  playersNotReady: string
-}
-
-const OutterGrid = styled(Grid)(() => ({
-  paddingTop: '40px',
-  margin: '0px',
-  justifyContent: 'flex-start',
-  flexDirection: 'column',
-  height: '80vh',
-}))
-
-const InnerGrid = styled(Grid)(() => ({
-  display: 'flex', 
-  justifyContent: 'center', 
-  alignItems: 'stretch',
-  flexWrap: 'wrap', 
-  height: '40%',
-  gap: 'calc(100vw * 0.02)',
-}))
-
-const PlayersInfoContainer = styled('div')(() => ({
-  display: 'flex', 
-  flexDirection:'column', 
-  height: '90vh', 
-  alignItems:'center',
-  flex: '0 0 70%'
-}))
-
-const WaitingRoomContainer = styled('div')(() => ({
-  display:'flex'
-}))
-
-const ChatBoxContainer = styled('div')(() => ({
-  flex:'0 0 30%',
-  height: '60vh',
-  width: '25vw'
-}))
 
 const WaitingRoom = (): ReactElement => {
   const params = new URLSearchParams(window.location.search)

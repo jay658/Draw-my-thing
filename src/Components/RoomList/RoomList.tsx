@@ -2,13 +2,10 @@ import { ReactElement, useEffect, useState } from "react";
 import { Table, TableBody, TableCell, TableHead, TableRow } from "@mui/material";
 
 import Button from '@mui/material/Button';
+import { Room } from "./Types";
 import socket from "../Websocket/socket";
 import { useNavigate } from 'react-router-dom'
 
-type Room = {
-  name: string,
-  members: string[]
-}
 export const MAX_ROOM_CAPACITY = 8
 
 const RoomList = (): ReactElement => {

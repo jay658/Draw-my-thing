@@ -1,25 +1,11 @@
+import { StyledButton, StyledDiv } from './StyledComponents';
 import { useEffect, useState } from 'react'
 
-import Button from '@mui/material/Button';
 import ColorSlider from './VolumeSlider'
 import IntroMusic from '../../assets/intro-music.mp3'
 import Lottie from 'lottie-react'
 import MusicOnOff from '../../assets/lottie/music-on-off.json'
 import ReactHowler from 'react-howler'
-import { styled } from '@mui/material'
-
-const StyledDiv = styled('div')(() => ({
-  display:'flex', 
-  justifyContent:'flex-end', 
-  alignItems:'center'
-}))
-
-const StyledButton = styled(Button)(() => ({
-  width:'3vw', 
-  maxWidth:'50px', 
-  maxHeight:'20px', 
-  margin: '10px'
-}))
 
 const MusicPlayer = () => {
   const [musicPlaying, setMusicPlaying] = useState(false)

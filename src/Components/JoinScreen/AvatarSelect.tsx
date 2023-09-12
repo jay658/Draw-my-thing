@@ -1,16 +1,16 @@
 import Select, { SelectChangeEvent } from '@mui/material/Select';
 
+import type { AvatarType } from './Types';
 import ChillWatermelon from '../../assets/lottie/icons/Chill-Watermelon.json'
 import DancingBear from '../../assets/lottie/icons/Dancing-Bear.json'
 import ExtraLongNeckGiraffe from '../../assets/lottie/icons/Extra-Long-Neck-Giraffe.json'
-import FormControl from '@mui/material/FormControl';
 import HappyTrashCan from '../../assets/lottie/icons/Happy-Trash-Can.json'
 import HelloRobot from '../../assets/lottie/icons/Hello-Robot.json'
 import InputLabel from '@mui/material/InputLabel';
 import Lottie from 'lottie-react'
 import LoungingFox from '../../assets/lottie/icons/Lounging-Fox.json'
 import MenuItem from '@mui/material/MenuItem';
-import { styled } from '@mui/material/styles';
+import { StyledFormControl } from './StyledComponents'
 import { useState } from 'react'
 
 export const avatarsMap: Record<string, any> = {
@@ -23,15 +23,6 @@ export const avatarsMap: Record<string, any> = {
 }
 
 const avatars = Object.keys(avatarsMap)
-
-const StyledFormControl = styled(FormControl)(() => ({
-  margin: '10px',
-  width:'8vw',
-  minWidth: '75px',
-  maxWidth: '100px'
-}))
-
-type AvatarType = keyof typeof avatarsMap
 
 type OwnPropsT = {
   setPlayerAvatar: (avatar: AvatarType) => void

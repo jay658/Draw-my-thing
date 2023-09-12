@@ -1,41 +1,13 @@
+import { StyledCard, StyledCardContent, StyledSkeleton } from './StyledComponents';
+
 import Button from '@mui/material/Button';
-import Card from '@mui/material/Card';
-import CardContent from '@mui/material/CardContent';
 import Lottie from 'lottie-react'
-import { MAX_ROOM_CAPACITY } from "./RoomList";
-import type { Player } from './WaitingRoom'
+import { MAX_ROOM_CAPACITY } from "../RoomList/RoomList";
+import type { Player } from './Types'
 import { ReactElement } from "react";
 import ReadyAnimation from '../../assets/lottie/ready-animation.json'
-import Skeleton from '@mui/material/Skeleton';
 import Typography from '@mui/material/Typography';
-import { avatarsMap } from './AvatarSelect'
-import { styled } from '@mui/material/styles';
-
-const StyledCard = styled(Card)(() => ({
-  borderRadius:'3%',
-  width: '12vw',
-  height: '100%',
-  display:'flex',
-  flexDirection: 'column',
-  alignItems:' center',
-  padding: '16px',
-  justifyContent: 'center'
-}))
-
-const StyledSkeleton = styled(Skeleton)(() => ({
-  borderRadius:'3%',
-  width: '12vw',
-  height: '100%',
-  display:'flex',
-  flexDirection: 'column',
-  alignItems:' center',
-  padding: '16px'
-}))
-
-const StyledCardContent = styled(CardContent)(() => ({
-  padding:'5px',
-  height:'50%'
-}))
+import { avatarsMap } from '../JoinScreen/AvatarSelect'
 
 type OwnPropsT = {
   players: Player[],

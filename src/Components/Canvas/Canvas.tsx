@@ -1,29 +1,12 @@
-import { Layer, Line, Stage } from 'react-konva';
+import { Layer, Line } from 'react-konva';
+import { LinesT, SettingsT } from './Types';
 import { useRef, useState } from 'react';
 
 import CanvasSettings from "./CanvasSettings";
 import Konva from 'konva';
 import type { ReactElement } from "react";
 import type { SelectChangeEvent } from '@mui/material/Select';
-import { styled } from '@mui/material'
-
-export type LinesT = {
-  tool: string
-  points: number[],
-  stroke: string,
-  strokeWidth: string
-}
-
-export type SettingsT = {
-  tool: string,
-  stroke: string,
-  strokeWidth: string
-}
-
-const StyledStage = styled(Stage)(() => ({
-  border: '1px solid black', 
-  touchAction:'none'
-}))
+import { StyledStage } from './StyledComponents'
 
 const Canvas = (): ReactElement => {
   

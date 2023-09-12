@@ -1,108 +1,26 @@
-import { Box, Button, Grid, Paper } from "@mui/material";
 import { ChangeEvent, ReactElement, useEffect, useState } from "react";
+import {
+  ChatContainer,
+  Message,
+  MessageBox,
+  MessageGrid,
+  SendMessageButton,
+  Sender,
+  StyledScrollToBottom,
+  StyledTextField,
+  TextBoxContainer
+} from './StyledComponents'
 import { getRandom, wordbank } from '../../../public/wordbank'
 
-import ScrollToBottom from 'react-scroll-to-bottom';
+import type { MessageT } from "./Types";
 import SendIcon from '@mui/icons-material/Send';
-import TextField from '@mui/material/TextField';
 import socket from "../Websocket/socket";
-import { styled } from '@mui/material/styles';
 
-type MessageT = {
-  author: {
-    sessionId: string,
-    username: string
-  },
-  message: string
-} 
-
-type ChatBoxPropsT = {
+type OwnPropsT = {
   roomName: string | null
 }
 
-const ChatContainer = styled(Box)(() =>({
-  width: '90%',
-  height: '100%',
-  display: 'flex',
-  flexDirection: 'column',
-  justifyContent: 'center',
-  backgroundColor: '#EAEAEA',
-  margin:'10px',
-  marginTop:'5vh',
-  marginLeft:'0px',
-  borderRadius:'3%',
-  padding: '5px'
-}))
-
-const StyledScrollToBottom = styled(ScrollToBottom)(() => ({
-  height: '100%',
-  width: '100%',
-  '& > div': {
-    display: 'flex',
-    flexDirection: 'column',
-    height: '100%',
-    width: '100%',
-    overflowY: 'auto',
-    position: 'relative',
-    '&::before': {
-      content: '""',
-      flexGrow: 1,
-    },
-  }
-}))
-
-const MessageBox = styled('div')(() => ({
-  width: '100%',
-  height:'85%',
-}))
-
-const MessageGrid = styled(Grid)(({ theme }) =>({
-  maxWidth:'70%',
-  display: 'flex',
-  flexDirection: 'column',
-  padding: theme.spacing(1),
-  margin: '3px', 
-  overflowWrap: 'break-word',
-  wordBreak: 'break-all',
-  textAlign: 'left'
-}))
-
-const Message = styled(Paper)(({ theme }) => ({
-  backgroundColor: theme.palette.mode === 'dark' ? '#1A2027' : '#fff',
-  ...theme.typography.body2,
-  padding: theme.spacing(1),
-}));
-
-const Sender = styled(Paper)(({ theme }) => ({
-  backgroundColor: 'lightblue',
-  ...theme.typography.body2,
-  height: "5px",
-  textAlign: 'center',
-  fontSize: '.6rem',
-  border: 'none',
-  padding: "5px",
-}));
-
-const TextBoxContainer = styled(Grid)(() => ({
-  display: 'flex',
-  padding:'0px 10px'
-}))
-
-const StyledTextField = styled(TextField)(() => ({
-  '& .MuiInputBase-input': {
-    padding: '5px',
-    backgroundColor: 'white',
-  },
-  flex:'0 0 80%'
-}))
-
-const SendMessageButton = styled(Button)(() => ({
-  padding: '5px',
-  flex: '0 0 20%',
-  minWidth: '0px'
-}))
-
-const Chatbox = ({ roomName }: ChatBoxPropsT): ReactElement => {
+const Chatbox = ({ roomName }: OwnPropsT): ReactElement => {
   const sessionId = sessionStorage.getItem('sessionId')
   const [messages, setMessages] = useState<MessageT[]>([])
   const [currentMessage, setCurrentMessage] = useState("")
