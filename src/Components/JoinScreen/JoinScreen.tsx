@@ -12,7 +12,8 @@ import { useNavigate } from 'react-router-dom'
 
 export type JoinScreenErrorsT = {
   roomNotFound: string,
-  roomNameTaken: string
+  roomNameTaken: string, 
+  roomFull: string
 }
 
 const Item = styled(Paper)(({ theme }) => ({
@@ -50,50 +51,26 @@ const JoinScreen = (): ReactElement => {
   const [playerAvatar, setPlayerAvatar] = useState('Lounging Fox')
   const [error, setError] = useState<JoinScreenErrorsT>({
     roomNotFound: '',
-    roomNameTaken: ''
+    roomNameTaken: '',
+    roomFull: ''
   })
   const errorRef = useRef(error)
   const [openError, setOpenError] = useState(errorRef.current.roomNotFound? true: false)
   const navigate = useNavigate()
 
   useEffect(() => {
-    socket.on("room_not_found", (data) => {
-      setOpenError(true)
-      setError(prevError => {
-        const newError = { ...prevError, roomNotFound: data }
-        errorRef.current = newError
-        return newError
-      });
-    });
-
     socket.on("room_name_taken", (data) => {
       setOpenError(true)
       setError(_prevError => {
-        const newError = { roomNotFound: '', roomNameTaken: data }
+        const newError = { roomNotFound: '', roomFull:'', roomNameTaken: data }
         errorRef.current = newError
         return newError
       })
     })
 
-    //We can potentially delete this. Currently navigating through a callback function on the emit
-    socket.on("create_room_success", ({name, roomName}) => {
-      console.log(`${name} created room ${roomName}`)
-      navigate(`/loading?room=${roomName}`)
-    })
-
-    socket.on("join_room_success", ({name, roomName, sessionId}) => {
-      console.log(`${name} joined room ${roomName}`)
-      socket.username = name
-      sessionStorage.setItem('sessionId', sessionId)
-      navigate(`/loading?room=${roomName}`)
-    })
-
     // Cleanup by removing the event listener when the component unmounts
     return () => {
-        socket.off("room_not_found")
         socket.off("room_name_taken")
-        socket.off("create_room_success")
-        socket.off("join_room_success")
     };
 }, []);
   
@@ -103,14 +80,35 @@ const JoinScreen = (): ReactElement => {
       if(response === 'success') {
         socket.username = name
         sessionStorage.setItem('sessionId', sessionId)
-        navigate(`/loading?room=${roomName}`) 
+        navigate(`/loading?redirect=/waitingroom?room=${roomName}`) 
       }
     })
   }
 
   const handleJoinRoom = () => {
     if(!socket.connected) socket.connect()
-    socket.emit("join_room", {name, roomName, avatar: playerAvatar})
+    socket.emit("join_room", {name, roomName, avatar: playerAvatar}, (response: string, userInfo: {name: string, roomName: string, sessionId: string}) => {
+      if(response === 'join_room_success'){
+        console.log(`${name} joined room ${roomName}`)
+        socket.username = name
+        sessionStorage.setItem('sessionId', userInfo.sessionId)
+        navigate(`/loading?redirect=/waitingroom?room=${roomName}`)
+      }else if(response === `There is no room ${roomName}`){
+        setOpenError(true)
+        setError(_prevError => {
+          const newError = { roomNameTaken: '', roomFull: '', roomNotFound: response }
+          errorRef.current = newError
+          return newError
+        });
+      }else if(response === `Room ${roomName} is currently full!`){
+        setOpenError(true)
+        setError(_prevError => {
+          const newError = { roomNameTaken: '', roomNotFound: '', roomFull: response }
+          errorRef.current = newError
+          return newError
+        });
+      }
+    })
   }
 
   const handleNameChange = (e: ChangeEvent<HTMLInputElement>) => {

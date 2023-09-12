@@ -44,7 +44,7 @@ const PlayersInfoContainer = styled('div')(() => ({
   flexDirection:'column', 
   height: '90vh', 
   alignItems:'center',
-  flex: '0 0 75%'
+  flex: '0 0 70%'
 }))
 
 const WaitingRoomContainer = styled('div')(() => ({
@@ -52,8 +52,9 @@ const WaitingRoomContainer = styled('div')(() => ({
 }))
 
 const ChatBoxContainer = styled('div')(() => ({
-  flex:'0 0 25%',
-  height: '60vh'
+  flex:'0 0 30%',
+  height: '60vh',
+  width: '25vw'
 }))
 
 const WaitingRoom = (): ReactElement => {
@@ -150,7 +151,7 @@ const WaitingRoom = (): ReactElement => {
 
   const backToJoinScreen = () => {
     socket.emit('leave_room')
-    navigate('/join')
+    navigate(`/loading?redirect=/join`)
   }
   
   if(loading) return <CircularProgress/>
