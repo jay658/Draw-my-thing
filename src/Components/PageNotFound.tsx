@@ -28,7 +28,7 @@ const PageNotFound = () => {
   useEffect(() => {
     const timer = setTimeout(() => {
       navigate(`/join`);
-    }, 5000);
+    }, 3000);
     
     return () => {
       clearTimeout(timer); 

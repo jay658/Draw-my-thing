@@ -7,14 +7,14 @@ import { useNavigate } from 'react-router-dom';
 
 const LoadingScreen = () => {
   const params = new URLSearchParams(window.location.search)
-  const roomName = params.get("room")
+  const redirectLink = params.get("redirect")
   const differentAnimationsRef = useRef<LottieRefCurrentProps>(null)
   const loadingAnimationRef = useRef<LottieRefCurrentProps>(null)
   const navigate = useNavigate()
 
   useEffect(() => {
     const timer = setTimeout(() => {
-      navigate(`/waitingroom?room=${roomName}`);
+      navigate(`${redirectLink}`);
     }, 2000);
     
     return () => {

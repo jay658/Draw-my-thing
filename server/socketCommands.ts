@@ -23,6 +23,8 @@ type Room = {
   members: Member[]
 }
 
+const MAX_ROOM_SIZE = 8
+
 const generateSessionId = () => {
   return uuidv4()
 }
@@ -130,21 +132,24 @@ const socketCommands = (io: Server)=>{
       }
     })
 
-    socket.on('join_room', ({name, roomName, avatar})=>{
+    socket.on('join_room', ({name, roomName, avatar}, callback)=>{
       socket.readyStatus = false
+      leaveAllOtherRooms(socket)
       if(roomExists(roomName)){
-        leaveAllOtherRooms(socket)
-        socket.username = name
-        socket.avatar = avatar
-        socket.roomName = roomName
-        addKeyToSessions(socket.sessionId, { sessionId: socket.sessionId, username:name, roomName, avatar, readyStatus:socket.readyStatus })
-        socket.join(roomName)
-        console.log(`User ${socket.username} (${socket.id}) joined room: ${roomName}`)
-        
-        io.to(roomName).emit('send_room', getRoom(roomName))
-        socket.emit('join_room_success', {name: socket.username, roomName, sessionId: socket.sessionId})
+        if(getRoom(roomName)?.members.length === MAX_ROOM_SIZE) callback(`Room ${roomName} is currently full!`)
+        else{
+          socket.username = name
+          socket.avatar = avatar
+          socket.roomName = roomName
+          addKeyToSessions(socket.sessionId, { sessionId: socket.sessionId, username:name, roomName, avatar, readyStatus:socket.readyStatus })
+          socket.join(roomName)
+          console.log(`User ${socket.username} (${socket.id}) joined room: ${roomName}`)
+          
+          io.to(roomName).emit('send_room', getRoom(roomName))
+          callback('join_room_success', {name: socket.username, roomName, sessionId: socket.sessionId})
+        }
       }else{
-        socket.emit('room_not_found', `There is no room ${roomName}`)
+        callback(`There is no room ${roomName}`)
       }
     })
 

@@ -2,6 +2,8 @@ import { Box, Button, Grid, Paper } from "@mui/material";
 import { ChangeEvent, ReactElement, useEffect, useState } from "react";
 import { getRandom, wordbank } from '../../../public/wordbank'
 
+import ScrollToBottom from 'react-scroll-to-bottom';
+import SendIcon from '@mui/icons-material/Send';
 import TextField from '@mui/material/TextField';
 import socket from "../Websocket/socket";
 import { styled } from '@mui/material/styles';
@@ -24,27 +26,45 @@ const ChatContainer = styled(Box)(() =>({
   display: 'flex',
   flexDirection: 'column',
   justifyContent: 'center',
-  backgroundColor: 'lightgrey',
+  backgroundColor: '#EAEAEA',
   margin:'10px',
   marginTop:'5vh',
   marginLeft:'0px',
-  borderRadius:'3%'
+  borderRadius:'3%',
+  padding: '5px'
+}))
+
+const StyledScrollToBottom = styled(ScrollToBottom)(() => ({
+  height: '100%',
+  width: '100%',
+  '& > div': {
+    display: 'flex',
+    flexDirection: 'column',
+    height: '100%',
+    width: '100%',
+    overflowY: 'auto',
+    position: 'relative',
+    '&::before': {
+      content: '""',
+      flexGrow: 1,
+    },
+  }
 }))
 
 const MessageBox = styled('div')(() => ({
   width: '100%',
-  display: 'flex',
-  flexDirection: 'column',
-  justifyContent: 'flex-end',
-  height:'80%'
+  height:'85%',
 }))
 
 const MessageGrid = styled(Grid)(({ theme }) =>({
+  maxWidth:'70%',
   display: 'flex',
   flexDirection: 'column',
   padding: theme.spacing(1),
-  width: '70%',
   margin: '3px', 
+  overflowWrap: 'break-word',
+  wordBreak: 'break-all',
+  textAlign: 'left'
 }))
 
 const Message = styled(Paper)(({ theme }) => ({
@@ -56,7 +76,6 @@ const Message = styled(Paper)(({ theme }) => ({
 const Sender = styled(Paper)(({ theme }) => ({
   backgroundColor: 'lightblue',
   ...theme.typography.body2,
-  width: "25%",
   height: "5px",
   textAlign: 'center',
   fontSize: '.6rem',
@@ -64,11 +83,23 @@ const Sender = styled(Paper)(({ theme }) => ({
   padding: "5px",
 }));
 
+const TextBoxContainer = styled(Grid)(() => ({
+  display: 'flex',
+  padding:'0px 10px'
+}))
+
 const StyledTextField = styled(TextField)(() => ({
   '& .MuiInputBase-input': {
     padding: '5px',
-    backgroundColor:'white'
+    backgroundColor: 'white',
   },
+  flex:'0 0 80%'
+}))
+
+const SendMessageButton = styled(Button)(() => ({
+  padding: '5px',
+  flex: '0 0 20%',
+  minWidth: '0px'
 }))
 
 const Chatbox = ({ roomName }: ChatBoxPropsT): ReactElement => {
@@ -107,29 +138,33 @@ const Chatbox = ({ roomName }: ChatBoxPropsT): ReactElement => {
     }
     setCurrentMessage("")
   }
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if(e.key === 'Enter') handleSendMessage()
+  }
   
   return (
     <ChatContainer>
       <MessageBox>
-        {messages.map((message, idx)=>{
-          const isUserMessage = message.author.sessionId === sessionId
-          const textAlign = isUserMessage ? 'right' : 'left'
-          const alignSelf = isUserMessage ? 'end': 'start'
-          return (
-            <MessageGrid key={idx} sx={{
-              textAlign: textAlign,
-              alignSelf: alignSelf
-            }}>
-              <Message>{message.message}</Message>
-              <Sender sx={{ alignSelf: alignSelf }}>{message.author.username}</Sender>
-            </MessageGrid>
-          )
-        })}
+        <StyledScrollToBottom>
+          {messages.map((message, idx)=>{
+            const isUserMessage = message.author.sessionId === sessionId
+            const alignSelf = isUserMessage ? 'end': 'start'
+            return (
+              <MessageGrid key={idx} sx={{
+                alignSelf: alignSelf
+              }}>
+                <Message>{message.message}</Message>
+                <Sender sx={{ alignSelf: alignSelf }}>{message.author.username}</Sender>
+              </MessageGrid>
+            )
+          })}
+        </StyledScrollToBottom>
       </MessageBox>
-      <Grid>
-        <StyledTextField value={currentMessage} onChange={handleCurrMessage} variant='outlined'/>
-        <Button onClick={handleSendMessage}>Send Message</Button>
-      </Grid>
+      <TextBoxContainer>
+        <StyledTextField variant='outlined' placeholder={'Send a message'} value={currentMessage} onChange={handleCurrMessage} onKeyDown={handleKeyDown}/>
+        <SendMessageButton onClick={handleSendMessage}><SendIcon/></SendMessageButton>
+      </TextBoxContainer>
     </ChatContainer>
   )
 }
