@@ -22,6 +22,6 @@
     "noUnusedParameters": true,
     "noFallthroughCasesInSwitch": true
   },
-  "include": ["src", "server/socketCommands.ts"],
+  "include": ["src", "server/socketCommands/index.ts"],
   "exclude": ["node_modules"]
 }
