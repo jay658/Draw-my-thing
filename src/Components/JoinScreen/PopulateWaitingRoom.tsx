@@ -9,12 +9,11 @@ import ReadyAnimation from '../../assets/lottie/ready-animation.json'
 import Skeleton from '@mui/material/Skeleton';
 import Typography from '@mui/material/Typography';
 import { avatarsMap } from './AvatarSelect'
-import socket from "../Websocket/socket";
 import { styled } from '@mui/material/styles';
 
 const StyledCard = styled(Card)(() => ({
   borderRadius:'3%',
-  width: '13vw',
+  width: '12vw',
   height: '100%',
   display:'flex',
   flexDirection: 'column',
@@ -25,7 +24,7 @@ const StyledCard = styled(Card)(() => ({
 
 const StyledSkeleton = styled(Skeleton)(() => ({
   borderRadius:'3%',
-  width: '13vw',
+  width: '12vw',
   height: '100%',
   display:'flex',
   flexDirection: 'column',
@@ -44,7 +43,7 @@ type OwnPropsT = {
 }
 
 const PopulateWaitingScreen = ({ players, readyUp }: OwnPropsT): ReactElement => {
-
+  const sessionId = sessionStorage.getItem('sessionId')
   const playerDetails = []
   for(let i = 0; i < MAX_ROOM_CAPACITY; i++){
     const player = players[i]
@@ -58,7 +57,7 @@ const PopulateWaitingScreen = ({ players, readyUp }: OwnPropsT): ReactElement =>
               {player.username}
             </Typography>
             <Lottie loop={player.readyStatus? false: true} animationData={ReadyAnimation} initialSegment={player.readyStatus? [30, 100]: [0, 30]} style={{height:'50%'}}/>
-            <Button size="small" onClick={()=> readyUp(i)} style={{visibility: socket.id === player.id? 'visible': 'hidden'}}>Ready Up</Button>
+            <Button size="small" onClick={()=> readyUp(i)} style={{visibility: sessionId === player.sessionId? 'visible': 'hidden'}}>Ready Up</Button>
           </StyledCardContent>
         </StyledCard>)
     )

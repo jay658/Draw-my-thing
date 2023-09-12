@@ -81,10 +81,10 @@ const JoinScreen = (): ReactElement => {
       navigate(`/loading?room=${roomName}`)
     })
 
-    socket.on("join_room_success", ({name, roomName}) => {
+    socket.on("join_room_success", ({name, roomName, sessionId}) => {
       console.log(`${name} joined room ${roomName}`)
       socket.username = name
-      sessionStorage.setItem('sessionId', socket.id)
+      sessionStorage.setItem('sessionId', sessionId)
       navigate(`/loading?room=${roomName}`)
     })
 
@@ -99,10 +99,10 @@ const JoinScreen = (): ReactElement => {
   
   const handleCreateRoom = () => {
     if(!socket.connected) socket.connect()
-    socket.emit("create_room", {name, roomName, avatar: playerAvatar}, (response: 'success' | 'failed') => {
+    socket.emit("create_room", {name, roomName, avatar: playerAvatar}, (response: 'success' | 'failed', sessionId: string) => {
       if(response === 'success') {
         socket.username = name
-        sessionStorage.setItem('sessionId', socket.id)
+        sessionStorage.setItem('sessionId', sessionId)
         navigate(`/loading?room=${roomName}`) 
       }
     })

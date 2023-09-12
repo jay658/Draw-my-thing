@@ -1,7 +1,10 @@
 import { Server, Socket } from 'socket.io'
 
+import { v4 as uuidv4 } from 'uuid'
+
 declare module 'socket.io' {
   interface Socket {
+      sessionId: string,
       username: string,
       readyStatus: boolean,
       avatar: string,
@@ -9,7 +12,7 @@ declare module 'socket.io' {
   }
 }
 type Member = {
-  id: string,
+  sessionId: string
   username: string,
   readyStatus: boolean, 
   avatar: string,
@@ -20,7 +23,22 @@ type Room = {
   members: Member[]
 }
 
-const sessions: Record<string, Member>= {}
+const generateSessionId = () => {
+  return uuidv4()
+}
+
+const sessions: Record<string, {member: Member, timerId: NodeJS.Timeout}>= {}
+
+const addKeyToSessions = (key: string, value: Member) => {
+  if(key in sessions && sessions[key].timerId) clearTimeout(sessions[key].timerId)
+
+  const timerId = setTimeout(() => {
+    console.log(`Deleting ${key}`)
+    delete sessions[key]
+  }, 1000 * 60 * 60)
+
+  sessions[key] = { member: value, timerId }
+}
 
 const socketCommands = (io: Server)=>{
   
@@ -34,8 +52,8 @@ const socketCommands = (io: Server)=>{
       membersSetArray.forEach(memberStringId => {
         const socket = io.sockets.sockets.get(memberStringId)
         if(socket){
-          const { id, readyStatus, username, avatar } = socket
-          if(username) members.push({id, username, readyStatus, avatar}) 
+          const { sessionId, readyStatus, username, avatar } = socket
+          if(username) members.push({ sessionId, username, readyStatus, avatar}) 
         }
       });
       roomData.push({name, members})
@@ -89,6 +107,7 @@ const socketCommands = (io: Server)=>{
   return (socket: Socket)=>{
     console.log(io.engine.clientsCount)
 
+    socket.sessionId = generateSessionId()
     socket.username = socket.id
     socket.readyStatus = false
     socket.avatar = 'Lounging Fox'
@@ -101,9 +120,9 @@ const socketCommands = (io: Server)=>{
         socket.username = name
         socket.avatar = avatar
         socket.roomName = roomName
-        sessions[socket.id] = { id: socket.id, username:name, roomName, avatar, readyStatus:socket.readyStatus }
+        addKeyToSessions(socket.sessionId, { sessionId: socket.sessionId, username:name, roomName, avatar, readyStatus:socket.readyStatus })
         socket.join(roomName)
-        callback('success')
+        callback('success', socket.sessionId)
         console.log(`User ${socket.username} (${socket.id}) created the room ${roomName}`)
         //socket.emit('create_room_success', {name: socket.username, roomName})
       }else{
@@ -118,12 +137,12 @@ const socketCommands = (io: Server)=>{
         socket.username = name
         socket.avatar = avatar
         socket.roomName = roomName
-        sessions[socket.id] = { id: socket.id, username:name, roomName, avatar, readyStatus:socket.readyStatus }
+        addKeyToSessions(socket.sessionId, { sessionId: socket.sessionId, username:name, roomName, avatar, readyStatus:socket.readyStatus })
         socket.join(roomName)
         console.log(`User ${socket.username} (${socket.id}) joined room: ${roomName}`)
         
         io.to(roomName).emit('send_room', getRoom(roomName))
-        socket.emit('join_room_success', {name: socket.username, roomName})
+        socket.emit('join_room_success', {name: socket.username, roomName, sessionId: socket.sessionId})
       }else{
         socket.emit('room_not_found', `There is no room ${roomName}`)
       }
@@ -159,13 +178,14 @@ const socketCommands = (io: Server)=>{
 
     socket.on('restore_session', (sessionId, callback) => {
       if(sessionId in sessions){
-        const { username, avatar, roomName } = sessions[sessionId]
+        const { username, avatar, roomName } = sessions[sessionId].member
         socket.username = username
         socket.readyStatus = false
         socket.avatar = avatar
         socket.roomName = roomName
+        socket.sessionId = sessionId
         if(roomName) socket.join(roomName)
-        callback('success')
+        callback('success', { username, avatar, roomName })
       }else{
         callback('failed')
       }
@@ -181,8 +201,8 @@ const socketCommands = (io: Server)=>{
     })
 
     socket.on('disconnect', ()=>{
-      const { roomName, id } = socket
-      if(roomName) io.to(roomName).emit('player_left', { id })
+      const { roomName, sessionId } = socket
+      if(roomName) io.to(roomName).emit('player_left', { sessionId })
       console.log(`User ${socket.username} (${socket.id}) disconnected`, socket.id)
     })
 

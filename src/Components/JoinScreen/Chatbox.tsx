@@ -2,12 +2,13 @@ import { Box, Button, Grid, Paper } from "@mui/material";
 import { ChangeEvent, ReactElement, useEffect, useState } from "react";
 import { getRandom, wordbank } from '../../../public/wordbank'
 
+import TextField from '@mui/material/TextField';
 import socket from "../Websocket/socket";
 import { styled } from '@mui/material/styles';
 
 type MessageT = {
   author: {
-    id: string,
+    sessionId: string,
     username: string
   },
   message: string
@@ -63,7 +64,15 @@ const Sender = styled(Paper)(({ theme }) => ({
   padding: "5px",
 }));
 
+const StyledTextField = styled(TextField)(() => ({
+  '& .MuiInputBase-input': {
+    padding: '5px',
+    backgroundColor:'white'
+  },
+}))
+
 const Chatbox = ({ roomName }: ChatBoxPropsT): ReactElement => {
+  const sessionId = sessionStorage.getItem('sessionId')
   const [messages, setMessages] = useState<MessageT[]>([])
   const [currentMessage, setCurrentMessage] = useState("")
   // const [gamewords, setGameWords] = useState<string[]>([])
@@ -92,7 +101,7 @@ const Chatbox = ({ roomName }: ChatBoxPropsT): ReactElement => {
     if(currWord === currentMessage) console.log("We have a winner!!!")
     else{
       socket.emit("message_to_server", { author: {
-        id:socket.id, 
+        sessionId: sessionId, 
         username: socket.username
       }, message: currentMessage, roomName: roomName })
     }
@@ -103,7 +112,7 @@ const Chatbox = ({ roomName }: ChatBoxPropsT): ReactElement => {
     <ChatContainer>
       <MessageBox>
         {messages.map((message, idx)=>{
-          const isUserMessage = message.author.id === socket.id
+          const isUserMessage = message.author.sessionId === sessionId
           const textAlign = isUserMessage ? 'right' : 'left'
           const alignSelf = isUserMessage ? 'end': 'start'
           return (
@@ -118,7 +127,7 @@ const Chatbox = ({ roomName }: ChatBoxPropsT): ReactElement => {
         })}
       </MessageBox>
       <Grid>
-        <input value={currentMessage} onChange={handleCurrMessage}></input>
+        <StyledTextField value={currentMessage} onChange={handleCurrMessage} variant='outlined'/>
         <Button onClick={handleSendMessage}>Send Message</Button>
       </Grid>
     </ChatContainer>

@@ -12,7 +12,7 @@ import { styled } from '@mui/material/styles';
 import { useNavigate } from 'react-router-dom'
 
 export type Player = {
-  id: string,
+  sessionId: string,
   username: string,
   readyStatus: boolean,
   avatar: string
@@ -79,12 +79,18 @@ const WaitingRoom = (): ReactElement => {
     
     if(!socket.connected && sessionId){
       socket.connect()
-      socket.emit('restore_session', sessionId, (response: 'success' | 'failed') => {
+      socket.emit('restore_session', sessionId, (response: 'success' | 'failed', userInfo: { username: string, avatar: string, roomName: string}) => {
         if(response === 'failed') {
           socket.disconnect()
           finalizeLoading(false)
         }
         if(response === 'success'){ 
+          if(userInfo){
+            const { username, avatar, roomName } = userInfo
+            socket.username = username
+            socket.avatar = avatar
+            socket.roomName = roomName
+          }
           socket.emit("get_room", roomName)
         }
       })
@@ -117,9 +123,9 @@ const WaitingRoom = (): ReactElement => {
       })
     })
 
-    socket.on("player_left", ({ id }) => {
+    socket.on("player_left", ({ sessionId }) => {
       setPlayers((prevPlayers) => {
-        return prevPlayers.filter(player => player.id !== id)
+        return prevPlayers.filter(player => player.sessionId !== sessionId)
       })
     })
     
