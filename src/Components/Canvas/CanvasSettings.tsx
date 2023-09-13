@@ -85,6 +85,21 @@ const CanvasSettings = ({settings, setSettings, handleSettingChange, setLines, h
             value={`${strokeWidth}`}
             label={'Pen Width'}
             onChange={handleSettingChange}
+            // MenuProps={{
+            //   anchorOrigin: {
+            //     vertical: 'bottom',
+            //     horizontal: 'left',
+            //   },
+            //   transformOrigin: {
+            //     vertical: 'top',
+            //     horizontal: 'left',
+            //   },
+            //   PaperProps: {
+            //     style: {
+            //       transform: 'translateY(-100%) translateY(-20px)',
+            //     },
+            //   },
+            // }}
           >
             <MenuItem value={'1'}>XS</MenuItem>
             <MenuItem value={'5'}>S</MenuItem>

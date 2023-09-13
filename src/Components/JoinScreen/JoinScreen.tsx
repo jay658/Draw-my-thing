@@ -107,7 +107,7 @@ const JoinScreen = (): ReactElement => {
               label="Username"
               defaultValue={name}
               onChange={handleNameChange}
-              inputProps={{ maxLength: 15 }}
+              inputProps={{ maxLength: 10 }}
             />
             <AvatarSelect setPlayerAvatar={setPlayerAvatar}/>
           </InLineContainer>
