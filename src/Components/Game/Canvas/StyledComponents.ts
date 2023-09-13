@@ -21,7 +21,7 @@ const CanvasScreen = styled('div')(() => ({
 /* CANVAS SETTINGS COMPONENTS */
 const StyledSelect = styled(Select)(() => ({
   '&&.css-11u53oe-MuiSelect-select-MuiInputBase-input-MuiOutlinedInput-input': {
-    padding: '8px 6px'
+    padding: '8px 6px',
   },
 }))
 

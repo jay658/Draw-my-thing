@@ -10,7 +10,12 @@ import type { SelectChangeEvent } from '@mui/material/Select';
 
 const ASPECT_RATIO = 16/9
 
-const Canvas = (): ReactElement => {
+type OwnPropsT = {
+  drawerSessionId: string
+}
+
+const Canvas = ({ drawerSessionId }: OwnPropsT): ReactElement => {
+  const sessionId = sessionStorage.getItem('sessionId')
   const [dimensions, setDimensions] = useState({
     width: 0,
     height: 0
@@ -121,15 +126,6 @@ const Canvas = (): ReactElement => {
 
   return (
     <CanvasScreen ref={containerRef}>
-      <CanvasSettings 
-        settings={settings} 
-        handleSettingChange={handleSettingChange} 
-        setSettings={setSettings} 
-        setLines={setLines}
-        handleRedo={handleRedo}
-        handleUndo={handleUndo}
-        handleClearHistory={handleClearHistory}
-      />
       <StyledStage
         width={dimensions.width}
         height={dimensions.height}
@@ -155,6 +151,15 @@ const Canvas = (): ReactElement => {
           ))}
         </Layer>
       </StyledStage>
+      {drawerSessionId === sessionId && <CanvasSettings 
+        settings={settings} 
+        handleSettingChange={handleSettingChange} 
+        setSettings={setSettings} 
+        setLines={setLines}
+        handleRedo={handleRedo}
+        handleUndo={handleUndo}
+        handleClearHistory={handleClearHistory}
+      />}
     </CanvasScreen>
   );
 };

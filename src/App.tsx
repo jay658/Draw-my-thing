@@ -1,6 +1,7 @@
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom'
 
-import Canvas from './Components/Canvas/Canvas';
+import Canvas from './Components/Game/Canvas/Canvas';
+import GameBoard from './Components/Game/Gameboard';
 import Home from './Routes/Home'
 import JoinScreen from './Components/JoinScreen/JoinScreen';
 import LoadingScreen from './Components/LoadingScreen/LoadingScreen';
@@ -17,11 +18,12 @@ const App = ():ReactElement => {
       <NavBar/>
       <Routes>
         <Route path="/" element={<Home />} />
-        <Route path="/draw" element={<Canvas />} />
+        <Route path="/draw" element={<Canvas drawerSessionId=''/>} />
         <Route path ="/join" element={<JoinScreen/>}/>
         <Route path ="/rooms" element={<RoomList/>}/>
         <Route path ="/waitingroom" element={<WaitingRoom/>}/>
         <Route path="/loading" element={<LoadingScreen/>}/>
+        <Route path="/game" element={<GameBoard/>}/>
         <Route path="*" element={<Navigate to='/' replace={true}/>} />
       </Routes>
     </BrowserRouter>

@@ -94,8 +94,10 @@ const CanvasSettings = ({settings, setSettings, handleSettingChange, setLines, h
           </StyledSelect>
         </FormControl>
       </PenWidthContainer>
-      <Button onClick={handleUndo}>Undo</Button>
-      <Button onClick={handleRedo}>Redo</Button>
+      <div style={{display:'flex', flexDirection:'column'}}>
+        <Button onClick={handleUndo}>Undo</Button>
+        <Button onClick={handleRedo}>Redo</Button>
+      </div>
       <Button onClick={handleClear}>Clear</Button>
     </StyledDiv>
   )
