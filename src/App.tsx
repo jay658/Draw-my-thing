@@ -1,6 +1,6 @@
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom'
 
-import Canvas from './Components/Canvas/Canvas';
+import Canvas from './Components/Game/Canvas/Canvas';
 import GameBoard from './Components/Game/Gameboard';
 import Home from './Routes/Home'
 import JoinScreen from './Components/JoinScreen/JoinScreen';

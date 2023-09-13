@@ -1,14 +1,15 @@
 import { useEffect, useState } from 'react';
 
 import { Button } from '@mui/base';
-import Canvas from '../Canvas/Canvas';
+import Canvas from './Canvas/Canvas';
 import Chatbox from '../Chat/Chatbox';
 import CircularProgress from '@mui/material/CircularProgress';
 import Grid from '@mui/material/Grid';
 import PageNotFound from '../PageNotFound/PageNotFound';
 import type { Player } from '../WaitingRoom/Types';
-import ScoreBoard from '../ScoreBoard/ScoreBoard';
+import ScoreBoard from './ScoreBoard/ScoreBoard';
 import { Typography } from '@mui/material';
+import WordDisplay from './WordDisplay/WordDisplay';
 import socket from '../Websocket/socket';
 
 const GameBoard = () => {
@@ -74,17 +75,17 @@ const GameBoard = () => {
   if(!roomExists) return <PageNotFound/>
   
   return (
-    <Grid style={{display:'flex'}}>
-      <Grid style={{flex:'0 0 15%'}}>
+    <Grid container sx={{height:'85vh'}}>
+      <Grid item xs={2} sx={{height: '100%'}}>
         <ScoreBoard players={players} drawer={players[drawerIdx]}/>
       </Grid>
-      <Grid style={{flex:'0 0 60%'}}>
-        {/* Word shower here. Maybe also the timer */}
+      <Grid item xs={7.5} sx={{height: '100%'}}>
+        <WordDisplay word={ 'Suez Canal' }/>
         <Canvas drawerSessionId={players[drawerIdx].sessionId}/>
         <Typography>Turn: {turn}</Typography>
         <Button onClick={handleNextDrawer}>Next drawer</Button>
       </Grid>
-      <Grid style={{flex:'0 0 25%'}}>
+      <Grid item xs={2.5} sx={{height: '100%'}}>
         <Chatbox roomName={roomName}/>
       </Grid>
     </Grid>

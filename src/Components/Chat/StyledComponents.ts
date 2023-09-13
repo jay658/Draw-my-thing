@@ -5,7 +5,7 @@ import TextField from '@mui/material/TextField';
 import { styled } from '@mui/material/styles';
 
 const ChatContainer = styled(Box)(() =>({
-  width: '90%',
+  width: '95%',
   height: '100%',
   display: 'flex',
   flexDirection: 'column',
