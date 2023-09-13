@@ -1,49 +1,18 @@
 import { ChangeEvent, ReactElement, useEffect, useRef, useState } from "react";
+import {
+  InLineContainer,
+  InnerGrid,
+  Item,
+  OutterGrid,
+} from './StyledComponents'
 
 import AvatarSelect from './AvatarSelect';
 import Button from '@mui/material/Button';
-import ErrorMessages from "./ErrorMessage";
-import Grid from '@mui/material/Grid';
-import Paper from '@mui/material/Paper';
+import ErrorMessages from "../ErrorMessages/ErrorMessage";
+import type { JoinScreenErrorsT } from "./Types";
 import TextField from '@mui/material/TextField';
 import socket from "../Websocket/socket";
-import { styled } from '@mui/material/styles';
 import { useNavigate } from 'react-router-dom'
-
-export type JoinScreenErrorsT = {
-  roomNotFound: string,
-  roomNameTaken: string, 
-  roomFull: string
-}
-
-const Item = styled(Paper)(({ theme }) => ({
-  backgroundColor: theme.palette.mode === 'dark' ? '#1A2027' : '#fff',
-  ...theme.typography.body2,
-  padding: theme.spacing(3),
-  textAlign: 'center',
-  color: theme.palette.text.secondary,
-  width: '100vw',
-  maxWidth: '600px',
-  border: '1px solid black',
-}));
-
-const InLineContainer = styled('div')(() => ({
-  display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'center'
-}));
-
-const InnerGrid = styled(Grid)(() => ({
-  justifyContent:'center',
-  alignItems:'center'
-}))
-
-const OutterGrid = styled(Grid)(() => ({
-  display: 'flex', 
-  justifyContent: 'center', 
-  alignItems: 'center', 
-  height: '80vh'
-}))
 
 const JoinScreen = (): ReactElement => {
   const [name, setName] = useState('')

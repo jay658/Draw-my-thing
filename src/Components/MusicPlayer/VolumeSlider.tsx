@@ -1,22 +1,13 @@
-import Box from '@mui/material/Box';
 import Slider from '@mui/material/Slider';
-import { mq } from '../NavBar';
-import { styled } from '@mui/material'
+import { StyledBox } from './StyledComponents';
 import { useState } from 'react';
 
-type ColorSliderPropsT = {
+type OwnPropsT = {
   volume: number,
   setVolume: React.Dispatch<React.SetStateAction<number>>
 }
 
-const StyledBox = styled(Box)(() => ({
-  width: '100px',
-  [mq.mobile]:{
-    display: 'none'
-  }
-}))
-
-export default function ColorSlider({volume, setVolume}: ColorSliderPropsT) {
+export default function ColorSlider({volume, setVolume}: OwnPropsT) {
   const [sliderValue, setSliderValue] = useState(volume);
 
   const handleChangeVolume = (_e: Event, value: number | number[]) => {

@@ -1,32 +1,21 @@
-import { Layer, Line, Stage } from 'react-konva';
-import { useRef, useState } from 'react';
+import { CanvasScreen, StyledStage } from './StyledComponents'
+import { Layer, Line } from 'react-konva';
+import { LinesT, SettingsT } from './Types';
+import { useEffect, useRef, useState } from 'react';
 
 import CanvasSettings from "./CanvasSettings";
 import Konva from 'konva';
 import type { ReactElement } from "react";
 import type { SelectChangeEvent } from '@mui/material/Select';
-import { styled } from '@mui/material'
 
-export type LinesT = {
-  tool: string
-  points: number[],
-  stroke: string,
-  strokeWidth: string
-}
-
-export type SettingsT = {
-  tool: string,
-  stroke: string,
-  strokeWidth: string
-}
-
-const StyledStage = styled(Stage)(() => ({
-  border: '1px solid black', 
-  touchAction:'none'
-}))
+const ASPECT_RATIO = 16/9
 
 const Canvas = (): ReactElement => {
-  
+  const [dimensions, setDimensions] = useState({
+    width: 0,
+    height: 0
+  })
+  const containerRef = useRef<HTMLDivElement | null>(null)
   const [settings, setSettings] = useState<SettingsT>({
     tool: 'pen',
     stroke: "#000000",
@@ -37,6 +26,26 @@ const Canvas = (): ReactElement => {
   const [lines, setLines] = useState<LinesT[]>(history.current[historyStep.current]);
   const isDrawing = useRef(false);
 
+  useEffect(() => {
+    const handleResize = () => {
+      if(containerRef && containerRef.current){
+        const container = containerRef.current
+        setDimensions({
+          width: container.offsetWidth * .95,
+          height: container.offsetWidth * .95 / ASPECT_RATIO
+        })
+      }
+    }
+
+    handleResize()
+
+    window.addEventListener('resize', handleResize)
+
+    return () => {
+      window.removeEventListener('resize', handleResize)
+    }
+  }, [])
+  
   const handleUndo = () => {
     if (historyStep.current === 0) return 
     historyStep.current -= 1
@@ -111,7 +120,7 @@ const Canvas = (): ReactElement => {
   }
 
   return (
-    <div>
+    <CanvasScreen ref={containerRef}>
       <CanvasSettings 
         settings={settings} 
         handleSettingChange={handleSettingChange} 
@@ -122,8 +131,8 @@ const Canvas = (): ReactElement => {
         handleClearHistory={handleClearHistory}
       />
       <StyledStage
-        width={window.innerWidth}
-        height={window.innerHeight * .8}
+        width={dimensions.width}
+        height={dimensions.height}
         onPointerUp={handlePointerUp}
         onPointerDown={handlePointerDown}
         onPointerMove={handlePointerMove}
@@ -146,7 +155,7 @@ const Canvas = (): ReactElement => {
           ))}
         </Layer>
       </StyledStage>
-    </div>
+    </CanvasScreen>
   );
 };
 

@@ -1,13 +1,13 @@
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom'
 
-import Canvas from './Components/Canvas';
+import Canvas from './Components/Canvas/Canvas';
 import Home from './Routes/Home'
 import JoinScreen from './Components/JoinScreen/JoinScreen';
-import LoadingScreen from './Components/JoinScreen/LoadingScreen';
-import NavBar from './Components/NavBar'
+import LoadingScreen from './Components/LoadingScreen/LoadingScreen';
+import NavBar from './Components/NavBar/NavBar'
 import { ReactElement } from 'react'
-import RoomList from './Components/JoinScreen/RoomList';
-import WaitingRoom from './Components/JoinScreen/WaitingRoom';
+import RoomList from './Components/RoomList/RoomList';
+import WaitingRoom from './Components/WaitingRoom/WaitingRoom';
 
 const App = ():ReactElement => {
   

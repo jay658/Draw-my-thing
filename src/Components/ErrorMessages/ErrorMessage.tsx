@@ -1,34 +1,17 @@
-import MuiAlert, { AlertProps } from '@mui/material/Alert';
-import { SyntheticEvent, forwardRef } from 'react'
+import { StyledAlert, StyledStack } from './StyledComponents';
 
-import type { JoinScreenErrorsT } from './JoinScreen'
+import type { JoinScreenErrorsT } from '../JoinScreen/Types'
 import Snackbar from '@mui/material/Snackbar';
-import Stack from '@mui/material/Stack';
-import type { WaitingRoomErrorsT } from './WaitingRoom'
-import { styled } from '@mui/material/styles';
+import { SyntheticEvent } from 'react'
+import type { WaitingRoomErrorsT } from '../WaitingRoom/Types'
 
-const Alert = forwardRef<HTMLDivElement, AlertProps>(function Alert(
-  props,
-  ref,
-) {
-  return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
-});
-
-type ErrorsPropsT = {
+type OwnPropsT = {
   error: Partial<JoinScreenErrorsT & WaitingRoomErrorsT>,
   openError: boolean,
   setOpenError: (open: boolean) => void
 }
 
-const StyledStack = styled(Stack)(() => ({
-  width: '100%'
-}))
-
-const StyledAlert = styled(Alert)(() => ({
-  width: '100%'
-}))
-
-export default function ErrorMessages({error, openError, setOpenError}: ErrorsPropsT) {
+export default function ErrorMessages({error, openError, setOpenError}: OwnPropsT) {
   const errors = Object.keys(error) as (keyof (JoinScreenErrorsT & WaitingRoomErrorsT))[]
 
   const handleClose = (_event?: SyntheticEvent | Event, reason?: string) => {

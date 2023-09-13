@@ -1,17 +1,21 @@
 import { BsEraser, BsPencil } from "react-icons/bs";
-import { ColorResult, CompactPicker } from 'react-color';
-import { LinesT, SettingsT } from './Canvas'
-import Select, { SelectChangeEvent } from '@mui/material/Select';
+import { ColorResult, GithubPicker } from 'react-color';
+import { LinesT, SettingsT } from './Types'
+import {
+  PenWidthContainer,
+  StyledDiv,
+  StyledInputLabel,
+  StyledSelect,
+  ToolsContainer
+} from './StyledComponents'
 
-import Box from '@mui/material/Box';
 import { Button } from "@mui/material";
 import FormControl from '@mui/material/FormControl';
-import InputLabel from '@mui/material/InputLabel';
 import MenuItem from "@mui/material/MenuItem";
 import { ReactElement } from "react"
-import { styled } from '@mui/material'
+import { SelectChangeEvent } from '@mui/material/Select';
 
-type CanvasSettingsT = {
+type OwnPropsT = {
   setSettings: React.Dispatch<React.SetStateAction<SettingsT>>,
   settings: SettingsT,
   handleSettingChange: (e:SelectChangeEvent<unknown>) => void,
@@ -21,34 +25,26 @@ type CanvasSettingsT = {
   handleClearHistory: () => void
 }
 
-const StyledSelect = styled(Select)(() => ({
-  '&&.css-11u53oe-MuiSelect-select-MuiInputBase-input-MuiOutlinedInput-input': {
-    padding: '8px 6px'
-  },
-}))
+const colors = [
+  "#000000", // Black
+  "#808080", // Gray
+  "#A9A9A9", // Dark Gray
+  "#D3D3D3", // Light Gray
+  "#FFFFFF", // White
+  "#FF0000", // Red
+  "#FFA500", // Orange
+  "#FFFF00", // Yellow
+  "#808000", // Olive
+  "#00FF00", // Green
+  "#008080", // Teal
+  "#00FFFF", // Cyan
+  "#0000FF", // Blue
+  "#800080", // Purple
+  "#FF00FF", // Magenta
+  "#800000"  // Maroon
+];
 
-const PenWidthContainer = styled(Box)(() => ({
-  minWidth: 70
-}))
-
-const ToolsContainer = styled(Box)(() => ({
-  display:'flex', 
-  flexDirection:'column'
-}))
-
-const StyledDiv = styled('div')(() => ({
-  display: 'flex',
-  justifyContent: 'center', 
-  alignItems: 'center',
-  gap: '10px',
-  flexWrap: 'wrap'
-}))
-
-const StyledInputLabel = styled(InputLabel)(() => ({
-  fontSize: '13px'
-}))
-
-const CanvasSettings = ({settings, setSettings, handleSettingChange, setLines, handleRedo, handleUndo, handleClearHistory}: CanvasSettingsT): ReactElement => {
+const CanvasSettings = ({settings, setSettings, handleSettingChange, setLines, handleRedo, handleUndo, handleClearHistory}: OwnPropsT): ReactElement => {
 
   const { stroke, tool, strokeWidth } = settings
   const handleToolClick = (tool:string) => {
@@ -66,7 +62,8 @@ const CanvasSettings = ({settings, setSettings, handleSettingChange, setLines, h
   
   return (
     <StyledDiv>
-      <CompactPicker color={stroke} onChange={(color:ColorResult) => {handleColorPickerClick(color.hex)}}/>
+      {/*Can use the width property to make this vertical. Can also change the box sizes to fit mobile better. */}
+      <GithubPicker color={stroke} onChange={(color:ColorResult) => {handleColorPickerClick(color.hex)}} colors={colors}/>
       <ToolsContainer>
         <Button 
           sx={{'border':tool === 'pen'? '1px solid black': ''}}

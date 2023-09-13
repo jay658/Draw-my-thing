@@ -1,15 +1,16 @@
-import * as React from 'react';
+import {
+  AppIcon,
+  HomeLink,
+  NavBarBox,
+  NavButton,
+  StyledAppBar,
+} from './StyledComponents'
 
-import AdbIcon from '@mui/icons-material/Adb';
-import AppBar from '@mui/material/AppBar';
-import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import Container from '@mui/material/Container';
-import MusicPlayer from './MusicPlayer/MusicPlayer';
+import MusicPlayer from '../MusicPlayer/MusicPlayer';
 import Toolbar from '@mui/material/Toolbar';
-import Typography from '@mui/material/Typography';
-import socket from './Websocket/socket';
-import { styled } from '@mui/material'
+import socket from '../Websocket/socket';
 import { useNavigate } from 'react-router-dom'
 
 const breakpoints = {
@@ -28,49 +29,6 @@ const tabs = {
 }
 
 const mobile = new Set(['Draw', 'Join Screen', 'Rooms'])
-
-const StyledAppBar = styled(AppBar)(() => ({
-  backgroundColor: 'white'
-}))
-
-const NavBarBox = styled(Box)(() => ({
-  display: 'flex',
-}))
-
-const NavButton = styled(Button)(() => ({
-  [mq.mobile]: {
-    display: 'none',
-  }
-}))
-
-const AppIcon = styled(AdbIcon)(() => ({
-  color: 'black',
-  display: 'flex',
-  marginRight: 8, 
-  '@media (max-width: 600px)': {
-    display: 'flex',
-  },
-  '@media (min-width: 960px)': {
-    display: 'flex',
-  },
-}));
-
-const HomeLink = styled(Typography)(() => ({
-  marginRight: 16, 
-  display: 'flex',
-  flexGrow: 1,
-  fontFamily: 'monospace',
-  fontWeight: 700,
-  letterSpacing: '.3rem',
-  color: 'inherit',
-  textDecoration: 'none',
-  '@media (max-width: 600px)': { 
-    display: 'flex',
-  },
-  '@media (min-width: 960px)': { 
-    display: 'flex',
-  },
-}));
 
 function ResponsiveAppBar() {
   const navigate = useNavigate()
