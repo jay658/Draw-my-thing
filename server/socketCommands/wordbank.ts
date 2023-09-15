@@ -1,0 +1,1 @@
+export const wordbank = ['test', 'hi', 'tree', 'leaf', 'tire', 'man', 'wedding', 'triangle', 'summer', 'magic', 'jumping', 'spacewalk', 'littering', 'raining', 'crying', 'drawing', 'magician', 'murderer', 'gun', 'mountain', 'peak', 'bank', 'shark']
