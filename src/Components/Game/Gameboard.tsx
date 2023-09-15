@@ -47,9 +47,12 @@ const GameBoard = () => {
         }
       })
     }else {
+      //socket.emit("get_game_info", roomName)
       socket.emit("get_room", roomName)
     }
     
+    //socket.on("send_game_info_to_client", gameinfo)
+    //gameinfo is the game class object
     socket.on("send_room", (room)=>{
       if(room){
         if(!roomExists) setRoomExists(true)

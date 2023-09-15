@@ -1,7 +1,7 @@
 import { Server, Socket } from 'socket.io'
 import { getRoom, getRooms, leaveAllOtherRooms, roomExists } from '../helperFunctions/room'
 
-import { addKeyToSessions } from '../helperFunctions/session'
+import { addKeyToSessions } from '../helperFunctions/sessions'
 
 export const roomSocketFunctions = (socket: Socket, io: Server, MAX_ROOM_SIZE: number) =>{
   socket.on('create_room', ({name, roomName, avatar}, callback) => {
