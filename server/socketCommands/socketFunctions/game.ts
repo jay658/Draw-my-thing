@@ -1,5 +1,5 @@
 import { Socket } from 'socket.io'
-import { games} from '../helperFunctions/games'
+import { games } from '../helperFunctions/games'
 
 export const gameFunctions = (socket: Socket) =>{
   socket.on('get_game_info', (roomName)=>{

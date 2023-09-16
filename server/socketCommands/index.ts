@@ -1,14 +1,15 @@
 import { Server, Socket } from 'socket.io'
-import { generateSessionId } from './helperFunctions/sessions'
-import { games } from './helperFunctions/games'
+
 import { disconnect } from './socketFunctions/disconnect'
+import { gameFunctions } from './socketFunctions/game'
+import { games } from './helperFunctions/games'
+import { generateSessionId } from './helperFunctions/sessions'
 import { messageFunctions } from './socketFunctions/message'
 import { roomSocketFunctions } from './socketFunctions/room'
 import { sessionFunctions } from './socketFunctions/session'
+import { socketError } from './socketFunctions/error'
 import { socketInfo } from './socketFunctions/socketInfo'
 import { statusFunctions } from './socketFunctions/status'
-import { socketError } from './socketFunctions/error'
-import { gameFunctions } from './socketFunctions/game'
 
 declare module 'socket.io' {
   interface Socket {
