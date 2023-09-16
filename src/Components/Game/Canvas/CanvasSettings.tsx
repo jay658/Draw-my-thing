@@ -19,7 +19,7 @@ type OwnPropsT = {
   setSettings: React.Dispatch<React.SetStateAction<SettingsT>>,
   settings: SettingsT,
   handleSettingChange: (e:SelectChangeEvent<unknown>) => void,
-  setLines: React.Dispatch<React.SetStateAction<LinesT[]>>,
+  updateLines: (updatedLines: LinesT[]) => void,
   handleRedo: () => void,
   handleUndo: () => void,
   handleClearHistory: () => void
@@ -44,7 +44,7 @@ const colors = [
   "#800000"  // Maroon
 ];
 
-const CanvasSettings = ({settings, setSettings, handleSettingChange, setLines, handleRedo, handleUndo, handleClearHistory}: OwnPropsT): ReactElement => {
+const CanvasSettings = ({settings, setSettings, handleSettingChange, updateLines, handleRedo, handleUndo, handleClearHistory}: OwnPropsT): ReactElement => {
 
   const { stroke, tool, strokeWidth } = settings
   const handleToolClick = (tool:string) => {
@@ -57,7 +57,7 @@ const CanvasSettings = ({settings, setSettings, handleSettingChange, setLines, h
 
   const handleClear = () => {
     handleClearHistory()
-    setLines([])
+    updateLines([])
   }
   
   return (

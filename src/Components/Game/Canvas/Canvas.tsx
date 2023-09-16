@@ -7,11 +7,13 @@ import CanvasSettings from "./CanvasSettings";
 import Konva from 'konva';
 import type { ReactElement } from "react";
 import type { SelectChangeEvent } from '@mui/material/Select';
+import socket from '../../Websocket/socket';
 
 const ASPECT_RATIO = 16/9
 
 type OwnPropsT = {
-  drawerSessionId: string
+  drawerSessionId: string,
+  roomName: string | null
 }
 
 const convertLines = (lines: LinesT[], height: number, width: number) => {
@@ -26,7 +28,7 @@ const convertLines = (lines: LinesT[], height: number, width: number) => {
   });
 }
 
-const Canvas = ({ drawerSessionId }: OwnPropsT): ReactElement => {
+const Canvas = ({ drawerSessionId, roomName }: OwnPropsT): ReactElement => {
   const sessionId = sessionStorage.getItem('sessionId')
   const [dimensions, setDimensions] = useState({
     width: 0,
@@ -44,7 +46,7 @@ const Canvas = ({ drawerSessionId }: OwnPropsT): ReactElement => {
   const isDrawing = useRef(false);
 
   useEffect(() => {
-    const handleResize = () => {
+    const handleResize = (initialLoad: boolean) => {
       if(containerRef && containerRef.current){
         const container = containerRef.current
         const newWidth = container.offsetWidth * .95
@@ -53,18 +55,44 @@ const Canvas = ({ drawerSessionId }: OwnPropsT): ReactElement => {
           width: newWidth,
           height: newHeight
         })
-        setLines(prevLines => convertLines(prevLines, newHeight, newWidth));
+        if(initialLoad){
+          socket.emit('get_drawing', roomName, (returnedLines:LinesT[]) => {
+            if(returnedLines.length) {
+              setLines(convertLines(returnedLines, newHeight, newWidth)) 
+            }
+          })
+        }else setLines(prevLines => convertLines(prevLines, newHeight, newWidth))
       }
     }
 
-    handleResize()
+    const resizeScreen = () => handleResize(false)
 
-    window.addEventListener('resize', handleResize)
+    handleResize(true)
+
+    window.addEventListener('resize', resizeScreen)
 
     return () => {
-      window.removeEventListener('resize', handleResize)
+      window.removeEventListener('resize', resizeScreen)
     }
   }, [])
+
+  useEffect(() => {
+      const handleUpdate = (updatedLines: LinesT[]) => {
+          const convertedLines = convertLines(updatedLines, dimensions.height, dimensions.width);
+          setLines(convertedLines);
+      };
+
+      socket.on('sending_updated_drawing', handleUpdate);
+
+      return () => {
+          socket.off('sending_updated_drawing', handleUpdate);
+      };
+  }, [dimensions, socket]);
+
+  const updateLines = (updatedLines: LinesT[]) => {
+    setLines(updatedLines)
+    socket.emit('update_drawing', { lines: updatedLines, roomName })
+  }
   
   const handleUndo = () => {
     if (historyStep.current === 0) return 
@@ -73,9 +101,9 @@ const Canvas = ({ drawerSessionId }: OwnPropsT): ReactElement => {
     
     if(history.current[historyStep.current].dimensions.height !== dimensions.height){
       const updatedLines = convertLines(previousLines, dimensions.height, dimensions.width)
-      setLines([...updatedLines])
+      updateLines([...updatedLines])
     }else{
-      setLines([...previousLines])
+      updateLines([...previousLines])
     }  
   }
 
@@ -86,9 +114,9 @@ const Canvas = ({ drawerSessionId }: OwnPropsT): ReactElement => {
     
     if(history.current[historyStep.current].dimensions.height !== dimensions.height){
       const updatedLines = convertLines(nextLines, dimensions.height, dimensions.width)
-      setLines([...updatedLines])
+      updateLines([...updatedLines])
     }else{
-      setLines([...nextLines])
+      updateLines([...nextLines])
     }  
   }
   
@@ -111,7 +139,7 @@ const Canvas = ({ drawerSessionId }: OwnPropsT): ReactElement => {
     history.current.push({lines: updatedLines, dimensions})
     historyStep.current += 1
     
-    setLines([...updatedLines]);
+    updateLines([...updatedLines]);
   };
 
   const handlePointerMove = (e: Konva.KonvaEventObject<PointerEvent>) => {
@@ -136,7 +164,7 @@ const Canvas = ({ drawerSessionId }: OwnPropsT): ReactElement => {
     const updatedLines = lines.concat()
     history.current[history.current.length - 1].lines = updatedLines
     if(point.x <= 0 + delta || point.y <= 0 + delta || point.x >= width - delta || point.y >= height - delta) isDrawing.current = false
-    setLines(updatedLines);
+    updateLines([...updatedLines]);
   };
 
   const handlePointerUp = () => {
@@ -185,7 +213,7 @@ const Canvas = ({ drawerSessionId }: OwnPropsT): ReactElement => {
         settings={settings} 
         handleSettingChange={handleSettingChange} 
         setSettings={setSettings} 
-        setLines={setLines}
+        updateLines={updateLines}
         handleRedo={handleRedo}
         handleUndo={handleUndo}
         handleClearHistory={handleClearHistory}
