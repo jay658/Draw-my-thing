@@ -2,7 +2,10 @@ type LinesT = {
   tool: string
   points: number[],
   stroke: string,
-  strokeWidth: string
+  strokeWidth: string,
+  ratio: number[],
+  width: number,
+  height: number
 }
 
 type SettingsT = {

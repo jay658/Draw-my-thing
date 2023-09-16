@@ -23,7 +23,7 @@ const ScoreBoard = ({ players, drawer }: OwnPropsT) => {
       {players.map(player => {
         const avatarData = avatarsMap[player.avatar]
         return(
-          <Grid container height={'12.25%'} width={'100%'} margin={'0px'} alignItems={'center'} justifyContent={'center'} style={{border:player.sessionId === drawer?.sessionId? '1px solid red': ''}}>
+          <Grid container height={'12.25%'} width={'100%'} margin={'0px'} alignItems={'center'} justifyContent={'center'} style={{border:player.sessionId === drawer?.sessionId? '1px solid red': ''}} key={player.sessionId}>
             <Grid item xs={3} alignItems={'center'} justifyContent={'center'}>
               <Lottie animationData={avatarData}/>
             </Grid>
