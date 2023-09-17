@@ -19,7 +19,7 @@ const GameBoard = () => {
   const [drawerIdx, setDrawerIdx] = useState(0)
   const [roomExists, setRoomExists] = useState(false)
   const [loading, setLoading] = useState(true)
-  const [turn, setTurn] = useState(1)
+  const [round, setRound] = useState(1)
 
   useEffect(() => {
     const sessionId = sessionStorage.getItem('sessionId')
@@ -61,17 +61,19 @@ const GameBoard = () => {
       finalizeLoading(!!room)
     })
 
+    socket.on('update_drawer_and_round', (newDrawerIdx: number, newRound: number) => {
+      setDrawerIdx(newDrawerIdx)
+      setRound(newRound)
+    })
+
     return () => {
       socket.off("send_room")
+      socket.off('update_drawer_and_round')
     }
   }, [])
 
   const handleNextDrawer = () => {
-    if(drawerIdx >= players.length - 1) {
-      setDrawerIdx(0)
-      setTurn(turn + 1)
-    }
-    else setDrawerIdx(drawerIdx + 1)
+    socket.emit('next_drawer', roomName)
   }
 
   if(loading) return <CircularProgress/>
@@ -84,8 +86,8 @@ const GameBoard = () => {
       </Grid>
       <Grid item xs={7.5} sx={{height: '100%'}}>
         <WordDisplay word={ 'Suez Canal' }/>
-        <Canvas drawerSessionId={players[drawerIdx].sessionId} roomName={roomName}/>
-        <Typography>Turn: {turn}</Typography>
+        <Canvas drawerSessionId={players[drawerIdx].sessionId} roomName={roomName} drawerIdx={drawerIdx}/>
+        <Typography>Round: {round}</Typography>
         <Button onClick={handleNextDrawer}>Next drawer</Button>
       </Grid>
       <Grid item xs={2.5} sx={{height: '100%'}}>

@@ -43,7 +43,7 @@ const socketCommands = (io: Server)=>{
     sessionFunctions(socket)
     statusFunctions(socket, io)
     messageFunctions(socket, io)
-    gameFunctions(socket)
+    gameFunctions(socket, io)
     disconnect(socket, io)
     socketError(socket)
   }

@@ -3,6 +3,7 @@ import { Layer, Line } from 'react-konva';
 import { LinesT, SettingsT } from './Types';
 import { useEffect, useRef, useState } from 'react';
 
+import { Button } from '@mui/base';
 import CanvasSettings from "./CanvasSettings";
 import Konva from 'konva';
 import type { ReactElement } from "react";
@@ -13,7 +14,8 @@ const ASPECT_RATIO = 16/9
 
 type OwnPropsT = {
   drawerSessionId: string,
-  roomName: string | null
+  roomName: string | null,
+  drawerIdx: number
 }
 
 const convertLines = (lines: LinesT[], height: number, width: number) => {
@@ -28,7 +30,7 @@ const convertLines = (lines: LinesT[], height: number, width: number) => {
   });
 }
 
-const Canvas = ({ drawerSessionId, roomName }: OwnPropsT): ReactElement => {
+const Canvas = ({ drawerSessionId, roomName, drawerIdx }: OwnPropsT): ReactElement => {
   const sessionId = sessionStorage.getItem('sessionId')
   const [dimensions, setDimensions] = useState({
     width: 0,
@@ -42,8 +44,10 @@ const Canvas = ({ drawerSessionId, roomName }: OwnPropsT): ReactElement => {
   })
   const history = useRef<{ lines: LinesT[], dimensions: {width: number, height: number}}[]>([{lines: [], dimensions}])
   const historyStep = useRef(0)
-  const [lines, setLines] = useState<LinesT[]>(history.current[historyStep.current].lines);
+  const [lines, setLines] = useState<LinesT[]>([]);
   const isDrawing = useRef(false);
+  const stageRef = useRef<Konva.Stage | null>(null)
+  const [image, setImage] = useState<string | null>(null)
 
   useEffect(() => {
     const handleResize = (initialLoad: boolean) => {
@@ -88,6 +92,17 @@ const Canvas = ({ drawerSessionId, roomName }: OwnPropsT): ReactElement => {
           socket.off('sending_updated_drawing', handleUpdate);
       };
   }, [dimensions, socket]);
+
+  useEffect(() => {
+    setSettings({
+      tool: 'pen',
+      stroke: "#000000",
+      strokeWidth: '5'
+    })
+    history.current = [{lines: [], dimensions}]
+    historyStep.current = 0
+    setLines([])
+  }, [drawerIdx])
 
   const updateLines = (updatedLines: LinesT[]) => {
     setLines(updatedLines)
@@ -182,6 +197,14 @@ const Canvas = ({ drawerSessionId, roomName }: OwnPropsT): ReactElement => {
     })
   }
 
+  const handleTakePicture = () => {
+    const stage = stageRef.current
+    if(stage){
+      const url = stage.toDataURL()
+      setImage(url)
+    }
+  }
+
   return (
     <CanvasScreen ref={containerRef}>
       <StyledStage
@@ -192,6 +215,7 @@ const Canvas = ({ drawerSessionId, roomName }: OwnPropsT): ReactElement => {
         onPointerMove={handlePointerMove}
         onContextMenu={handlePointerUp}
         onMouseLeave={handleMouseLeave}
+        ref={stageRef}
       >
         <Layer>
           {lines.map((line, i) => (
@@ -218,6 +242,8 @@ const Canvas = ({ drawerSessionId, roomName }: OwnPropsT): ReactElement => {
         handleUndo={handleUndo}
         handleClearHistory={handleClearHistory}
       />}
+      <Button onClick={handleTakePicture}>Take picture</Button>
+      {image && <img src={image}/>}
     </CanvasScreen>
   );
 };
