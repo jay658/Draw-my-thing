@@ -84,7 +84,7 @@ const GameBoard = () => {
       </Grid>
       <Grid item xs={7.5} sx={{height: '100%'}}>
         <WordDisplay word={ 'Suez Canal' }/>
-        <Canvas drawerSessionId={players[drawerIdx].sessionId}/>
+        <Canvas drawerSessionId={players[drawerIdx].sessionId} roomName={roomName}/>
         <Typography>Turn: {turn}</Typography>
         <Button onClick={handleNextDrawer}>Next drawer</Button>
       </Grid>

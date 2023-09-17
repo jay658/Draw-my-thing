@@ -14,6 +14,7 @@ export type gameInfo = {
   name: string,
   players: Member[],
   wordbank: string[],
+  lines?: number[][]
 }
 
 export class Game {
@@ -21,12 +22,14 @@ export class Game {
   players: Member[]
   wordbank: string[]
   scoreboard: number[]
+  lines: number[][]
 
   constructor(gameInfo: gameInfo){
     this.name = gameInfo.name;
     this.players = gameInfo.players;
     this.wordbank = gameInfo.wordbank
     this.scoreboard = new Array(this.players.length).fill(0)
+    this.lines = []
   }
 
   getThreeWords(){
