@@ -32,4 +32,13 @@ export const gameFunctions = (socket: Socket, io: Server) =>{
 
     io.to(roomName).emit('update_drawer_and_round', nextDrawerIdx, nextRound)
   })
+
+  socket.on("send_selected_word_to_other_players", ({roomName, word}) =>{
+    socket.broadcast.to(roomName).emit('set_currentWord_on_client', word)
+  })
+
+  socket.on("get_word_choices", (roomName) =>{
+    const words = games[roomName].getThreeWords()
+    io.to(socket.id).emit('word_choices_from_server', words)
+  })
 }

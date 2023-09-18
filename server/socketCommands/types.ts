@@ -44,9 +44,12 @@ export class Game {
   
     while(gameWordSet.size < 3){
       const word = bank[Math.floor(Math.random() * bank.length)]
+      if(!gameWordSet.has(word)){
+        bank.filter(bankWord => bankWord === word)
+      }
       gameWordSet.add(word)
     }
-
+    
     return [...gameWordSet]
   }
 }
