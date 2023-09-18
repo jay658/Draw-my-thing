@@ -15,7 +15,7 @@ const LoadingScreen = () => {
   useEffect(() => {
     const timer = setTimeout(() => {
       navigate(`${redirectLink}`);
-    }, 2000);
+    }, 100);
     
     return () => {
       clearTimeout(timer); 
