@@ -6,11 +6,11 @@ import Chatbox from '../Chat/Chatbox';
 import CircularProgress from '@mui/material/CircularProgress';
 import Grid from '@mui/material/Grid';
 import PageNotFound from '../PageNotFound/PageNotFound';
+import PickWord from './PickWord/PickWord';
 import type { Player } from '../WaitingRoom/Types';
 import ScoreBoard from './ScoreBoard/ScoreBoard';
 import { Typography } from '@mui/material';
 import WordDisplay from './WordDisplay/WordDisplay';
-import PickWord from './PickWord/PickWord';
 import socket from '../Websocket/socket';
 
 const GameBoard = () => {
@@ -24,7 +24,7 @@ const GameBoard = () => {
   const [round, setRound] = useState(1)
   const [wordChoices, setWordChoices] = useState<string[]>([])
   const [currentWord, setCurrentWord] = useState("")
-  const currentPlayer = useMemo(()=>players.length ? players[drawerIdx] : null,[players, drawerIdx]) 
+  const drawer = useMemo(() => players.length ? players[drawerIdx] : null,[players, drawerIdx]) 
 
   useEffect(() => {
     const finalizeLoading = (exists: boolean) => {
@@ -62,6 +62,7 @@ const GameBoard = () => {
     socket.on('word_choices_from_server', (words)=>{
       setWordChoices(words)
     })
+    
     socket.on('set_currentWord_on_client', (word)=>{
       setCurrentWord(word)
     })
@@ -88,9 +89,8 @@ const GameBoard = () => {
   },[players])
 
   useEffect(()=>{
-    console.log(currentPlayer, drawerIdx, players)
 
-    if(sessionId === currentPlayer?.sessionId && wordChoices.length === 0){
+    if(sessionId === drawer?.sessionId && wordChoices.length === 0){
       socket.emit("get_word_choices", roomName)
     }
   },[drawerIdx, players])
@@ -101,27 +101,25 @@ const GameBoard = () => {
   if(loading) return <CircularProgress/>
   if(!roomExists) return <PageNotFound/>
 
-  if(!currentWord && sessionId === currentPlayer?.sessionId){
-    return <PickWord 
-      words= {wordChoices} 
-      setCurrentWord= {setCurrentWord}
-      roomName= {roomName}
-    />
-  } 
-
   return (
     <Grid container sx={{height:'85vh'}}>
+      {!currentWord && sessionId === drawer?.sessionId && 
+        <PickWord 
+        words= {wordChoices} 
+        setCurrentWord= {setCurrentWord}
+        roomName= {roomName}/>
+      }
       <Grid item xs={2} sx={{height: '100%'}}>
-        <ScoreBoard players={players} drawer={players[drawerIdx]}/>
+        <ScoreBoard players={players} drawer={drawer}/>
       </Grid>
       <Grid item xs={7.5} sx={{height: '100%'}}>
-        <WordDisplay word={currentWord}/>
+        <WordDisplay word={currentWord} drawer={drawer}/>
         <Canvas drawerSessionId={players[drawerIdx].sessionId} roomName={roomName} drawerIdx={drawerIdx}/>
         <Typography>Round: {round}</Typography>
         <Button onClick={handleNextDrawer}>Next drawer</Button>
       </Grid>
       <Grid item xs={2.5} sx={{height: '100%'}}>
-        <Chatbox roomName={roomName}/>
+        <Chatbox roomName={roomName} currentWord={currentWord}/>
       </Grid>
     </Grid>
   )

@@ -41,4 +41,8 @@ export const gameFunctions = (socket: Socket, io: Server) =>{
     const words = games[roomName].getThreeWords()
     io.to(socket.id).emit('word_choices_from_server', words)
   })
+
+  socket.on('guessed_correct_word', (roomName) => {
+    io.to(roomName).emit('player_guessed_correct_word', socket.username)
+  })
 }
