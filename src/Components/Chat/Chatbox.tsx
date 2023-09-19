@@ -10,35 +10,35 @@ import {
   StyledTextField,
   TextBoxContainer
 } from './StyledComponents'
-import { getRandom, wordbank } from '../../../public/wordbank'
 
 import type { MessageT } from "./Types";
 import SendIcon from '@mui/icons-material/Send';
 import socket from "../Websocket/socket";
 
 type OwnPropsT = {
-  roomName: string | null
+  roomName: string | null,
+  currentWord?: string
 }
 
-const Chatbox = ({ roomName }: OwnPropsT): ReactElement => {
+const Chatbox = ({ roomName, currentWord='' }: OwnPropsT): ReactElement => {
   const sessionId = sessionStorage.getItem('sessionId')
   const [messages, setMessages] = useState<MessageT[]>([])
   const [currentMessage, setCurrentMessage] = useState("")
-  // const [gamewords, setGameWords] = useState<string[]>([])
-  const [currWord, setCurrWord] = useState("")
   
   useEffect(()=>{
-    const words = getRandom(5, wordbank)
-    setCurrWord(words[Math.floor(Math.random()*words.length)])
-    
     socket.on("message_to_client", ({author, message})=>{
       setMessages((prevMessages) =>{
         return [...prevMessages, {author, message}]
       })
     })
+
+    socket.on('player_guessed_correct_word', (username) => {
+      setMessages([...messages, {author: "Server", message: `${username} guessed the correct word!`}])
+    })
     
     return ()=>{
       socket.off("message_to_client")
+      socket.off('player_guessed_correct_word')
     }
   },[])
 
@@ -46,8 +46,9 @@ const Chatbox = ({ roomName }: OwnPropsT): ReactElement => {
     const inputValue = ev.target.value
     setCurrentMessage(inputValue)
   }
+  
   const handleSendMessage = () =>{
-    if(currWord === currentMessage) console.log("We have a winner!!!")
+    if(currentWord === currentMessage.toLowerCase()) socket.emit('guessed_correct_word', roomName)
     else{
       socket.emit("message_to_server", { author: {
         sessionId: sessionId, 
@@ -66,16 +67,22 @@ const Chatbox = ({ roomName }: OwnPropsT): ReactElement => {
       <MessageBox>
         <StyledScrollToBottom>
           {messages.map((message, idx)=>{
-            const isUserMessage = message.author.sessionId === sessionId
-            const alignSelf = isUserMessage ? 'end': 'start'
-            return (
-              <MessageGrid key={idx} sx={{
-                alignSelf: alignSelf
-              }}>
-                <Message>{message.message}</Message>
-                <Sender sx={{ alignSelf: alignSelf }}>{message.author.username}</Sender>
-              </MessageGrid>
-            )
+            if(message.author === "Server"){
+              return(
+                <div key={idx} style={{color:'green'}}>{message.message}</div>
+              )
+            }else{
+              const isUserMessage = message.author.sessionId === sessionId
+              const alignSelf = isUserMessage ? 'end': 'start'
+              return (
+                <MessageGrid key={idx} sx={{
+                  alignSelf: alignSelf
+                }}>
+                  <Message>{message.message}</Message>
+                  <Sender sx={{ alignSelf: alignSelf }}>{message.author.username}</Sender>
+                </MessageGrid>
+              )
+            }
           })}
         </StyledScrollToBottom>
       </MessageBox>
