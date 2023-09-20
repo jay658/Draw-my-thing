@@ -12,15 +12,17 @@ import {
 } from './StyledComponents'
 
 import type { MessageT } from "./Types";
+import type { Player } from '../WaitingRoom/Types';
 import SendIcon from '@mui/icons-material/Send';
 import socket from "../Websocket/socket";
 
 type OwnPropsT = {
   roomName: string | null,
-  currentWord?: string
+  currentWord?: string,
+  drawer?: Player | null
 }
 
-const Chatbox = ({ roomName, currentWord='' }: OwnPropsT): ReactElement => {
+const Chatbox = ({ roomName, currentWord='', drawer=null }: OwnPropsT): ReactElement => {
   const sessionId = sessionStorage.getItem('sessionId')
   const [messages, setMessages] = useState<MessageT[]>([])
   const [currentMessage, setCurrentMessage] = useState("")
@@ -33,7 +35,7 @@ const Chatbox = ({ roomName, currentWord='' }: OwnPropsT): ReactElement => {
     })
 
     socket.on('player_guessed_correct_word', (username) => {
-      setMessages([...messages, {author: "Server", message: `${username} guessed the correct word!`}])
+      setMessages((prevMessages) => [...prevMessages, {author: "Server", message: `${username} guessed correctly!`}])
     })
     
     return ()=>{
@@ -48,7 +50,10 @@ const Chatbox = ({ roomName, currentWord='' }: OwnPropsT): ReactElement => {
   }
   
   const handleSendMessage = () =>{
-    if(currentWord === currentMessage.toLowerCase()) socket.emit('guessed_correct_word', roomName)
+    if(currentWord === currentMessage.toLowerCase()){
+      if(drawer?.sessionId === sessionId) setMessages([...messages, {author: "Server", message: `You can't guess your own word!!`}])
+      else socket.emit('guessed_correct_word', roomName)
+    }
     else{
       socket.emit("message_to_server", { author: {
         sessionId: sessionId, 

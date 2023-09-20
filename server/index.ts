@@ -32,25 +32,25 @@ const init = async () => {
   }
   try {
     console.log(`server connected on port ${PORT}`)
-    if(process.env.SEED === "true"){
-      console.log('reset database')
-      await db.sequelize.sync({force: true})
-      await Promise.all(
-        leetcodeInfo.problems.map((problem) => db.Problem.create(problem))
-      )
-      const testUser = await db.User.create({
-        ...users[0],
-        ...leetcodeInfo.userInfo
-      })
-      await Promise.all(
-        leetcodeInfo.problemInfo.map(problem => db.ProblemInfo.create({
-          user_id:testUser.id,
-          ...problem
-        }))
-      )
-    }else await db.sequelize.sync()
+    // if(process.env.SEED === "true"){
+    //   console.log('reset database')
+    //   await db.sequelize.sync({force: true})
+    //   await Promise.all(
+    //     leetcodeInfo.problems.map((problem) => db.Problem.create(problem))
+    //   )
+    //   const testUser = await db.User.create({
+    //     ...users[0],
+    //     ...leetcodeInfo.userInfo
+    //   })
+    //   await Promise.all(
+    //     leetcodeInfo.problemInfo.map(problem => db.ProblemInfo.create({
+    //       user_id:testUser.id,
+    //       ...problem
+    //     }))
+    //   )
+    // }else await db.sequelize.sync()
 
-    console.log("db connected")
+    // console.log("db connected")
   } catch (ex) {
     console.log(ex);
   }

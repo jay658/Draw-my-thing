@@ -3,6 +3,8 @@ type Player = {
   username: string,
   readyStatus: boolean,
   avatar: string
+  score: number,
+  pointsThisRound: number,
 } 
 
 type WaitingRoomErrorsT = {

@@ -25,16 +25,24 @@ export const gameFunctions = (socket: Socket, io: Server) =>{
       nextDrawerIdx = 0
       nextRound++
     }else nextDrawerIdx++
-
+    
+    players.forEach(player => {
+      player.score += player.pointsThisRound
+      player.pointsThisRound = 0
+    })
+    
     game.lines = []
     game.drawerIdx = nextDrawerIdx
     game.round = nextRound
-
-    io.to(roomName).emit('update_drawer_and_round', nextDrawerIdx, nextRound)
+    game.guessOrder = []
+    if(game.gameClock) clearInterval(game.gameClock)
+    console.log(round)
+    io.to(roomName).emit('update_drawer_and_round', { drawerIdx: nextDrawerIdx, round: nextRound, players })
   })
 
   socket.on("send_selected_word_to_other_players", ({roomName, word}) =>{
     socket.broadcast.to(roomName).emit('set_currentWord_on_client', word)
+    games[roomName].startTimer(io)
   })
 
   socket.on("get_word_choices", (roomName) =>{
@@ -43,6 +51,19 @@ export const gameFunctions = (socket: Socket, io: Server) =>{
   })
 
   socket.on('guessed_correct_word', (roomName) => {
-    io.to(roomName).emit('player_guessed_correct_word', socket.username)
+    const game = games[roomName]
+    const currPlayer = game.players.find(player => player.sessionId === socket.sessionId)
+    const drawer = game.players[game.drawerIdx]
+    
+    if(currPlayer && !currPlayer.pointsThisRound){
+      drawer.pointsThisRound += 50
+      game.guessOrder.push(socket.username)
+      if(game.guessOrder.length === 1) currPlayer.pointsThisRound += 300
+      else if(game.guessOrder.length === 2) currPlayer.pointsThisRound += 200
+      else currPlayer.pointsThisRound += 100
+      game.setTimePenalty(io)
+      io.to(roomName).emit('player_guessed_correct_word', socket.username)
+      io.to(roomName).emit('update_scores', game.players)
+    }
   })
 }

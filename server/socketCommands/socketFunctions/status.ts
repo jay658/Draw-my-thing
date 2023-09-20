@@ -22,7 +22,8 @@ export const statusFunctions = (socket: Socket, io: Server) =>{
         const gameInfo = {
           name: room.name,
           players: room.members,
-          wordbank
+          wordbank,
+          roomName
         }
         addGame(gameInfo)
         io.to(roomName).emit('starting_game')
