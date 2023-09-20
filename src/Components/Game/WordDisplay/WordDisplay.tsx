@@ -44,7 +44,7 @@ const WordDisplay = ({ word, drawer }: OwnPropsT) => {
   return(
     <Grid container spacing={3} alignItems={'center'} width={'100%'} margin={'0px'}>
       <Grid item xs={3}>
-        <Timer startTime={60}/>
+        <Timer drawer={drawer}/>
       </Grid>
       <Grid item xs={6}>
         {sessionId === drawer?.sessionId? 

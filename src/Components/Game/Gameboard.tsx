@@ -55,7 +55,7 @@ const GameBoard = () => {
     
     socket.on("send_game_info_to_client", (gameinfo)=>{
       if(!roomExists) setRoomExists(true)
-      setPlayers([...gameinfo.players])
+      setPlayers(gameinfo.players)
       finalizeLoading(true)
     })
 
@@ -67,6 +67,10 @@ const GameBoard = () => {
       setCurrentWord(word)
     })
 
+    socket.on('update_scores', (players) => {
+      setPlayers(players)
+    })
+
     return () => {
       socket.off("send_game_info_to_client")
       socket.off('update_drawer_and_round')
@@ -76,11 +80,12 @@ const GameBoard = () => {
   }, [])
 
   useEffect(()=>{
-    socket.on('update_drawer_and_round', (newDrawerIdx: number, newRound: number) => {
+    socket.on('update_drawer_and_round', ({ drawerIdx, round, players }: { drawerIdx: number, round: number, players: Player[] }) => {
       setCurrentWord("")
       setWordChoices([])
-      setDrawerIdx(newDrawerIdx)
-      setRound(newRound)
+      setPlayers(players)
+      setDrawerIdx(drawerIdx)
+      setRound(round)
     })
 
     return () => {
@@ -98,6 +103,7 @@ const GameBoard = () => {
   const handleNextDrawer = () => {
     socket.emit('next_drawer', roomName)
   }
+  
   if(loading) return <CircularProgress/>
   if(!roomExists) return <PageNotFound/>
 
@@ -119,7 +125,7 @@ const GameBoard = () => {
         <Button onClick={handleNextDrawer}>Next drawer</Button>
       </Grid>
       <Grid item xs={2.5} sx={{height: '100%'}}>
-        <Chatbox roomName={roomName} currentWord={currentWord}/>
+        <Chatbox roomName={roomName} currentWord={currentWord} drawer={drawer}/>
       </Grid>
     </Grid>
   )

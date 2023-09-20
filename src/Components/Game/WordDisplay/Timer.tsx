@@ -1,15 +1,39 @@
 import { useEffect, useRef, useState } from "react"
 
 import { Button } from '@mui/base';
+import { Player } from "../../WaitingRoom/Types";
+import socket from "../../Websocket/socket";
+
+const START_TIME = 30
 
 type OwnPropsT = {
-  startTime: number
+  drawer: Player | null
 }
 
-const Timer = ({ startTime }: OwnPropsT) => {
-  const [time, setTime] = useState(startTime)
+const Timer = ({ drawer }: OwnPropsT) => {
+  const sessionId = sessionStorage.getItem("sessionId")
+  const params = new URLSearchParams(window.location.search)
+  const roomName = params.get("room")
+  const [time, setTime] = useState(START_TIME)
   const timeRef = useRef(time)
   const timerRef = useRef<any>(null)
+
+  useEffect(() => {
+    socket.on('start_timer', () => {
+      console.log('starting timer')
+      resetTimer()
+    })
+
+    socket.on('update_timer', (time: number) => {
+      console.log(`updating time: ${time}`)
+      updateTimer(time)
+    })
+
+    return () => {
+      socket.off('update_timer')
+      socket.off('start_timer')
+    }
+  }, [])
 
   useEffect(() => {
       timeRef.current = time
@@ -19,25 +43,25 @@ const Timer = ({ startTime }: OwnPropsT) => {
     if(timerRef.current) clearInterval(timerRef.current)
     
     timerRef.current = setInterval(() => {
-      if(timeRef.current === 0) clearInterval(timerRef.current)
-      else setTime((prevTime) => prevTime - 1)
+      if(timeRef.current === 0) {
+        if(drawer && sessionId === drawer.sessionId) socket.emit('next_drawer', roomName)
+        clearInterval(timerRef.current)
+      }
+      else setTime((prevTime) => {
+        console.log(prevTime - 1)
+        return prevTime - 1
+      })
     }, 1000)
   }
 
-  //@ts-ignore
-  const updateTimer = (newTime: number) => {
-      setTime(newTime)
-      startTimer()
+  const updateTimer = (updatedTime: number) => {
+    setTime(updatedTime)
+    startTimer()
   }
 
   const resetTimer = () => {
-    if(timerRef.current) clearInterval(timerRef.current)
-    setTime(startTime)
-    
-    timerRef.current = setInterval(() => {
-      if(timeRef.current === 0) clearInterval(timerRef.current)
-      else setTime((prevTime) => prevTime - 1)
-    }, 1000)
+    setTime(START_TIME)
+    startTimer()
   }
   
   return(
