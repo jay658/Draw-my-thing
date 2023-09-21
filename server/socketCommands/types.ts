@@ -78,11 +78,13 @@ export class Game {
   startTimer(io: Server){
     this.elapsedTime = 0
     io.to(this.roomName).emit('start_timer')
-    this.gameClock = setInterval(() => {
-      this.elapsedTime += 1
-      if(this.elapsedTime % 5 === 0) io.to(this.roomName).emit('update_timer', this.TOTAL_TIME - this.elapsedTime)
-      if(this.elapsedTime > this.TOTAL_TIME) clearInterval(this.gameClock as any)
-    }, 1000)
+    if(!this.gameClock){
+      this.gameClock = setInterval(() => {
+        this.elapsedTime += 1
+        if(this.elapsedTime % 5 === 0) io.to(this.roomName).emit('update_timer', this.TOTAL_TIME - this.elapsedTime)
+        if(this.elapsedTime > this.TOTAL_TIME) clearInterval(this.gameClock as any)
+      }, 1000)
+    }
   }
 
   setTimePenalty(io: Server){

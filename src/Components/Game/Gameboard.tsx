@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 
 import { Button } from '@mui/base';
 import Canvas from './Canvas/Canvas';
@@ -25,6 +25,7 @@ const GameBoard = () => {
   const [wordChoices, setWordChoices] = useState<string[]>([])
   const [currentWord, setCurrentWord] = useState("")
   const drawer = useMemo(() => players.length ? players[drawerIdx] : null,[players, drawerIdx]) 
+  const secondsElapsed = useRef(0)
 
   useEffect(() => {
     const finalizeLoading = (exists: boolean) => {
@@ -53,9 +54,10 @@ const GameBoard = () => {
       socket.emit("get_game_info", roomName)
     }
     
-    socket.on("send_game_info_to_client", (players)=>{
+    socket.on("send_game_info_to_client", ({ players, elapsedTime })=>{
       if(!roomExists) setRoomExists(true)
       setPlayers(players)
+      secondsElapsed.current = elapsedTime
       finalizeLoading(true)
     })
 
@@ -119,7 +121,7 @@ const GameBoard = () => {
         <ScoreBoard players={players} drawer={drawer}/>
       </Grid>
       <Grid item xs={7.5} sx={{height: '100%'}}>
-        <WordDisplay word={currentWord} drawer={drawer}/>
+        <WordDisplay word={currentWord} drawer={drawer} secondsElapsed={secondsElapsed.current}/>
         <Canvas drawerSessionId={players[drawerIdx].sessionId} roomName={roomName} drawerIdx={drawerIdx}/>
         <Typography>Round: {round}</Typography>
         <Button onClick={handleNextDrawer}>Next drawer</Button>

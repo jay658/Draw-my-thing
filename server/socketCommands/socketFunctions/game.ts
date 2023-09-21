@@ -4,7 +4,8 @@ import { games } from '../helperFunctions/games'
 
 export const gameFunctions = (socket: Socket, io: Server) =>{
   socket.on('get_game_info', (roomName)=>{
-    socket.emit('send_game_info_to_client', games[roomName].players)
+    const { players, elapsedTime } = games[roomName]
+    socket.emit('send_game_info_to_client', { players, elapsedTime } );
   })
 
   socket.on('update_drawing', ({roomName, lines}: { roomName: string, lines: number[][]}) => {
