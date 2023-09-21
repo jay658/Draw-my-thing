@@ -8,7 +8,8 @@ import socket from '../../Websocket/socket';
 
 type OwnPropsT = {
   word: string,
-  drawer: Player | null
+  drawer: Player | null, 
+  secondsElapsed: number,
 }
 
 const hideWord = (word: string, shownLetters?:Set<number>) => {
@@ -22,7 +23,7 @@ const hideWord = (word: string, shownLetters?:Set<number>) => {
   return hiddenWord
 }
 
-const WordDisplay = ({ word, drawer }: OwnPropsT) => {
+const WordDisplay = ({ word, drawer, secondsElapsed }: OwnPropsT) => {
   const sessionId = sessionStorage.getItem('sessionId');
   const [currentWord, setCurrentWord] = useState('');
   const [shownLetters, setShownLetters] = useState<Set<number>>(new Set([0, 1]));
@@ -44,7 +45,7 @@ const WordDisplay = ({ word, drawer }: OwnPropsT) => {
   return(
     <Grid container spacing={3} alignItems={'center'} width={'100%'} margin={'0px'}>
       <Grid item xs={3}>
-        <Timer drawer={drawer}/>
+        <Timer drawer={drawer} secondsElapsed={secondsElapsed}/>
       </Grid>
       <Grid item xs={6}>
         {sessionId === drawer?.sessionId? 

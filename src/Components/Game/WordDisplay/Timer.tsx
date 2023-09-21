@@ -7,14 +7,15 @@ import socket from "../../Websocket/socket";
 const START_TIME = 30
 
 type OwnPropsT = {
-  drawer: Player | null
+  drawer: Player | null, 
+  secondsElapsed: number
 }
 
-const Timer = ({ drawer }: OwnPropsT) => {
+const Timer = ({ drawer, secondsElapsed = 0 }: OwnPropsT) => {
   const sessionId = sessionStorage.getItem("sessionId")
   const params = new URLSearchParams(window.location.search)
   const roomName = params.get("room")
-  const [time, setTime] = useState(START_TIME)
+  const [time, setTime] = useState(START_TIME - secondsElapsed) 
   const timeRef = useRef(time)
   const timerRef = useRef<any>(null)
 
@@ -32,6 +33,7 @@ const Timer = ({ drawer }: OwnPropsT) => {
     return () => {
       socket.off('update_timer')
       socket.off('start_timer')
+      if(timerRef.current) clearInterval(timerRef.current)
     }
   }, [])
 
@@ -41,7 +43,6 @@ const Timer = ({ drawer }: OwnPropsT) => {
 
   const startTimer = () => {
     if(timerRef.current) clearInterval(timerRef.current)
-    
     timerRef.current = setInterval(() => {
       if(timeRef.current === 0) {
         if(drawer && sessionId === drawer.sessionId) socket.emit('next_drawer', roomName)
