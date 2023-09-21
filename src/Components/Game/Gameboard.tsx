@@ -53,9 +53,9 @@ const GameBoard = () => {
       socket.emit("get_game_info", roomName)
     }
     
-    socket.on("send_game_info_to_client", (gameinfo)=>{
+    socket.on("send_game_info_to_client", (players)=>{
       if(!roomExists) setRoomExists(true)
-      setPlayers(gameinfo.players)
+      setPlayers(players)
       finalizeLoading(true)
     })
 
