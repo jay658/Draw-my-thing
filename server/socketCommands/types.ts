@@ -39,7 +39,7 @@ export class Game {
   gameClock: NodeJS.Timeout | number | null
   roomName: string
 
-  elapsedTime: number = 0
+  elapsedSeconds: number = 0
   TOTAL_TIME = 30
   TIME_PENALTY = 10
   
@@ -76,20 +76,40 @@ export class Game {
   }
 
   startTimer(io: Server){
-    this.elapsedTime = 0
+    this.elapsedSeconds = 0
     io.to(this.roomName).emit('start_timer')
-    this.gameClock = setInterval(() => {
-      this.elapsedTime += 1
-      if(this.elapsedTime % 5 === 0) io.to(this.roomName).emit('update_timer', this.TOTAL_TIME - this.elapsedTime)
-      if(this.elapsedTime > this.TOTAL_TIME) clearInterval(this.gameClock as any)
-    }, 1000)
+    if(!this.gameClock){
+      this.gameClock = setInterval(() => {
+        this.elapsedSeconds += 1
+        if(this.elapsedSeconds % 5 === 0) io.to(this.roomName).emit('update_timer', this.TOTAL_TIME - this.elapsedSeconds)
+        if(this.elapsedSeconds > this.TOTAL_TIME) {
+          clearInterval(this.gameClock as any)
+          this.gameClock = null
+        }
+      }, 1000)
+    }
+  }
+
+  startEndOfRoundScoreboardTimer(io: Server){
+    if(!this.gameClock){
+      this.elapsedSeconds = 0
+      this.gameClock = setInterval(() => {
+        this.elapsedSeconds += 5
+        if(this.elapsedSeconds >= 5) {
+          console.log('emiting to rooms', this.roomName)
+          io.to(this.roomName).emit("starting_next_round")
+          clearInterval(this.gameClock as any)
+          this.gameClock = null
+        }
+      }, 5000)
+    }
   }
 
   setTimePenalty(io: Server){
-    if(this.TOTAL_TIME - this.elapsedTime <= 10) return
-    if(this.elapsedTime + 20 >= this.TOTAL_TIME) this.elapsedTime = this.TOTAL_TIME - 10
-    else this.elapsedTime += this.TIME_PENALTY
-    io.to(this.roomName).emit('update_timer', this.TOTAL_TIME - this.elapsedTime)
+    if(this.TOTAL_TIME - this.elapsedSeconds <= 10) return
+    if(this.elapsedSeconds + 20 >= this.TOTAL_TIME) this.elapsedSeconds = this.TOTAL_TIME - 10
+    else this.elapsedSeconds += this.TIME_PENALTY
+    io.to(this.roomName).emit('update_timer', this.TOTAL_TIME - this.elapsedSeconds)
   }
 }
 

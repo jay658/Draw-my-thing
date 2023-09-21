@@ -1,9 +1,10 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 
 import { Button } from '@mui/base';
 import Canvas from './Canvas/Canvas';
 import Chatbox from '../Chat/Chatbox';
 import CircularProgress from '@mui/material/CircularProgress';
+import EndOfRoundScoreboard from './ScoreBoard/EndOfRoundScoreboard';
 import Grid from '@mui/material/Grid';
 import PageNotFound from '../PageNotFound/PageNotFound';
 import PickWord from './PickWord/PickWord';
@@ -20,11 +21,13 @@ const GameBoard = () => {
   const [players, setPlayers] = useState<Player[]>([])
   const [drawerIdx, setDrawerIdx] = useState(0)
   const [roomExists, setRoomExists] = useState(false)
+  const [endOfRound, setEndOfRound] = useState(false)
   const [loading, setLoading] = useState(true)
   const [round, setRound] = useState(1)
   const [wordChoices, setWordChoices] = useState<string[]>([])
   const [currentWord, setCurrentWord] = useState("")
   const drawer = useMemo(() => players.length ? players[drawerIdx] : null,[players, drawerIdx]) 
+  const secondsElapsed = useRef(0)
 
   useEffect(() => {
     const finalizeLoading = (exists: boolean) => {
@@ -53,9 +56,10 @@ const GameBoard = () => {
       socket.emit("get_game_info", roomName)
     }
     
-    socket.on("send_game_info_to_client", (gameinfo)=>{
+    socket.on("send_game_info_to_client", ({ players, elapsedTime })=>{
       if(!roomExists) setRoomExists(true)
-      setPlayers(gameinfo.players)
+      setPlayers(players)
+      secondsElapsed.current = elapsedTime
       finalizeLoading(true)
     })
 
@@ -70,12 +74,16 @@ const GameBoard = () => {
     socket.on('update_scores', (players) => {
       setPlayers(players)
     })
+    socket.on('end_of_round_to_client', () => {
+      setEndOfRound(true)
+    })
 
     return () => {
       socket.off("send_game_info_to_client")
-      socket.off('update_drawer_and_round')
       socket.off('word_choices_from_server')
       socket.off('set_currentWord_on_client')
+      socket.off('update_scores')
+      socket.off('end_of_round_to_client')
     }
   }, [])
 
@@ -94,7 +102,6 @@ const GameBoard = () => {
   },[players])
 
   useEffect(()=>{
-
     if(sessionId === drawer?.sessionId && wordChoices.length === 0){
       socket.emit("get_word_choices", roomName)
     }
@@ -109,17 +116,19 @@ const GameBoard = () => {
 
   return (
     <Grid container sx={{height:'85vh'}}>
+      {endOfRound && 
+        <EndOfRoundScoreboard roomName= {roomName} setEndOfRound={setEndOfRound}/>
+      }
       {!currentWord && sessionId === drawer?.sessionId && 
         <PickWord 
         words= {wordChoices} 
-        setCurrentWord= {setCurrentWord}
         roomName= {roomName}/>
       }
       <Grid item xs={2} sx={{height: '100%'}}>
         <ScoreBoard players={players} drawer={drawer}/>
       </Grid>
       <Grid item xs={7.5} sx={{height: '100%'}}>
-        <WordDisplay word={currentWord} drawer={drawer}/>
+        <WordDisplay word={currentWord} drawer={drawer} secondsElapsed={secondsElapsed.current}/>
         <Canvas drawerSessionId={players[drawerIdx].sessionId} roomName={roomName} drawerIdx={drawerIdx}/>
         <Typography>Round: {round}</Typography>
         <Button onClick={handleNextDrawer}>Next drawer</Button>
