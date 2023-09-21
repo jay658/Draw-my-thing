@@ -4,8 +4,8 @@ import { games } from '../helperFunctions/games'
 
 export const gameFunctions = (socket: Socket, io: Server) =>{
   socket.on('get_game_info', (roomName)=>{
-    const { players, elapsedTime } = games[roomName]
-    socket.emit('send_game_info_to_client', { players, elapsedTime } );
+    const { players, elapsedSeconds } = games[roomName]
+    socket.emit('send_game_info_to_client', { players, elapsedSeconds } );
   })
 
   socket.on('update_drawing', ({roomName, lines}: { roomName: string, lines: number[][]}) => {
@@ -20,6 +20,10 @@ export const gameFunctions = (socket: Socket, io: Server) =>{
   socket.on('next_drawer', (roomName) => {
     const game = games[roomName]
     const { drawerIdx, round, players } = game
+
+    if(socket.sessionId !== players[drawerIdx].sessionId){
+      return
+    }
     let nextDrawerIdx = drawerIdx, nextRound = round
 
     if(nextDrawerIdx === players.length - 1){
@@ -37,12 +41,23 @@ export const gameFunctions = (socket: Socket, io: Server) =>{
     game.round = nextRound
     game.guessOrder = []
     if(game.gameClock) clearInterval(game.gameClock)
-    console.log(round)
     io.to(roomName).emit('update_drawer_and_round', { drawerIdx: nextDrawerIdx, round: nextRound, players })
   })
 
+  socket.on("end_of_round", (roomName)=>{
+    io.to(roomName).emit("end_of_round_to_client")
+  })
+  
+  socket.on("get_roundend_scoreboard", (roomName)=>{
+    const game = games[roomName]
+    const { players } = game
+    socket.emit('send_scoreboard_to_client', players)
+    
+    game.startEndOfRoundScoreboardTimer(io)
+  })
+
   socket.on("send_selected_word_to_other_players", ({roomName, word}) =>{
-    socket.broadcast.to(roomName).emit('set_currentWord_on_client', word)
+    io.to(roomName).emit('set_currentWord_on_client', word)
     games[roomName].startTimer(io)
   })
 

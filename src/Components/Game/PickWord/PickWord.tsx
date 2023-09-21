@@ -1,4 +1,3 @@
-import { Dispatch, SetStateAction } from 'react';
 import { ReactElement, Ref, forwardRef, useState } from 'react';
 
 import { Button } from '@mui/material';
@@ -11,7 +10,6 @@ import socket from '../../Websocket/socket';
 
 type OwnPropsT = {
   words: string[]
-  setCurrentWord: Dispatch<SetStateAction<string>>
   roomName: string | null
 }
 
@@ -24,13 +22,12 @@ const Transition = forwardRef(function Transition(
   return <Slide direction="down" ref={ref} {...props} timeout={500}/>;
 });
 
-export default function PickWord({ words, setCurrentWord, roomName }: OwnPropsT) {
+export default function PickWord({ words, roomName }: OwnPropsT) {
   const [open, setOpen] = useState(true);
 
   const handleClick = (word:string) =>{
     socket.emit('send_selected_word_to_other_players', {roomName, word})
     setOpen(false);
-    setCurrentWord(word)
   }
 
   return (

@@ -45,7 +45,9 @@ const Timer = ({ drawer, secondsElapsed = 0 }: OwnPropsT) => {
     if(timerRef.current) clearInterval(timerRef.current)
     timerRef.current = setInterval(() => {
       if(timeRef.current === 0) {
-        if(drawer && sessionId === drawer.sessionId) socket.emit('next_drawer', roomName)
+        if(drawer && sessionId === drawer.sessionId){
+          socket.emit('end_of_round', roomName)
+        }
         clearInterval(timerRef.current)
       }
       else setTime((prevTime) => {
