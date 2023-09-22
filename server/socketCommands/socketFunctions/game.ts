@@ -4,8 +4,8 @@ import { games } from '../helperFunctions/games'
 
 export const gameFunctions = (socket: Socket, io: Server) =>{
   socket.on('get_game_info', (roomName)=>{
-    const { players, elapsedSeconds } = games[roomName]
-    socket.emit('send_game_info_to_client', { players, elapsedSeconds } );
+    const { players, elapsedSeconds, currentWord } = games[roomName]
+    socket.emit('send_game_info_to_client', { players, elapsedSeconds, currentWord } );
   })
 
   socket.on('update_drawing', ({roomName, lines}: { roomName: string, lines: number[][]}) => {
@@ -40,6 +40,7 @@ export const gameFunctions = (socket: Socket, io: Server) =>{
     game.drawerIdx = nextDrawerIdx
     game.round = nextRound
     game.guessOrder = []
+    game.currentWord = ""
     if(game.gameClock) clearInterval(game.gameClock)
     io.to(roomName).emit('update_drawer_and_round', { drawerIdx: nextDrawerIdx, round: nextRound, players })
   })
@@ -57,6 +58,7 @@ export const gameFunctions = (socket: Socket, io: Server) =>{
   })
 
   socket.on("send_selected_word_to_other_players", ({roomName, word}) =>{
+    games[roomName].currentWord = word
     io.to(roomName).emit('set_currentWord_on_client', word)
     games[roomName].startTimer(io)
   })
