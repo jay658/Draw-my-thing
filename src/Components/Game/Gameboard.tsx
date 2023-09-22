@@ -56,9 +56,10 @@ const GameBoard = () => {
       socket.emit("get_game_info", roomName)
     }
     
-    socket.on("send_game_info_to_client", ({ players, elapsedTime })=>{
+    socket.on("send_game_info_to_client", ({ players, elapsedTime, currentWord })=>{
       if(!roomExists) setRoomExists(true)
       setPlayers(players)
+      setCurrentWord(currentWord)
       secondsElapsed.current = elapsedTime
       finalizeLoading(true)
     })

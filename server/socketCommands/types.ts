@@ -38,6 +38,7 @@ export class Game {
   guessOrder: string[]
   gameClock: NodeJS.Timeout | number | null
   roomName: string
+  currentWord: string
 
   elapsedSeconds: number = 0
   TOTAL_TIME = 30
@@ -58,6 +59,7 @@ export class Game {
     this.guessOrder = []
     this.gameClock = null
     this.roomName = gameInfo.roomName
+    this.currentWord = ""
   }
 
   getThreeWords(){
