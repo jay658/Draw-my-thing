@@ -26,17 +26,21 @@ const hideWord = (word: string, shownLetters?:Set<number>) => {
 const WordDisplay = ({ word, drawer, secondsElapsed }: OwnPropsT) => {
   const sessionId = sessionStorage.getItem('sessionId');
   const [currentWord, setCurrentWord] = useState('');
-  const [shownLetters, setShownLetters] = useState<Set<number>>(new Set([0, 1]));
+  const [shownLetters, setShownLetters] = useState<Set<number>>(new Set());
 
   useEffect(() => {
     socket.on('show_more_letters', (letters) => {
-      setShownLetters(new Set([...shownLetters, ...letters]))
+      setShownLetters(new Set([...letters]))
     })
 
     return () => {
       socket.off('show_more_letters')
     }
   }, [])
+  
+  useEffect(() => {
+    setShownLetters(new Set())
+  },[word])
 
   useEffect(() => {
     setCurrentWord(hideWord(word, shownLetters));

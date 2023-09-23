@@ -13,10 +13,12 @@ import ScoreBoard from './ScoreBoard/ScoreBoard';
 import { Typography } from '@mui/material';
 import WordDisplay from './WordDisplay/WordDisplay';
 import socket from '../Websocket/socket';
+import { useNavigate } from'react-router-dom';
 
 const GameBoard = () => {
   const params = new URLSearchParams(window.location.search)
   const roomName = params.get("room")
+  const navigate = useNavigate()
   const sessionId = sessionStorage.getItem('sessionId')
   const [players, setPlayers] = useState<Player[]>([])
   const [drawerIdx, setDrawerIdx] = useState(0)
@@ -40,7 +42,7 @@ const GameBoard = () => {
       socket.emit('restore_session', sessionId, (response: 'success' | 'failed', userInfo: { username: string, avatar: string, roomName: string}) => {
         if(response === 'failed') {
           socket.disconnect()
-          finalizeLoading(false)
+          navigate('/join')
         }
         if(response === 'success'){ 
           if(userInfo){
@@ -52,6 +54,9 @@ const GameBoard = () => {
           socket.emit("get_game_info", roomName)
         }
       })
+    }
+    else if(!socket.connected && !sessionId){
+      navigate('/join')
     }else {
       socket.emit("get_game_info", roomName)
     }

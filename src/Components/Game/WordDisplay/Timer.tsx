@@ -50,10 +50,10 @@ const Timer = ({ drawer, secondsElapsed = 0 }: OwnPropsT) => {
         }
         clearInterval(timerRef.current)
       }
-      else setTime((prevTime) => {
-        console.log(prevTime - 1)
-        return prevTime - 1
-      })
+      else {
+        console.log(timeRef.current - 1)
+        setTime((prevTime) => prevTime - 1)
+      }
     }, 1000)
   }
 

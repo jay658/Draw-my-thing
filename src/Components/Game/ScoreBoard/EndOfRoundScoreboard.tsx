@@ -24,6 +24,7 @@ const Transition = forwardRef(function Transition(
 });
 
 export default function EndOfRoundScoreboard({ roomName, setEndOfRound }: OwnPropsT) {
+  const sessionId = sessionStorage.getItem('sessionId')
   const [open, setOpen] = useState(true);
   const [players, setPlayers] = useState<Player[]>([]);
 
@@ -32,17 +33,25 @@ export default function EndOfRoundScoreboard({ roomName, setEndOfRound }: OwnPro
     socket.on("send_scoreboard_to_client", (players)=>{
       setPlayers(players)
     })
-    socket.on("starting_next_round", ()=>{
-      socket.emit('next_drawer', roomName)
+
+    return () => {
+      socket.off('send_scoreboard_to_client')
+    }
+  },[])
+
+  useEffect(() => {
+    socket.on("starting_next_round", (drawerIdx)=>{
+      if(sessionId === players[drawerIdx].sessionId){
+        socket.emit('next_drawer', roomName)
+      }
       setOpen(false)
       setEndOfRound(false)
     })
 
     return () => {
-      socket.off('send_scoreboard_to_client')
       socket.off('starting_next_round')
     }
-  },[])
+  }, [players])
 
   return (
     <Dialog

@@ -38,11 +38,14 @@ export class Game {
   guessOrder: string[]
   gameClock: NodeJS.Timeout | number | null
   roomName: string
-  currentWord: string
-
   elapsedSeconds: number = 0
+  revealedLettersSet: Set <number> = new Set()
+  numberLettersRevealedNextTick: number = 0
+  currentWord = ""
+  
   TOTAL_TIME = 30
   TIME_PENALTY = 10
+  NUM_SECONDS_TO_REVEAL_LETTERS = Math.floor(this.TOTAL_TIME/10)
   
   constructor(gameInfo: gameInfo){
     this.name = gameInfo.name;
@@ -59,31 +62,49 @@ export class Game {
     this.guessOrder = []
     this.gameClock = null
     this.roomName = gameInfo.roomName
-    this.currentWord = ""
   }
 
   getThreeWords(){
-    const bank = this.wordbank
-    const gameWordSet = new Set<string>();
-  
-    while(gameWordSet.size < 3){
+    let bank = this.wordbank
+    const wordChoices = []
+    while(wordChoices.length < 3){
       const word = bank[Math.floor(Math.random() * bank.length)]
-      if(!gameWordSet.has(word)){
-        bank.filter(bankWord => bankWord === word)
-      }
-      gameWordSet.add(word)
+      bank = bank.filter(bankword => bankword !== word)
+      wordChoices.push(word)
     }
-    
-    return [...gameWordSet]
+    this.wordbank = bank
+    return wordChoices
   }
 
+  revealLetters(){
+    this.numberLettersRevealedNextTick += this.currentWord.length/10
+    let amountLettersToReveal = Math.floor(this.numberLettersRevealedNextTick)
+    this.numberLettersRevealedNextTick -= amountLettersToReveal
+    
+    while(amountLettersToReveal > 0){
+      const idxToReveal = Math.floor(Math.random() * this.currentWord.length)
+      if(!this.revealedLettersSet.has(idxToReveal)){
+        this.revealedLettersSet.add(idxToReveal)
+        amountLettersToReveal --
+      }
+    }
+  }
+  
   startTimer(io: Server){
     this.elapsedSeconds = 0
     io.to(this.roomName).emit('start_timer')
     if(!this.gameClock){
       this.gameClock = setInterval(() => {
         this.elapsedSeconds += 1
-        if(this.elapsedSeconds % 5 === 0) io.to(this.roomName).emit('update_timer', this.TOTAL_TIME - this.elapsedSeconds)
+        if(this.elapsedSeconds % 5 === 0) {
+          io.to(this.roomName).emit('update_timer', this.TOTAL_TIME - this.elapsedSeconds)
+        }
+        if(this.elapsedSeconds % this.NUM_SECONDS_TO_REVEAL_LETTERS === 0
+            && this.TOTAL_TIME - this.elapsedSeconds >= 10
+          ){
+          this.revealLetters()
+          io.to(this.roomName).emit('show_more_letters', [...this.revealedLettersSet])
+        }
         if(this.elapsedSeconds > this.TOTAL_TIME) {
           clearInterval(this.gameClock as any)
           this.gameClock = null
@@ -98,8 +119,7 @@ export class Game {
       this.gameClock = setInterval(() => {
         this.elapsedSeconds += 5
         if(this.elapsedSeconds >= 5) {
-          console.log('emiting to rooms', this.roomName)
-          io.to(this.roomName).emit("starting_next_round")
+          io.to(this.roomName).emit("starting_next_round", this.drawerIdx)
           clearInterval(this.gameClock as any)
           this.gameClock = null
         }
@@ -112,6 +132,17 @@ export class Game {
     if(this.elapsedSeconds + 20 >= this.TOTAL_TIME) this.elapsedSeconds = this.TOTAL_TIME - 10
     else this.elapsedSeconds += this.TIME_PENALTY
     io.to(this.roomName).emit('update_timer', this.TOTAL_TIME - this.elapsedSeconds)
+  }
+
+  resetForNextRound(nextDrawerIdx: number, nextRound: number){
+    this.lines = []
+    this.drawerIdx = nextDrawerIdx
+    this.round = nextRound
+    this.guessOrder = []
+    this.currentWord = ""
+    this.numberLettersRevealedNextTick = 0
+    this.revealedLettersSet = new Set()
+    this.elapsedSeconds = 0
   }
 }
 
