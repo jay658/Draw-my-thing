@@ -18,12 +18,10 @@ export const gameFunctions = (socket: Socket, io: Server) =>{
   })
 
   socket.on('next_drawer', (roomName) => {
+    //Move this to the game object after testing so we don't make an extra back and forth call between client and server (startEndOfRoundScoreboardTimer game object method and the endOfRoundScoreboard file's useeffect)
     const game = games[roomName]
     const { drawerIdx, round, players } = game
 
-    if(socket.sessionId !== players[drawerIdx].sessionId){
-      return
-    }
     let nextDrawerIdx = drawerIdx, nextRound = round
 
     if(nextDrawerIdx === players.length - 1){
@@ -36,11 +34,8 @@ export const gameFunctions = (socket: Socket, io: Server) =>{
       player.pointsThisRound = 0
     })
     
-    game.lines = []
-    game.drawerIdx = nextDrawerIdx
-    game.round = nextRound
-    game.guessOrder = []
-    game.currentWord = ""
+    game.resetForNextRound(nextDrawerIdx, nextRound)
+    
     if(game.gameClock) clearInterval(game.gameClock)
     io.to(roomName).emit('update_drawer_and_round', { drawerIdx: nextDrawerIdx, round: nextRound, players })
   })

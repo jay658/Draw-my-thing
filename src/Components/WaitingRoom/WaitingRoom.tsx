@@ -37,7 +37,7 @@ const WaitingRoom = (): ReactElement => {
       socket.emit('restore_session', sessionId, (response: 'success' | 'failed', userInfo: { username: string, avatar: string, roomName: string}) => {
         if(response === 'failed') {
           socket.disconnect()
-          finalizeLoading(false)
+          navigate('/join')
         }
         if(response === 'success'){ 
           if(userInfo){
@@ -49,7 +49,10 @@ const WaitingRoom = (): ReactElement => {
           socket.emit("get_room", roomName)
         }
       })
-    }else {
+    }
+    else if(!socket.connected && !sessionId){
+      navigate('/join')
+    } else {
       socket.emit("get_room", roomName)
     }
     
