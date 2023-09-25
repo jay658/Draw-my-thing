@@ -7,11 +7,6 @@ type Player = {
   pointsThisRound: number,
 } 
 
-type WaitingRoomErrorsT = {
-  playersNotReady: string
-}
-
 export type {
   Player,
-  WaitingRoomErrorsT
 }

@@ -1,4 +1,4 @@
-import { ChangeEvent, ReactElement, useEffect, useRef, useState } from "react";
+import { ChangeEvent, ReactElement, useEffect, useState } from "react";
 import {
   InLineContainer,
   InnerGrid,
@@ -9,7 +9,6 @@ import {
 import AvatarSelect from './AvatarSelect';
 import Button from '@mui/material/Button';
 import ErrorMessages from "../ErrorMessages/ErrorMessage";
-import type { JoinScreenErrorsT } from "./Types";
 import TextField from '@mui/material/TextField';
 import socket from "../Websocket/socket";
 import { useNavigate } from 'react-router-dom'
@@ -18,23 +17,14 @@ const JoinScreen = (): ReactElement => {
   const [name, setName] = useState('')
   const [roomName, setRoomName] = useState('')
   const [playerAvatar, setPlayerAvatar] = useState('Lounging Fox')
-  const [error, setError] = useState<JoinScreenErrorsT>({
-    roomNotFound: '',
-    roomNameTaken: '',
-    roomFull: ''
-  })
-  const errorRef = useRef(error)
-  const [openError, setOpenError] = useState(errorRef.current.roomNotFound? true: false)
+  const [error, setError] = useState<string | null>(null)
+  const [openError, setOpenError] = useState(false)
   const navigate = useNavigate()
 
   useEffect(() => {
     socket.on("room_name_taken", (data) => {
       setOpenError(true)
-      setError(_prevError => {
-        const newError = { roomNotFound: '', roomFull:'', roomNameTaken: data }
-        errorRef.current = newError
-        return newError
-      })
+      setError(data)
     })
 
     // Cleanup by removing the event listener when the component unmounts
@@ -62,20 +52,9 @@ const JoinScreen = (): ReactElement => {
         socket.username = name
         sessionStorage.setItem('sessionId', userInfo.sessionId)
         navigate(`/loading?redirect=/waitingroom?room=${roomName}`)
-      }else if(response === `There is no room ${roomName}`){
+      }else {
         setOpenError(true)
-        setError(_prevError => {
-          const newError = { roomNameTaken: '', roomFull: '', roomNotFound: response }
-          errorRef.current = newError
-          return newError
-        });
-      }else if(response === `Room ${roomName} is currently full!`){
-        setOpenError(true)
-        setError(_prevError => {
-          const newError = { roomNameTaken: '', roomNotFound: '', roomFull: response }
-          errorRef.current = newError
-          return newError
-        });
+        setError(response)
       }
     })
   }
@@ -85,9 +64,7 @@ const JoinScreen = (): ReactElement => {
   }
 
   const handleRoomChange = (e: ChangeEvent<HTMLInputElement>) => {
-    const updatedError = {...error, roomNameTaken: '', roomNotFound: ''}
-    setError(updatedError)
-    errorRef.current = updatedError
+    setError(null)
     setRoomName(e.target.value)
   }
 
@@ -128,7 +105,7 @@ const JoinScreen = (): ReactElement => {
             </Button>
           </InLineContainer>
         </Item>
-        <ErrorMessages error={errorRef.current} openError={openError} setOpenError={setOpenError}/>
+        <ErrorMessages error={error} openError={openError} setOpenError={setOpenError}/>
       </InnerGrid>
     </OutterGrid>
   )

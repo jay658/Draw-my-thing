@@ -43,6 +43,7 @@ export class Game {
   numberLettersRevealedNextTick: number = 0
   currentWord = ""
   
+  inProgress: boolean = true
   TOTAL_TIME = 30
   TIME_PENALTY = 10
   NUM_SECONDS_TO_REVEAL_LETTERS = Math.floor(this.TOTAL_TIME/10)

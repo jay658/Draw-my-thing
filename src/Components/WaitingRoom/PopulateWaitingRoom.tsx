@@ -11,7 +11,7 @@ import { avatarsMap } from '../JoinScreen/AvatarSelect'
 
 type OwnPropsT = {
   players: Player[],
-  readyUp: (idx: number) => void
+  readyUp: () => void
 }
 
 const PopulateWaitingScreen = ({ players, readyUp }: OwnPropsT): ReactElement => {
@@ -29,7 +29,7 @@ const PopulateWaitingScreen = ({ players, readyUp }: OwnPropsT): ReactElement =>
               {player.username}
             </Typography>
             <Lottie loop={player.readyStatus? false: true} animationData={ReadyAnimation} initialSegment={player.readyStatus? [30, 100]: [0, 30]} style={{height:'50%'}}/>
-            <Button size="small" onClick={()=> readyUp(i)} style={{visibility: sessionId === player.sessionId? 'visible': 'hidden'}}>Ready Up</Button>
+            <Button size="small" onClick={()=> readyUp()} style={{visibility: sessionId === player.sessionId? 'visible': 'hidden'}}>Ready Up</Button>
           </StyledCardContent>
         </StyledCard>)
     )
