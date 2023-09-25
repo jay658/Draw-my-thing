@@ -1,12 +1,12 @@
 import { ChatBoxContainer, InnerGrid, OutterGrid, PlayersInfoContainer, WaitingRoomContainer } from './StyledComponents'
-import { Player, WaitingRoomErrorsT } from './Types'
-import { ReactElement, useEffect, useRef, useState } from "react";
+import { ReactElement, useEffect, useState } from "react";
 
 import Button from '@mui/material/Button';
 import Chatbox from "../Chat/Chatbox";
 import CircularProgress from '@mui/material/CircularProgress';
 import ErrorMessages from "../ErrorMessages/ErrorMessage";
 import PageNotFound from "../PageNotFound/PageNotFound";
+import { Player } from './Types'
 import PopulateWaitingScreen from './PopulateWaitingRoom';
 import socket from "../Websocket/socket";
 import { useNavigate } from 'react-router-dom'
@@ -14,19 +14,15 @@ import { useNavigate } from 'react-router-dom'
 const WaitingRoom = (): ReactElement => {
   const params = new URLSearchParams(window.location.search)
   const roomName = params.get("room")
+  const sessionId = sessionStorage.getItem('sessionId')
   const [players, setPlayers] = useState<Player[]>([])
   const [loading, setLoading] = useState(true)
   const [roomExists, setRoomExists] = useState(false)
-  const [error, setError] = useState<WaitingRoomErrorsT>({
-    playersNotReady: '',
-  })
-  const errorRef = useRef(error)
-  const [openError, setOpenError] = useState(errorRef.current.playersNotReady? true: false)
+  const [error, setError] = useState<string | null>(null)
+  const [openError, setOpenError] = useState(false)
   const navigate = useNavigate()
   
   useEffect(()=>{
-    const sessionId = sessionStorage.getItem('sessionId')
-
     const finalizeLoading = (exists: boolean) => {
       setRoomExists(exists);
       setLoading(false);
@@ -34,7 +30,7 @@ const WaitingRoom = (): ReactElement => {
     
     if(!socket.connected && sessionId){
       socket.connect()
-      socket.emit('restore_session', sessionId, (response: 'success' | 'failed', userInfo: { username: string, avatar: string, roomName: string}) => {
+      socket.emit('restore_waiting_room_session', sessionId, (response: 'success' | 'failed', userInfo: { username: string, avatar: string, roomName: string}) => {
         if(response === 'failed') {
           socket.disconnect()
           navigate('/join')
@@ -74,11 +70,7 @@ const WaitingRoom = (): ReactElement => {
 
     socket.on("players_not_ready", (data) => {
       setOpenError(true)
-      setError(_prevError => {
-        const newError = { playersNotReady: data }
-        errorRef.current = newError
-        return newError
-      })
+      setError(data)
     })
 
     socket.on("player_left", ({ sessionId }) => {
@@ -101,9 +93,8 @@ const WaitingRoom = (): ReactElement => {
     socket.emit("check_if_everyone_is_ready", roomName)
   }
   
-  const readyUp =(idx: number)=>{
-    const username = players[idx].username
-    socket.emit("update_status", {username, roomName})
+  const readyUp =()=>{
+    socket.emit("update_status", { sessionId, roomName })
   }
 
   const backToJoinScreen = () => {
@@ -126,7 +117,7 @@ const WaitingRoom = (): ReactElement => {
           <Button onClick={backToJoinScreen}>Back to join screen</Button>
           <Button onClick={startGame}>Start game</Button>
         </div>
-        <ErrorMessages openError={openError} setOpenError={setOpenError} error={errorRef.current}/>
+        <ErrorMessages openError={openError} setOpenError={setOpenError} error={error}/>
       </PlayersInfoContainer>
       <ChatBoxContainer>
         <Chatbox roomName={roomName}/>

@@ -30,7 +30,7 @@ const GameBoard = () => {
   const [currentWord, setCurrentWord] = useState("")
   const drawer = useMemo(() => players.length ? players[drawerIdx] : null,[players, drawerIdx]) 
   const secondsElapsed = useRef(0)
-
+  
   useEffect(() => {
     const finalizeLoading = (exists: boolean) => {
       setRoomExists(exists);
@@ -39,7 +39,7 @@ const GameBoard = () => {
     
     if(!socket.connected && sessionId){
       socket.connect()
-      socket.emit('restore_session', sessionId, (response: 'success' | 'failed', userInfo: { username: string, avatar: string, roomName: string}) => {
+      socket.emit('restore_game_session', { sessionId, roomName }, (response: 'success' | 'failed', userInfo: { username: string, avatar: string, roomName: string}) => {
         if(response === 'failed') {
           socket.disconnect()
           navigate('/join')
@@ -61,10 +61,11 @@ const GameBoard = () => {
       socket.emit("get_game_info", roomName)
     }
     
-    socket.on("send_game_info_to_client", ({ players, elapsedTime, currentWord })=>{
+    socket.on("send_game_info_to_client", ({ players, elapsedTime, currentWord, drawerIdx })=>{
       if(!roomExists) setRoomExists(true)
       setPlayers(players)
       setCurrentWord(currentWord)
+      setDrawerIdx(drawerIdx)
       secondsElapsed.current = elapsedTime
       finalizeLoading(true)
     })

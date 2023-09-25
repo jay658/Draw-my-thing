@@ -1,17 +1,22 @@
+import { restoreSession, sessions } from '../helperFunctions/sessions'
+
 import { Socket } from 'socket.io'
-import { sessions } from '../helperFunctions/sessions'
+import { games } from '../helperFunctions/games'
 
 export const sessionFunctions = (socket: Socket) =>{
-  socket.on('restore_session', (sessionId, callback) => {
+  socket.on('restore_game_session', ({ sessionId, roomName }, callback) => {
+    if(sessionId in sessions && roomName in games){
+      const userInfo = restoreSession(socket, sessionId)
+      callback('success', userInfo)
+    }else{
+      callback('failed')
+    }
+  })
+
+  socket.on('restore_waiting_room_session', (sessionId, callback) => {
     if(sessionId in sessions){
-      const { username, avatar, roomName } = sessions[sessionId].member
-      socket.username = username
-      socket.readyStatus = false
-      socket.avatar = avatar
-      socket.roomName = roomName
-      socket.sessionId = sessionId
-      if(roomName) socket.join(roomName)
-      callback('success', { username, avatar, roomName })
+      const userInfo = restoreSession(socket, sessionId)
+      callback('success', userInfo)
     }else{
       callback('failed')
     }

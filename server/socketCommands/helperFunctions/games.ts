@@ -1,4 +1,4 @@
-import { GamesT, Game, gameInfo } from '../types'
+import { Game, GamesT, gameInfo } from '../types'
 
 export const games: GamesT = {}
 

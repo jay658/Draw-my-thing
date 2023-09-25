@@ -2,6 +2,7 @@ import { Server, Socket } from 'socket.io'
 import { getRoom, getRooms, leaveAllOtherRooms, roomExists } from '../helperFunctions/room'
 
 import { addKeyToSessions } from '../helperFunctions/sessions'
+import { games } from '../helperFunctions/games'
 
 export const roomSocketFunctions = (socket: Socket, io: Server, MAX_ROOM_SIZE: number) =>{
   socket.on('create_room', ({name, roomName, avatar}, callback) => {
@@ -25,7 +26,9 @@ export const roomSocketFunctions = (socket: Socket, io: Server, MAX_ROOM_SIZE: n
     socket.readyStatus = false
     leaveAllOtherRooms(socket, io)
     if(roomExists(roomName, io)){
-      if(getRoom(roomName, io)?.members.length === MAX_ROOM_SIZE) callback(`Room ${roomName} is currently full!`)
+      const room = getRoom(roomName, io)
+      if(room?.members.length === MAX_ROOM_SIZE) callback(`Room ${roomName} is currently full!`)
+      else if(room && room.name in games && games[room.name].inProgress === true) callback('The game is already in progress!')
       else{
         socket.username = name
         socket.avatar = avatar
