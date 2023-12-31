@@ -17,9 +17,12 @@ type Player = Member & {
   pointsThisRound: number,
 }
 
+type Phase = "Pick_Word" | "End_Of_Round" | "Drawing"
+
 export type gameInfo = {
   name: string,
   players: Member[],
+  phase?: Phase,
   wordbank: string[],
   lines?: number[][],
   drawerIdx?: number,
@@ -27,9 +30,11 @@ export type gameInfo = {
   roomName: string
 }
 
+
 export class Game {
   name: string
   players: Player[]
+  currentPhase: Phase
   wordbank: string[]
   scoreboard: number[]
   lines: number[][]
@@ -55,6 +60,7 @@ export class Game {
       score: 0,
       pointsThisRound: 0
     }))
+    this.currentPhase = "Pick_Word"
     this.wordbank = gameInfo.wordbank
     this.scoreboard = new Array(this.players.length).fill(0)
     this.lines = []
@@ -107,8 +113,11 @@ export class Game {
           io.to(this.roomName).emit('show_more_letters', [...this.revealedLettersSet])
         }
         if(this.elapsedSeconds > this.TOTAL_TIME) {
+          io.to(this.roomName).emit("end_of_round_to_client")
+          this.currentPhase = "End_Of_Round"
           clearInterval(this.gameClock as any)
           this.gameClock = null
+          this.startEndOfRoundScoreboardTimer(io)
         }
       }, 1000)
     }
@@ -120,7 +129,8 @@ export class Game {
       this.gameClock = setInterval(() => {
         this.elapsedSeconds += 5
         if(this.elapsedSeconds >= 5) {
-          io.to(this.roomName).emit("starting_next_round", this.drawerIdx)
+          io.to(this.roomName).emit("starting_next_round")
+          this.nextDrawer(io)
           clearInterval(this.gameClock as any)
           this.gameClock = null
         }
@@ -135,6 +145,25 @@ export class Game {
     io.to(this.roomName).emit('update_timer', this.TOTAL_TIME - this.elapsedSeconds)
   }
 
+  nextDrawer(io: Server){
+    let nextDrawerIdx = this.drawerIdx, nextRound = this.round, players = this.players
+
+    if(nextDrawerIdx === players.length - 1){
+      nextDrawerIdx = 0
+      nextRound++
+    }else nextDrawerIdx++
+    
+    players.forEach(player => {
+      player.score += player.pointsThisRound
+      player.pointsThisRound = 0
+    })
+    
+    this.resetForNextRound(nextDrawerIdx, nextRound)
+    
+    if(this.gameClock) clearInterval(this.gameClock)
+    io.to(this.roomName).emit('update_drawer_and_round', { drawerIdx: nextDrawerIdx, round: nextRound, players })
+  }
+  
   resetForNextRound(nextDrawerIdx: number, nextRound: number){
     this.lines = []
     this.drawerIdx = nextDrawerIdx

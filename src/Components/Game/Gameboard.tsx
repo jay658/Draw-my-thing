@@ -23,7 +23,7 @@ const GameBoard = () => {
   const [players, setPlayers] = useState<Player[]>([])
   const [drawerIdx, setDrawerIdx] = useState(0)
   const [roomExists, setRoomExists] = useState(false)
-  const [endOfRound, setEndOfRound] = useState(false)
+  const [phase, setPhase] = useState("")
   const [loading, setLoading] = useState(true)
   const [round, setRound] = useState(1)
   const [wordChoices, setWordChoices] = useState<string[]>([])
@@ -61,28 +61,32 @@ const GameBoard = () => {
       socket.emit("get_game_info", roomName)
     }
     
-    socket.on("send_game_info_to_client", ({ players, elapsedTime, currentWord, drawerIdx })=>{
+    socket.on("send_game_info_to_client", ({ players, elapsedSeconds, currentWord, drawerIdx, round, currentPhase })=>{
       if(!roomExists) setRoomExists(true)
       setPlayers(players)
       setCurrentWord(currentWord)
       setDrawerIdx(drawerIdx)
-      secondsElapsed.current = elapsedTime
+      setRound(round)
+      setPhase(currentPhase)
+      secondsElapsed.current = elapsedSeconds
       finalizeLoading(true)
     })
 
-    socket.on('word_choices_from_server', (words)=>{
+    socket.on('word_choices_from_server', (words, phase)=>{
       setWordChoices(words)
+      setPhase(phase)
     })
     
-    socket.on('set_currentWord_on_client', (word)=>{
+    socket.on('set_currentWord_on_client', ({word, phase})=>{
       setCurrentWord(word)
+      setPhase(phase)
     })
 
     socket.on('update_scores', (players) => {
       setPlayers(players)
     })
     socket.on('end_of_round_to_client', () => {
-      setEndOfRound(true)
+      setPhase("End_Of_Round")
     })
 
     return () => {
@@ -123,8 +127,8 @@ const GameBoard = () => {
 
   return (
     <Grid container sx={{height:'85vh'}}>
-      {endOfRound && 
-        <EndOfRoundScoreboard roomName= {roomName} setEndOfRound={setEndOfRound}/>
+      {phase === "End_Of_Round" && 
+        <EndOfRoundScoreboard setPhase={setPhase} players={players}/>
       }
       {!currentWord && sessionId === drawer?.sessionId && 
         <PickWord 

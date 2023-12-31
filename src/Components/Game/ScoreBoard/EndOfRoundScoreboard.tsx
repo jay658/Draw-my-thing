@@ -10,8 +10,8 @@ import { Typography } from '@mui/material';
 import socket from '../../Websocket/socket';
 
 type OwnPropsT = {
-  roomName: string | null,
-  setEndOfRound: Dispatch<SetStateAction<boolean>>
+  setPhase: Dispatch<SetStateAction<string>>
+  players: Player[]
 }
 
 const Transition = forwardRef(function Transition(
@@ -23,29 +23,13 @@ const Transition = forwardRef(function Transition(
   return <Slide direction="down" ref={ref} {...props} timeout={500}/>;
 });
 
-export default function EndOfRoundScoreboard({ roomName, setEndOfRound }: OwnPropsT) {
-  const sessionId = sessionStorage.getItem('sessionId')
+export default function EndOfRoundScoreboard({ setPhase, players }: OwnPropsT) {
   const [open, setOpen] = useState(true);
-  const [players, setPlayers] = useState<Player[]>([]);
 
   useEffect(() => {
-    socket.emit("get_roundend_scoreboard", roomName)
-    socket.on("send_scoreboard_to_client", (players)=>{
-      setPlayers(players)
-    })
-
-    return () => {
-      socket.off('send_scoreboard_to_client')
-    }
-  },[])
-
-  useEffect(() => {
-    socket.on("starting_next_round", (drawerIdx)=>{
-      if(sessionId === players[drawerIdx].sessionId){
-        socket.emit('next_drawer', roomName)
-      }
+    socket.on("starting_next_round", ()=>{
       setOpen(false)
-      setEndOfRound(false)
+      setPhase("Pick_Word")
     })
 
     return () => {

@@ -1,20 +1,15 @@
 import { useEffect, useRef, useState } from "react"
 
 import { Button } from '@mui/base';
-import { Player } from "../../WaitingRoom/Types";
 import socket from "../../Websocket/socket";
 
 const START_TIME = 30
 
 type OwnPropsT = {
-  drawer: Player | null, 
   secondsElapsed: number
 }
 
-const Timer = ({ drawer, secondsElapsed = 0 }: OwnPropsT) => {
-  const sessionId = sessionStorage.getItem("sessionId")
-  const params = new URLSearchParams(window.location.search)
-  const roomName = params.get("room")
+const Timer = ({ secondsElapsed = 0 }: OwnPropsT) => {
   const [time, setTime] = useState(START_TIME - secondsElapsed) 
   const timeRef = useRef(time)
   const timerRef = useRef<any>(null)
@@ -45,9 +40,6 @@ const Timer = ({ drawer, secondsElapsed = 0 }: OwnPropsT) => {
     if(timerRef.current) clearInterval(timerRef.current)
     timerRef.current = setInterval(() => {
       if(timeRef.current === 0) {
-        if(drawer && sessionId === drawer.sessionId){
-          socket.emit('end_of_round', roomName)
-        }
         clearInterval(timerRef.current)
       }
       else {
