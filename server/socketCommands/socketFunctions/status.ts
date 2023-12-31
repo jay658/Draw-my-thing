@@ -12,7 +12,10 @@ export const statusFunctions = (socket: Socket, io: Server) =>{
     
     const updatedRoom = getRooms(io).find(room => room.name === roomName)
     
-    io.to(roomName).emit('status_updated', updatedRoom)
+    if(updatedRoom !== undefined) {
+      io.to(roomName).emit('status_updated', updatedRoom.members)
+    }
+    //else return error message
   })
 
   socket.on('check_if_everyone_is_ready', (roomName) => {

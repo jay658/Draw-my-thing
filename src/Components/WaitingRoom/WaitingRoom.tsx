@@ -60,8 +60,8 @@ const WaitingRoom = (): ReactElement => {
       finalizeLoading(!!room)
     })
     
-    socket.on("status_updated", (room)=>{
-      setPlayers(room.members)
+    socket.on("status_updated", (members)=>{
+      setPlayers(members)
     })
 
     socket.on("starting_game", () => {
