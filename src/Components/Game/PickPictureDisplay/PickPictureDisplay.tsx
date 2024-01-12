@@ -4,15 +4,16 @@ import Dialog from '@mui/material/Dialog';
 import DialogTitle from '@mui/material/DialogTitle';
 import Grid from '@mui/material/Grid';
 import { Phase } from '../Types';
-import type { Player } from '../../WaitingRoom/Types';
 import Slide from '@mui/material/Slide';
 import { TransitionProps } from '@mui/material/transitions';
-import { Typography } from '@mui/material';
 import socket from '../../Websocket/socket';
 
-type OwnPropsT = {
+type PickPictureDisplayProps = {
+  pictureUrls: {
+    sessionId: string,
+    pictureUrl: string
+  }[],
   setPhase: Dispatch<SetStateAction<Phase>>
-  players: Player[]
 }
 
 const Transition = forwardRef(function Transition(
@@ -24,7 +25,8 @@ const Transition = forwardRef(function Transition(
   return <Slide direction="down" ref={ref} {...props} timeout={500}/>;
 });
 
-export default function EndOfRoundScoreboard({ setPhase, players }: OwnPropsT) {
+const PickPictureDisplay = ({ pictureUrls, setPhase } : PickPictureDisplayProps) => {
+
   const [open, setOpen] = useState(true);
 
   useEffect(() => {
@@ -36,7 +38,7 @@ export default function EndOfRoundScoreboard({ setPhase, players }: OwnPropsT) {
     return () => {
       socket.off('starting_next_round')
     }
-  }, [players])
+  }, [])
 
   return (
     <Dialog
@@ -46,14 +48,16 @@ export default function EndOfRoundScoreboard({ setPhase, players }: OwnPropsT) {
       aria-describedby="alert-dialog-slide-description"
       sx={{display: 'flex', alignItems: 'center', justifyContent: 'center'}}
     >
-      <DialogTitle fontSize={36} sx={{textAlign:'center'}}>{"End of Round Scores"}</DialogTitle>
-      <Grid flexDirection={'column'} container spacing={3} alignItems={'center'} width={'100%'} margin={'0px'} padding={'10px'}>
-        {players.map((player, idx) =>(
-          <Typography key={idx} style={{width:`${100/players.length}%`}}>
-            {player.username}: {player.score} + {player.pointsThisTurn}
-          </Typography>
+      <DialogTitle fontSize={36} sx={{textAlign:'center'}}>{"Pick the best picture!"}</DialogTitle>
+      <Grid container spacing={3} alignItems={'center'} width={'100%'} margin={'0px'} padding={'10px'}>
+        {pictureUrls.map((image, idx) => (
+          <Grid item xs={12} sm={6} md={4} lg={3} key={idx}>
+            <img src={image.pictureUrl} alt={`Picture ${idx + 1}`} style={{ maxWidth:'100%', maxHeight:'100%'}}/>
+          </Grid>
         ))}
       </Grid>
     </Dialog>
-  );
+  )
 }
+
+export default PickPictureDisplay

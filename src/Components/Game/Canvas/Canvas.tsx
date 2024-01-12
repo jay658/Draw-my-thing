@@ -6,6 +6,7 @@ import { useEffect, useRef, useState } from 'react';
 import { Button } from '@mui/base';
 import CanvasSettings from "./CanvasSettings";
 import Konva from 'konva';
+import { Phase } from '../Types';
 import type { ReactElement } from "react";
 import type { SelectChangeEvent } from '@mui/material/Select';
 import socket from '../../Websocket/socket';
@@ -15,7 +16,8 @@ const ASPECT_RATIO = 16/9
 type OwnPropsT = {
   drawerSessionId: string,
   roomName: string | null,
-  drawerIdx: number
+  drawerIdx: number,
+  phase: Phase
 }
 
 const convertLines = (lines: LinesT[], height: number, width: number) => {
@@ -30,7 +32,7 @@ const convertLines = (lines: LinesT[], height: number, width: number) => {
   });
 }
 
-const Canvas = ({ drawerSessionId, roomName, drawerIdx }: OwnPropsT): ReactElement => {
+const Canvas = ({ drawerSessionId, roomName, drawerIdx, phase }: OwnPropsT): ReactElement => {
   const sessionId = sessionStorage.getItem('sessionId')
   const [dimensions, setDimensions] = useState({
     width: 0,
@@ -47,7 +49,7 @@ const Canvas = ({ drawerSessionId, roomName, drawerIdx }: OwnPropsT): ReactEleme
   const [lines, setLines] = useState<LinesT[]>([]);
   const isDrawing = useRef(false);
   const stageRef = useRef<Konva.Stage | null>(null)
-  const [image, setImage] = useState<string | null>(null)
+  const [images, setImages] = useState<{sessionId: string, pictureUrl: string}[]>([])
 
   useEffect(() => {
     const handleResize = (initialLoad: boolean) => {
@@ -75,8 +77,13 @@ const Canvas = ({ drawerSessionId, roomName, drawerIdx }: OwnPropsT): ReactEleme
 
     window.addEventListener('resize', resizeScreen)
 
+    socket.on('send_pictures', (pictures) => {
+      setImages(pictures)
+    })
+
     return () => {
       window.removeEventListener('resize', resizeScreen)
+      socket.off('send_pictures')
     }
   }, [])
 
@@ -89,7 +96,7 @@ const Canvas = ({ drawerSessionId, roomName, drawerIdx }: OwnPropsT): ReactEleme
       socket.on('sending_updated_drawing', handleUpdate);
 
       return () => {
-          socket.off('sending_updated_drawing', handleUpdate);
+          socket.off('sending_updated_drawing');
       };
   }, [dimensions, socket]);
 
@@ -104,6 +111,15 @@ const Canvas = ({ drawerSessionId, roomName, drawerIdx }: OwnPropsT): ReactEleme
     setLines([])
   }, [drawerIdx])
 
+  useEffect(() => {
+    if(phase === 'End_Of_Round') {
+      const stage = stageRef.current
+      if(!stage) return
+      const pictureUrl = stage.toDataURL()
+      socket.emit('save_drawing', roomName, pictureUrl)
+    }
+  }, [phase])
+  
   const updateLines = (updatedLines: LinesT[]) => {
     setLines(updatedLines)
     socket.emit('update_drawing', { lines: updatedLines, roomName })
@@ -197,12 +213,8 @@ const Canvas = ({ drawerSessionId, roomName, drawerIdx }: OwnPropsT): ReactEleme
     })
   }
 
-  const handleTakePicture = () => {
-    const stage = stageRef.current
-    if(stage){
-      const url = stage.toDataURL()
-      setImage(url)
-    }
+  const handleShowPictures = () => {
+    socket.emit('get_all_pictures', roomName)
   }
 
   return (
@@ -242,8 +254,12 @@ const Canvas = ({ drawerSessionId, roomName, drawerIdx }: OwnPropsT): ReactEleme
         handleUndo={handleUndo}
         handleClearHistory={handleClearHistory}
       />}
-      <Button onClick={handleTakePicture}>Take picture</Button>
-      {image && <img src={image}/>}
+      <Button onClick={handleShowPictures}>Show all pictures</Button>
+      {images.length && images.map((image, idx) => {
+        return (
+          <img src={image.pictureUrl} key={idx}/>
+        )
+      })}
     </CanvasScreen>
   );
 };

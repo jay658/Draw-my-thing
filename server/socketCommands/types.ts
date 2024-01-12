@@ -14,10 +14,14 @@ export type Room = {
 
 type Player = Member & {
   score: number,
-  pointsThisRound: number,
+  pointsThisTurn: number,
 }
 
-type Phase = "Pick_Word" | "End_Of_Round" | "Drawing"
+const turnPhases = ["Pick_Word", "Drawing", "End_Of_Round"] as const
+
+const roundPhases = ['Pick_Best_Picture', 'Tallying'] as const
+
+type Phase = typeof turnPhases[number] | typeof roundPhases[number]
 
 export type gameInfo = {
   name: string,
@@ -29,7 +33,6 @@ export type gameInfo = {
   round?: number,
   roomName: string
 }
-
 
 export class Game {
   name: string
@@ -47,6 +50,7 @@ export class Game {
   revealedLettersSet: Set <number> = new Set()
   numberLettersRevealedNextTick: number = 0
   currentWord = ""
+  drawingUrls: { sessionId: string, pictureUrl: string }[] = []
   
   inProgress: boolean = true
   TOTAL_TIME = 30
@@ -58,7 +62,7 @@ export class Game {
     this.players = gameInfo.players.map(player => ({
       ...player, 
       score: 0,
-      pointsThisRound: 0
+      pointsThisTurn: 0
     }))
     this.currentPhase = "Pick_Word"
     this.wordbank = gameInfo.wordbank
@@ -97,45 +101,41 @@ export class Game {
     }
   }
   
+  clearTimer(){
+    clearInterval(this.gameClock as any)
+    this.gameClock = null
+  }
+
   startTimer(io: Server){
+    this.clearTimer()
     this.elapsedSeconds = 0
     io.to(this.roomName).emit('start_timer')
-    if(!this.gameClock){
-      this.gameClock = setInterval(() => {
-        this.elapsedSeconds += 1
-        if(this.elapsedSeconds % 5 === 0) {
-          io.to(this.roomName).emit('update_timer', this.TOTAL_TIME - this.elapsedSeconds)
-        }
-        if(this.elapsedSeconds % this.NUM_SECONDS_TO_REVEAL_LETTERS === 0
-            && this.TOTAL_TIME - this.elapsedSeconds >= 10
-          ){
-          this.revealLetters()
-          io.to(this.roomName).emit('show_more_letters', [...this.revealedLettersSet])
-        }
-        if(this.elapsedSeconds > this.TOTAL_TIME) {
-          io.to(this.roomName).emit("end_of_round_to_client")
-          this.currentPhase = "End_Of_Round"
-          clearInterval(this.gameClock as any)
-          this.gameClock = null
-          this.startEndOfRoundScoreboardTimer(io)
-        }
-      }, 1000)
-    }
+    this.gameClock = setInterval(() => {
+      this.elapsedSeconds += 1
+      if(this.elapsedSeconds % 5 === 0) {
+        io.to(this.roomName).emit('update_timer', this.TOTAL_TIME - this.elapsedSeconds)
+      }
+      if(this.elapsedSeconds % this.NUM_SECONDS_TO_REVEAL_LETTERS === 0
+          && this.TOTAL_TIME - this.elapsedSeconds >= 10
+        ){
+        this.revealLetters()
+        io.to(this.roomName).emit('show_more_letters', [...this.revealedLettersSet])
+      }
+      if(this.elapsedSeconds > this.TOTAL_TIME) {
+        this.nextPhase(io)
+      }
+    }, 1000)
   }
 
   startEndOfRoundScoreboardTimer(io: Server){
-    if(!this.gameClock){
-      this.elapsedSeconds = 0
-      this.gameClock = setInterval(() => {
-        this.elapsedSeconds += 5
-        if(this.elapsedSeconds >= 5) {
-          io.to(this.roomName).emit("starting_next_round")
-          this.nextDrawer(io)
-          clearInterval(this.gameClock as any)
-          this.gameClock = null
-        }
-      }, 5000)
-    }
+    this.clearTimer()
+    this.elapsedSeconds = 0
+    this.gameClock = setInterval(() => {
+      this.elapsedSeconds += 5
+      if(this.elapsedSeconds >= 5) {
+        this.nextPhase(io)
+      }
+    }, 5000)  
   }
 
   setTimePenalty(io: Server){
@@ -143,6 +143,13 @@ export class Game {
     if(this.elapsedSeconds + 20 >= this.TOTAL_TIME) this.elapsedSeconds = this.TOTAL_TIME - 10
     else this.elapsedSeconds += this.TIME_PENALTY
     io.to(this.roomName).emit('update_timer', this.TOTAL_TIME - this.elapsedSeconds)
+  }
+
+  calculatePoints(){
+    this.players.forEach(player => {
+      player.score += player.pointsThisTurn
+      player.pointsThisTurn = 0
+    })
   }
 
   nextDrawer(io: Server){
@@ -153,18 +160,18 @@ export class Game {
       nextRound++
     }else nextDrawerIdx++
     
-    players.forEach(player => {
-      player.score += player.pointsThisRound
-      player.pointsThisRound = 0
-    })
+    this.currentPhase = 'Pick_Word'
+
+    this.calculatePoints()
     
-    this.resetForNextRound(nextDrawerIdx, nextRound)
+    this.resetForNextDrawer(nextDrawerIdx, nextRound)
     
     if(this.gameClock) clearInterval(this.gameClock)
     io.to(this.roomName).emit('update_drawer_and_round', { drawerIdx: nextDrawerIdx, round: nextRound, players })
   }
   
-  resetForNextRound(nextDrawerIdx: number, nextRound: number){
+  resetForNextDrawer(nextDrawerIdx: number, nextRound: number){
+    if(nextRound !== this.round) this.drawingUrls = []
     this.lines = []
     this.drawerIdx = nextDrawerIdx
     this.round = nextRound
@@ -173,6 +180,45 @@ export class Game {
     this.numberLettersRevealedNextTick = 0
     this.revealedLettersSet = new Set()
     this.elapsedSeconds = 0
+  }
+
+  //We potentially need to refactor this in the future
+  nextPhase(io: Server){
+    if(this.currentPhase === 'Tallying') {
+      io.to(this.roomName).emit("starting_next_round")
+      this.nextDrawer(io)
+    }else if(this.drawerIdx === this.players.length - 1 && this.currentPhase === 'End_Of_Round' || this.currentPhase === 'Pick_Best_Picture'){
+      if(this.currentPhase === 'Pick_Best_Picture'){
+        io.to(this.roomName).emit("end_of_round_to_client")
+        this.currentPhase = "Tallying"
+        this.startEndOfRoundScoreboardTimer(io)
+      }else {
+        this.currentPhase = 'Pick_Best_Picture'
+        io.to(this.roomName).emit('pick_picture_phase', {phase: 'Pick_Best_Picture', pictureUrls: this.drawingUrls})
+        this.startEndOfRoundScoreboardTimer(io)
+      }
+    }else{
+      if(this.currentPhase === 'Pick_Word'){
+        io.to(this.roomName).emit('set_currentWord_on_client', {word: this.currentWord, phase: this.currentPhase})
+        this.currentPhase = "Drawing"
+        this.startTimer(io)
+      }else if(this.currentPhase === 'Drawing'){
+        io.to(this.roomName).emit("end_of_round_to_client")
+        this.currentPhase = "End_Of_Round"
+        this.startEndOfRoundScoreboardTimer(io)
+      }else{
+        io.to(this.roomName).emit("starting_next_round")
+        this.nextDrawer(io)
+      }
+    }
+  }
+
+  savePicture(pictureUrl: string) {
+    const drawerSessionId = this.players[this.drawerIdx].sessionId
+    if(!this.drawingUrls[this.drawerIdx]) this.drawingUrls[this.drawerIdx] = {
+      sessionId: drawerSessionId,
+      pictureUrl
+    } 
   }
 }
 
