@@ -4,7 +4,7 @@ type Player = {
   readyStatus: boolean,
   avatar: string
   score: number,
-  pointsThisRound: number,
+  pointsThisTurn: number,
 } 
 
 export type {

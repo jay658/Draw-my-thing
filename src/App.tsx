@@ -18,7 +18,7 @@ const App = ():ReactElement => {
       <NavBar/>
       <Routes>
         <Route path="/" element={<Home />} />
-        <Route path="/draw" element={<Canvas drawerSessionId='' roomName={null} drawerIdx={0}/>} />
+        <Route path="/draw" element={<Canvas drawerSessionId='' roomName={null} drawerIdx={0} phase={"Pick_Word"}/>} />
         <Route path ="/join" element={<JoinScreen/>}/>
         <Route path ="/rooms" element={<RoomList/>}/>
         <Route path ="/waitingroom" element={<WaitingRoom/>}/>

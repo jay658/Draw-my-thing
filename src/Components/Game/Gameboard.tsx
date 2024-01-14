@@ -7,6 +7,8 @@ import CircularProgress from '@mui/material/CircularProgress';
 import EndOfRoundScoreboard from './ScoreBoard/EndOfRoundScoreboard';
 import Grid from '@mui/material/Grid';
 import PageNotFound from '../PageNotFound/PageNotFound';
+import { Phase } from './Types';
+import PickPictureDisplay from './PickPictureDisplay/PickPictureDisplay';
 import PickWord from './PickWord/PickWord';
 import type { Player } from '../WaitingRoom/Types';
 import ScoreBoard from './ScoreBoard/ScoreBoard';
@@ -23,11 +25,12 @@ const GameBoard = () => {
   const [players, setPlayers] = useState<Player[]>([])
   const [drawerIdx, setDrawerIdx] = useState(0)
   const [roomExists, setRoomExists] = useState(false)
-  const [phase, setPhase] = useState("")
+  const [phase, setPhase] = useState<Phase>("Pick_Word")
   const [loading, setLoading] = useState(true)
   const [round, setRound] = useState(1)
   const [wordChoices, setWordChoices] = useState<string[]>([])
   const [currentWord, setCurrentWord] = useState("")
+  const [pictureUrls, setPictureUrls] = useState<{sessionId: string, pictureUrl: string}[]>([])
   const drawer = useMemo(() => players.length ? players[drawerIdx] : null,[players, drawerIdx]) 
   const secondsElapsed = useRef(0)
   
@@ -61,13 +64,14 @@ const GameBoard = () => {
       socket.emit("get_game_info", roomName)
     }
     
-    socket.on("send_game_info_to_client", ({ players, elapsedSeconds, currentWord, drawerIdx, round, currentPhase })=>{
+    socket.on("send_game_info_to_client", ({ players, elapsedSeconds, currentWord, drawerIdx, round, currentPhase, pictureUrls })=>{
       if(!roomExists) setRoomExists(true)
       setPlayers(players)
       setCurrentWord(currentWord)
       setDrawerIdx(drawerIdx)
       setRound(round)
       setPhase(currentPhase)
+      setPictureUrls(pictureUrls)
       secondsElapsed.current = elapsedSeconds
       finalizeLoading(true)
     })
@@ -85,8 +89,14 @@ const GameBoard = () => {
     socket.on('update_scores', (players) => {
       setPlayers(players)
     })
+    
     socket.on('end_of_round_to_client', () => {
       setPhase("End_Of_Round")
+    })
+
+    socket.on('pick_picture_phase', ({phase, pictureUrls}) => {
+      setPhase(phase)
+      setPictureUrls(pictureUrls)
     })
 
     return () => {
@@ -127,8 +137,11 @@ const GameBoard = () => {
 
   return (
     <Grid container sx={{height:'85vh'}}>
-      {phase === "End_Of_Round" && 
+      {(phase === "End_Of_Round" || phase === 'Tallying') && 
         <EndOfRoundScoreboard setPhase={setPhase} players={players}/>
+      }
+      {phase === "Pick_Best_Picture" && 
+        <PickPictureDisplay pictureUrls={pictureUrls} setPhase={setPhase}/>
       }
       {!currentWord && sessionId === drawer?.sessionId && 
         <PickWord 
@@ -140,7 +153,7 @@ const GameBoard = () => {
       </Grid>
       <Grid item xs={7.5} sx={{height: '100%'}}>
         <WordDisplay word={currentWord} drawer={drawer} secondsElapsed={secondsElapsed.current}/>
-        <Canvas drawerSessionId={players[drawerIdx].sessionId} roomName={roomName} drawerIdx={drawerIdx}/>
+        <Canvas drawerSessionId={players[drawerIdx].sessionId} roomName={roomName} drawerIdx={drawerIdx} phase={phase}/>
         <Typography>Round: {round}</Typography>
         <Button onClick={handleNextDrawer}>Next drawer</Button>
       </Grid>
