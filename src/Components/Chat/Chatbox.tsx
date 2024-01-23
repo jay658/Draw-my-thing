@@ -1,4 +1,4 @@
-import { ChangeEvent, ReactElement, useEffect, useState } from "react";
+import { ChangeEvent, ReactElement, useEffect, useRef, useState } from "react";
 import {
   ChatContainer,
   Message,
@@ -26,6 +26,7 @@ const Chatbox = ({ roomName, currentWord='', drawer=null }: OwnPropsT): ReactEle
   const sessionId = sessionStorage.getItem('sessionId')
   const [messages, setMessages] = useState<MessageT[]>([])
   const [currentMessage, setCurrentMessage] = useState("")
+  const playerName = useRef<string>('')
   
   useEffect(()=>{
     socket.on("message_to_client", ({author, message})=>{
@@ -43,6 +44,13 @@ const Chatbox = ({ roomName, currentWord='', drawer=null }: OwnPropsT): ReactEle
       socket.off('player_guessed_correct_word')
     }
   },[])
+
+  useEffect(() => {
+    if(drawer && drawer.username !== playerName.current) {
+      playerName.current = drawer.username
+      setMessages((prevMessages) => [...prevMessages, {author: "Server", message: `${playerName.current} is currently picking a word!`}])
+    }
+  }, [drawer])
 
   const handleCurrMessage = (ev: ChangeEvent<HTMLInputElement>)=>{
     const inputValue = ev.target.value

@@ -2,7 +2,7 @@ import { BrowserRouter, Route, Routes } from 'react-router-dom'
 import { cleanup, screen } from '@testing-library/react';
 import { describe, expect, it } from 'vitest';
 
-import Home from '../Routes/Home';
+import Home from '../Routes/Test';
 import { renderWithProviders } from './mocks/renderWithProviders';
 import userEvent  from '@testing-library/user-event';
 

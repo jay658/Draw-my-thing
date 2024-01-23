@@ -1,4 +1,4 @@
-import './Home.css'
+import './Test.css'
 
 import { User, useGetUsersQuery, useGetUsersQueryResult } from '../Store/RTK/userSlice'
 import { useGetAuthQuery, useGetAuthQueryResult, useLogoutMutation } from '../Store/RTK/authSlice'
@@ -10,7 +10,7 @@ import { useNavigate } from 'react-router-dom'
 import { useState } from 'react'
 import viteLogo from '/vite.svg'
 
-function Home() {
+function Test() {
   const [count, setCount] = useState(0)
 
   const { data: auth }: Partial<useGetAuthQueryResult> = useGetAuthQuery()
@@ -64,4 +64,4 @@ function Home() {
   )
 }
 
-export default Home
+export default Test
