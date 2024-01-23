@@ -2,12 +2,12 @@ import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom'
 
 import Canvas from './Components/Game/Canvas/Canvas';
 import GameBoard from './Components/Game/Gameboard';
-import Home from './Routes/Home'
 import JoinScreen from './Components/JoinScreen/JoinScreen';
 import LoadingScreen from './Components/LoadingScreen/LoadingScreen';
 import NavBar from './Components/NavBar/NavBar'
 import { ReactElement } from 'react'
 import RoomList from './Components/RoomList/RoomList';
+import Test from './Routes/Test'
 import WaitingRoom from './Components/WaitingRoom/WaitingRoom';
 
 const App = ():ReactElement => {
@@ -17,9 +17,9 @@ const App = ():ReactElement => {
     <BrowserRouter>
       <NavBar/>
       <Routes>
-        <Route path="/" element={<Home />} />
+        <Route path="/" element={<JoinScreen/>} />
         <Route path="/draw" element={<Canvas drawerSessionId='' roomName={null} drawerIdx={0} phase={"Pick_Word"}/>} />
-        <Route path ="/join" element={<JoinScreen/>}/>
+        <Route path ="/test" element={<Test/>}/>
         <Route path ="/rooms" element={<RoomList/>}/>
         <Route path ="/waitingroom" element={<WaitingRoom/>}/>
         <Route path="/loading" element={<LoadingScreen/>}/>

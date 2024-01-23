@@ -22,8 +22,7 @@ export const mq = {
 };
 
 const tabs = {
-  Home: '',
-  'Join Screen': 'join',
+  'Join Screen': '',
 }
 
 const mobile = new Set(['Draw', 'Join Screen', 'Rooms'])
